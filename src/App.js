@@ -1,6 +1,8 @@
 import React from "react";
 import "./App.css";
 import mondaySdk from "monday-sdk-js";
+import Toolbar from './Toolbar';
+
 const monday = mondaySdk();
 
 class App extends React.Component {
@@ -19,7 +21,11 @@ class App extends React.Component {
   }
 
   render() {
-    return <div className="App">Hello, monday Apps!</div>;
+    return(
+      <div className="App">
+        <Toolbar/>
+      </div>
+    );
   }
 }
 

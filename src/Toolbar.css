@@ -1,0 +1,15 @@
+.toolbar {
+    height: 100%;
+    width: 20%;
+    text-align: center;
+    background-color: gray;
+    padding-left: 1%;
+    padding-right: 1%;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: medium;
+    transition: 0.9s ease;
+}
+
+.nodes {
+    column-count: 3;
+}
