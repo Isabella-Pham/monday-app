@@ -24,7 +24,7 @@ class App extends React.Component {
   render() {
     return(
       <div className="App">
-        <Toolbar width={`20vw`} height={0}>
+        <Toolbar>
             <ToolbarNode type={ToolbarNode.TYPES.RECT}/>
             <ToolbarNode type={ToolbarNode.TYPES.ROUND_RECT}/>
             <ToolbarNode type={ToolbarNode.TYPES.DIAMOND}/>
