@@ -1,5 +1,6 @@
-import React, {useState, useEffect} from "react";
+import React from "react";
 import "./Toolbar.css";
+import TransitionNode from './TransitionNode'
 
 class Toolbar extends React.Component {
   constructor(props) {
@@ -11,15 +12,12 @@ class Toolbar extends React.Component {
 
   render() {
     return (
-        <div className={this.state.hidden ? 'toolbar hidden': 'toolbar'}>
+        <div className={'toolbar' + (this.state.hidden ? ' hidden': '')}>
           <button
             onClick={() => {
               this.setState({ hidden: !this.state.hidden })
             }}
             className="toggle-menu"
-            style={{
-              transform: `translate(${this.props.width}, 50vh)`
-            }}
           ></button>
           <div className="nodes">{this.props.children}</div>
         </div>

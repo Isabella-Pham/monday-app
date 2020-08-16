@@ -1,0 +1,8 @@
+.transition-node {
+    position: fixed;
+    display: block;
+    outline: 1px solid black;
+    width: 100px;
+    height: 100px;
+    margin: 0;
+}
