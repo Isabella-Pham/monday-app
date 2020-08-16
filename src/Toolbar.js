@@ -1,30 +1,48 @@
-import React from 'react';
-import ToolbarNode from './ToolbarNode';
-import "./Toolbar.css"
+import "./Toolbar.css";
+import React, {useState, useEffect} from "react";
 
-class Toolbar extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            isOpen: true
-        }
-    }
-
-    render() {
-        return(
-            <div className="toolbar">
-                <p>Toolbar</p>
-                <div className="nodes">
-                    <ToolbarNode image={"https://m.media-amazon.com/images/I/9151bYqX+UL._AC_SS350_.jpg"}/>
-                    <ToolbarNode image={"https://m.media-amazon.com/images/I/9151bYqX+UL._AC_SS350_.jpg"}/>
-                    <ToolbarNode image={"https://m.media-amazon.com/images/I/9151bYqX+UL._AC_SS350_.jpg"}/>
-                    <ToolbarNode image={"https://m.media-amazon.com/images/I/9151bYqX+UL._AC_SS350_.jpg"}/>
-                    <ToolbarNode image={"https://m.media-amazon.com/images/I/9151bYqX+UL._AC_SS350_.jpg"}/>
-                    <ToolbarNode image={"https://m.media-amazon.com/images/I/9151bYqX+UL._AC_SS350_.jpg"}/>
-                </div>
-            </div>
-        )
-    }
+function viewportToPixels(value) {
+    var parts = value.match(/([0-9.]+)(vh|vw)/)
+    var q = Number(parts[1])
+    var side = window[['innerHeight', 'innerWidth'][['vh', 'vw'].indexOf(parts[2])]]
+    return side * (q / 100)
 }
+
+const Toolbar = ({ width, height, children }) => {
+  const [xPosition, setX] = useState(-viewportToPixels(width));
+
+  const toggleMenu = () => {
+    if (xPosition < 0) {
+      setX(0);
+    } else {
+      setX(-1 * viewportToPixels(width));
+    }
+  };
+
+  useEffect(() => {
+    setX(0);
+  }, []);
+  return (
+    <React.Fragment>
+      <div
+        className="toolbar"
+        style={{
+          transform: `translatex(${xPosition}px)`,
+          width: width,
+          minHeight: height
+        }}
+      >
+        <button
+          onClick={() => toggleMenu()}
+          className="toggle-menu"
+          style={{
+            transform: `translate(${width}, 50vh)`
+          }}
+        ></button>
+        <div className="content">{children}</div>
+      </div>
+    </React.Fragment>
+  );
+};
 
 export default Toolbar
