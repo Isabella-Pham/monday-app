@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import mondaySdk from "monday-sdk-js";
 import Toolbar from './toolbar/Toolbar';
+import ToolbarNode from './toolbar/ToolbarNode'
 
 const monday = mondaySdk();
 
@@ -23,7 +24,13 @@ class App extends React.Component {
   render() {
     return(
       <div className="App">
-        <Toolbar/>
+        <Toolbar width={`20vw`} height={0}>
+            <ToolbarNode type={ToolbarNode.TYPES.RECT}/>
+            <ToolbarNode type={ToolbarNode.TYPES.ROUND_RECT}/>
+            <ToolbarNode type={ToolbarNode.TYPES.DIAMOND}/>
+            <ToolbarNode type={ToolbarNode.TYPES.ELLIPSE}/>
+            <ToolbarNode type={ToolbarNode.TYPES.CIRCLE}/>
+        </Toolbar>
       </div>
     );
   }

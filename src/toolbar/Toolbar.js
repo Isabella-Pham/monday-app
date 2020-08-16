@@ -1,29 +1,30 @@
-import React from 'react';
-import ToolbarNode from './ToolbarNode';
-import "./Toolbar.css"
+import React, {useState, useEffect} from "react";
+import "./Toolbar.css";
 
 class Toolbar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isOpen: true
-    }
+      hidden: false
+    };
   }
 
   render() {
     return (
-      <div className="toolbar">
-        <div className="nodes">
-          <ToolbarNode type={ToolbarNode.TYPES.RECT} />
-          <ToolbarNode type={ToolbarNode.TYPES.ROUND_RECT} />
-          <ToolbarNode type={ToolbarNode.TYPES.CIRCLE} />
-          <ToolbarNode type={ToolbarNode.TYPES.ELLIPSE} />
-          <ToolbarNode type={ToolbarNode.TYPES.DIAMOND} />
-          <ToolbarNode type={ToolbarNode.TYPES.ROUND_RECT} />
+        <div className={this.state.hidden ? 'toolbar hidden': 'toolbar'}>
+          <button
+            onClick={() => {
+              this.setState({ hidden: !this.state.hidden })
+            }}
+            className="toggle-menu"
+            style={{
+              transform: `translate(${this.props.width}, 50vh)`
+            }}
+          ></button>
+          <div className="nodes">{this.props.children}</div>
         </div>
-      </div>
-    )
+    );
   }
 }
 
-export default Toolbar
+export default Toolbar;
