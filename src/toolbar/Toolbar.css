@@ -1,0 +1,16 @@
+.toolbar {
+  height: 100%;
+  width: 20%;
+  text-align: center;
+  background-color: transparent;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: medium;
+  border-color: black;
+  border-width: 2px;
+  border-style: solid;
+  padding: 5px;
+}
+
+.nodes {
+  column-count: 3;
+}

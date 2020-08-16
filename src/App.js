@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import mondaySdk from "monday-sdk-js";
-import Toolbar from './Toolbar';
+import Toolbar from './toolbar/Toolbar';
 
 const monday = mondaySdk();
 
