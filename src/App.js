@@ -31,8 +31,8 @@ class App extends React.Component {
   }
 
   handleTransitionNodeDown(e) {
-    const x = e.screenX;
-    const y = e.screenY;
+    const x = e.clientX;
+    const y = e.clientY;
     this.setState({inTransition: true},
       () => { 
         this.setTransitionNodePosition(x, y);
@@ -52,17 +52,16 @@ class App extends React.Component {
 
   updateTransition(e) {
     if (this.state.inTransition) {
-      this.setTransitionNodePosition(e.screenX, e.screenY);
+      this.setTransitionNodePosition(e.clientX, e.clientY);
     } else {
 
     }
   }
 
   setTransitionNodePosition(x, y) {
-    console.log(y);
     this.setState({
       transitionX: x,
-      transitionY: y - 60
+      transitionY: y
     })
   }
 
