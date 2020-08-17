@@ -1,6 +1,6 @@
 import React from 'react';
 
-const cursorCentered = true;
+const cursorCentered = false;
 
 class Constants {
 
