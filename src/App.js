@@ -1,10 +1,12 @@
 import React from "react";
 import "./App.css";
-import mondaySdk from "monday-sdk-js";
+//import mondaySdk from "monday-sdk-js";
 import Toolbar from './toolbar/Toolbar';
-import ToolbarNode from './toolbar/ToolbarNode'
+import ToolbarNode from './toolbar/ToolbarNode';
+import Shapes from './toolbar/Shapes';
+import TransitionNode from './toolbar/TransitionNode';
 
-const monday = mondaySdk();
+//const monday = mondaySdk();
 
 class App extends React.Component {
   constructor(props) {
@@ -14,23 +16,65 @@ class App extends React.Component {
     this.state = {
       settings: {},
       name: "",
+      inTransition: false,
+      transitionX: -1,
+      transitionY: -1
     };
+
+    this.handleTransitionNodeDown = this.handleTransitionNodeDown.bind(this);
+    this.handleTransitionNodeUp = this.handleTransitionNodeUp.bind(this);
+    this.updateTransition = this.updateTransition.bind(this);
   }
 
   componentDidMount() {
     // TODO: set up event listeners
   }
 
+  handleTransitionNodeDown(e) {
+    const x = e.clientX;
+    const y = e.clientY;
+    this.setState({inTransition: true}, () => { 
+      this.setTransitionNodePosition(x, y);
+    });
+  }
+
+  handleTransitionNodeUp(e) {
+    // const x = e.clientX;
+    // const y = e.clientY;
+    this.setState({inTransition: false}, () => { 
+      // do computational check
+    });
+  }
+
+  updateTransition(e) {
+    if (this.state.inTransition) {
+      this.setTransitionNodePosition(e.clientX, e.clientY);
+    } else {
+
+    }
+  }
+
+  setTransitionNodePosition(x, y) {
+    this.setState({
+      transitionX: x,
+      transitionY: y
+    })
+  }
+
   render() {
+    ToolbarNode.onMouseDown = this.handleTransitionNodeDown;
     return(
-      <div className="App">
+      <div className="App" onMouseMove={this.updateTransition} onMouseUp={this.handleTransitionNodeUp}>
         <Toolbar>
-            <ToolbarNode type={ToolbarNode.TYPES.RECT}/>
-            <ToolbarNode type={ToolbarNode.TYPES.ROUND_RECT}/>
-            <ToolbarNode type={ToolbarNode.TYPES.DIAMOND}/>
-            <ToolbarNode type={ToolbarNode.TYPES.ELLIPSE}/>
-            <ToolbarNode type={ToolbarNode.TYPES.CIRCLE}/>
+            <ToolbarNode type={Shapes.TYPES.RECT}/>
+            <ToolbarNode type={Shapes.TYPES.ROUND_RECT}/>
+            <ToolbarNode type={Shapes.TYPES.DIAMOND}/>
+            <ToolbarNode type={Shapes.TYPES.ELLIPSE}/>
+            <ToolbarNode type={Shapes.TYPES.CIRCLE}/>
         </Toolbar>
+        {this.state.inTransition ? 
+          <TransitionNode x={this.state.transitionX} y={this.state.transitionY}/> : null
+        }
       </div>
     );
   }
