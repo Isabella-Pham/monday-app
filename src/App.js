@@ -5,6 +5,7 @@ import Toolbar from './toolbar/Toolbar';
 import ToolbarNode from './toolbar/ToolbarNode';
 import Shapes from './toolbar/Shapes';
 import TransitionNode from './toolbar/TransitionNode';
+import Constants from './constants/constants';
 
 //const monday = mondaySdk();
 
@@ -22,7 +23,7 @@ class App extends React.Component {
         y: -1,
         width: 0,
         height: 0
-      }
+      },
     };
 
     this.showTransitionNode = this.showTransitionNode.bind(this);
@@ -33,7 +34,7 @@ class App extends React.Component {
   componentDidMount() {
     // TODO: set up event listeners
   }
-
+  
   showTransitionNode(e) {
     const x = e.clientX;
     const y = e.clientY;
@@ -60,7 +61,11 @@ class App extends React.Component {
         inTransition: false
       }
     }), () => { 
-      // do computational check
+      if (this.state.transitionNode.x - (Constants.cursorCentered ? (this.state.transitionNode.width / 2) : 0) > Constants.viewportToPixels('20vw')) {
+        console.log("OUTSIDE TOOLBAR");
+      } else {
+        console.log("INSIDE TOOLBAR");
+      }
     });
   }
 
