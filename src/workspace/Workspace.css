@@ -1,0 +1,8 @@
+.workspace {
+    height: 200%;
+    width: 200%;
+    position: absolute;
+    background-color: #FFFFFF;
+    z-index: -1;
+    overflow: auto;
+}

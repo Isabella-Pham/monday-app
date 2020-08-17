@@ -1,19 +1,16 @@
 import React from "react";
 import "./App.css";
-//import mondaySdk from "monday-sdk-js";
+import Workspace from './workspace/Workspace';
 import Toolbar from './toolbar/Toolbar';
 import ToolbarNode from './toolbar/ToolbarNode';
 import Shapes from './toolbar/Shapes';
 import TransitionNode from './toolbar/TransitionNode';
 import Constants from './constants/constants';
 
-//const monday = mondaySdk();
-
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    // Default state
     this.state = {
       settings: {},
       name: "",
@@ -98,12 +95,14 @@ class App extends React.Component {
             <ToolbarNode type={Shapes.TYPES.ELLIPSE}/>
             <ToolbarNode type={Shapes.TYPES.CIRCLE}/>
         </Toolbar>
+        <Workspace/>
         {this.state.transitionNode.inTransition ? 
           <TransitionNode
             x={this.state.transitionNode.x}
             y={this.state.transitionNode.y}
             width={this.state.transitionNode.width}
-            height={this.state.transitionNode.height}/> : null}
+            height={this.state.transitionNode.height}/> : null
+        }
       </div>
     );
   }
