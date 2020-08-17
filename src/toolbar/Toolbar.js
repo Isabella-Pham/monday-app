@@ -7,7 +7,8 @@ class Toolbar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      hidden: false
+      hidden: false,
+      onToolbar: false
     };
     this.hide = this.hide.bind(this);
   }

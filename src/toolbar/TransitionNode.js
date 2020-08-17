@@ -1,5 +1,6 @@
 import React from 'react';
 import './TransitionNode.css';
+import Constants from '../constants/constants'
 
 class TransitionNode extends React.Component {
     constructor(props) {
@@ -9,8 +10,8 @@ class TransitionNode extends React.Component {
     render() {
         return(
             <div className='transition-node' style={{
-              top: this.props.y + 'px',
-              left: this.props.x + 'px',
+              top: this.props.y - (Constants.cursorCentered ? (this.props.height / 2) : 0) + 'px',
+              left: this.props.x - (Constants.cursorCentered ? (this.props.width / 2) : 0) + 'px',
               width: this.props.width + 'px',
               height: this.props.height + 'px'
             }}></div>

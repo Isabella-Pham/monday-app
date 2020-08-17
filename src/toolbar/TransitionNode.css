@@ -1,4 +1,5 @@
 .transition-node {
     position: absolute;
     outline: 1px dashed black;
+    cursor: grabbing;
 }
