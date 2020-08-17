@@ -1,6 +1,4 @@
 .transition-node {
     position: absolute;
-    outline: 1px solid black;
-    width: 100px;
-    height: 100px;
+    outline: 1px dashed black;
 }

@@ -11,7 +11,7 @@ class ToolbarNode extends React.Component {
 
   render() {
     return (
-      <div className="node" onMouseDown={ToolbarNode.onMouseDown}>
+      <div data-type={this.props.type} className="node" onMouseDown={ToolbarNode.onMouseDown}>
         <svg viewBox="0 0 100 100">
           {Shapes.renderShape(this.props.type)}
         </svg>

@@ -10,7 +10,9 @@ class TransitionNode extends React.Component {
         return(
             <div className='transition-node' style={{
               top: this.props.y + 'px',
-              left: this.props.x + 'px'
+              left: this.props.x + 'px',
+              width: this.props.width + 'px',
+              height: this.props.height + 'px'
             }}></div>
         )
     }

@@ -16,38 +16,56 @@ class App extends React.Component {
     this.state = {
       settings: {},
       name: "",
-      inTransition: false,
-      transitionX: -1,
-      transitionY: -1
+      transitionNode: {
+        inTransition: false,
+        x: -1,
+        y: -1,
+        width: 0,
+        height: 0
+      }
     };
 
-    this.handleTransitionNodeDown = this.handleTransitionNodeDown.bind(this);
-    this.handleTransitionNodeUp = this.handleTransitionNodeUp.bind(this);
-    this.updateTransition = this.updateTransition.bind(this);
+    this.showTransitionNode = this.showTransitionNode.bind(this);
+    this.hideTransitionNode = this.hideTransitionNode.bind(this);
+    this.updateTransitionNode = this.updateTransitionNode.bind(this);
   }
 
   componentDidMount() {
     // TODO: set up event listeners
   }
 
-  handleTransitionNodeDown(e) {
+  showTransitionNode(e) {
     const x = e.clientX;
     const y = e.clientY;
-    this.setState({inTransition: true}, () => { 
+    const nodeType = e.currentTarget.getAttribute('data-type');
+    const dimensions = Shapes.getDefaultDimensions(nodeType);
+    this.setState(prevState => ({
+      transitionNode: {
+        ...prevState.transitionNode,
+        inTransition: true,
+        width: dimensions.width,
+        height: dimensions.height
+      }
+    }), () => { 
       this.setTransitionNodePosition(x, y);
     });
   }
 
-  handleTransitionNodeUp(e) {
-    // const x = e.clientX;
-    // const y = e.clientY;
-    this.setState({inTransition: false}, () => { 
+  hideTransitionNode(e) {
+    const x = e.clientX;
+    const y = e.clientY;
+    this.setState(prevState => ({
+      transitionNode: {
+        ...prevState.transitionNode,
+        inTransition: false
+      }
+    }), () => { 
       // do computational check
     });
   }
 
-  updateTransition(e) {
-    if (this.state.inTransition) {
+  updateTransitionNode(e) {
+    if (this.state.transitionNode.inTransition) {
       this.setTransitionNodePosition(e.clientX, e.clientY);
     } else {
 
@@ -55,16 +73,19 @@ class App extends React.Component {
   }
 
   setTransitionNodePosition(x, y) {
-    this.setState({
-      transitionX: x,
-      transitionY: y
-    })
+    this.setState(prevState => ({
+      transitionNode: {
+        ...prevState.transitionNode,
+        x: x,
+        y: y
+      }
+    }));
   }
 
   render() {
-    ToolbarNode.onMouseDown = this.handleTransitionNodeDown;
+    ToolbarNode.onMouseDown = this.showTransitionNode;
     return(
-      <div className="App" onMouseMove={this.updateTransition} onMouseUp={this.handleTransitionNodeUp}>
+      <div className="App non-drag" onMouseMove={this.updateTransitionNode} onMouseUp={this.hideTransitionNode}>
         <Toolbar>
             <ToolbarNode type={Shapes.TYPES.RECT}/>
             <ToolbarNode type={Shapes.TYPES.ROUND_RECT}/>
@@ -72,9 +93,12 @@ class App extends React.Component {
             <ToolbarNode type={Shapes.TYPES.ELLIPSE}/>
             <ToolbarNode type={Shapes.TYPES.CIRCLE}/>
         </Toolbar>
-        {this.state.inTransition ? 
-          <TransitionNode x={this.state.transitionX} y={this.state.transitionY}/> : null
-        }
+        {this.state.transitionNode.inTransition ? 
+          <TransitionNode
+            x={this.state.transitionNode.x}
+            y={this.state.transitionNode.y}
+            width={this.state.transitionNode.width}
+            height={this.state.transitionNode.height}/> : null}
       </div>
     );
   }

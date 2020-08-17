@@ -76,6 +76,7 @@ class Shapes {
     }
 
     static renderShape(type) {
+        type = parseInt(type);
         switch (type) {
             case Shapes.TYPES.RECT: return Shapes.getRect();
             case Shapes.TYPES.ROUND_RECT: return Shapes.getRoundedRect();
@@ -84,6 +85,33 @@ class Shapes {
             case Shapes.TYPES.DIAMOND: return Shapes.getDiamond();
             default: return null;
         }
+    }
+
+    static getDefaultDimensions(type) {
+      type = parseInt(type);
+      let dimensions = [0, 0];
+      switch (type) {
+        case Shapes.TYPES.RECT:
+          dimensions = [200, 100];
+          break;
+        case Shapes.TYPES.ROUND_RECT:
+          dimensions = [200, 100];
+          break;
+        case Shapes.TYPES.CIRCLE:
+          dimensions = [100, 100];
+          break;
+        case Shapes.TYPES.ELLIPSE:
+          dimensions = [200, 100];
+          break;
+        case Shapes.TYPES.DIAMOND:
+          dimensions = [100, 100];
+          break;
+        default: break;        
+      }
+      return {
+        width: dimensions[0],
+        height: dimensions[1]
+      };
     }
 }
 
