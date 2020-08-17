@@ -10,10 +10,6 @@ body {
   background: url(https://cdn.hipwallpaper.com/i/22/44/AKMUqs.gif)
 }
 
-.nodes {
-  column-count: 3;
-}
-
 .non-drag {
   /* user-drag: none;  */
   user-select: none;

@@ -1,4 +1,6 @@
 import React from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
 import "./Toolbar.css";
 
 class Toolbar extends React.Component {
@@ -7,18 +9,22 @@ class Toolbar extends React.Component {
     this.state = {
       hidden: false
     };
+    this.hide = this.hide.bind(this);
+  }
+
+  hide() {
+    this.setState({ hidden: !this.state.hidden });
   }
 
   render() {
     return (
         <div className={'toolbar' + (this.state.hidden ? ' hidden': '')}>
-          <button
-            onClick={() => {
-              this.setState({ hidden: !this.state.hidden })
-            }}
-            className="toggle-menu"
-          ></button>
           <div className="nodes">{this.props.children}</div>
+          <FontAwesomeIcon
+            icon={this.state.hidden ? faChevronRight : faChevronLeft}
+            onClick={this.hide}
+            size="lg"
+            className="toolbar-toggle"/>
         </div>
     );
   }

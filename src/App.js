@@ -37,7 +37,7 @@ class App extends React.Component {
   showTransitionNode(e) {
     const x = e.clientX;
     const y = e.clientY;
-    const nodeType = e.currentTarget.getAttribute('data-type');
+    let nodeType = e.currentTarget.getAttribute('data-type');
     const dimensions = Shapes.getDefaultDimensions(nodeType);
     this.setState(prevState => ({
       transitionNode: {

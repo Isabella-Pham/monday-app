@@ -1,9 +1,7 @@
 .node {
     border-radius: 25%;
-    padding: 0;
     cursor: pointer;
     background-color: transparent;
-    
 }
 
 .node:hover {
