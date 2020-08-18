@@ -98,13 +98,13 @@ class Shapes {
           dimensions = [200, 100];
           break;
         case Shapes.TYPES.CIRCLE:
-          dimensions = [100, 100];
+          dimensions = [200, 200];
           break;
         case Shapes.TYPES.ELLIPSE:
           dimensions = [200, 100];
           break;
         case Shapes.TYPES.DIAMOND:
-          dimensions = [100, 100];
+          dimensions = [200, 200];
           break;
         default: break;        
       }
