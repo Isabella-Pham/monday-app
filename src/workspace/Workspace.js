@@ -1,22 +1,35 @@
 import React from 'react';
 
 import './Workspace.css';
+import WorkspaceNode from './WorkspaceNode';
 
 class Workspace extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+        nodes: []
+    }
+
+    this.addNode = this.addNode.bind(this);
   }
 
   componentDidMount() {
   }
 
   addNode(attributes) {
-    console.log('New node attributes: '+JSON.stringify(attributes, null, 4));
+    let newNodes = this.state.nodes.concat(attributes);
+    this.setState({
+        nodes: newNodes
+    });
   }
 
   render() {
     return (
       <div className="workspace">
+          {this.state.nodes.map((item, i) =>
+            <WorkspaceNode key={i} attributes={item}/>
+          )}
       </div>
     )
   }

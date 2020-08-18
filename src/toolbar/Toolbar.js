@@ -18,9 +18,6 @@ class Toolbar extends React.Component {
 
   hide() {
     this.setState({ hidden: !this.state.hidden });
-    monday.api('query { users { name } }').then(res => {
-      console.log(res);
-    })
   }
 
   render() {

@@ -14,7 +14,10 @@ class WorkspaceNode extends React.Component {
 
   render() {
     return (
-      <div className="work-node">
+      <div className="work-node" style={{top: this.props.attributes.y, left: this.props.attributes.x, width: this.props.attributes.width, height: this.props.attributes.height}}>
+        <svg viewBox="0 0 100 100">
+          {Shapes.renderShape(this.props.attributes.type)}
+        </svg>
       </div>
     );
   }
