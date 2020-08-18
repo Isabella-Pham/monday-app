@@ -1,19 +1,16 @@
 import React from "react";
 import "./App.css";
-//import mondaySdk from "monday-sdk-js";
+import Workspace from './workspace/Workspace';
 import Toolbar from './toolbar/Toolbar';
 import ToolbarNode from './toolbar/ToolbarNode';
-import Shapes from './toolbar/Shapes';
+import Shapes from './assets/Shapes';
 import TransitionNode from './toolbar/TransitionNode';
 import Constants from './constants/constants';
-
-//const monday = mondaySdk();
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    // Default state
     this.state = {
       settings: {},
       name: "",
@@ -21,10 +18,11 @@ class App extends React.Component {
         inTransition: false,
         x: -1,
         y: -1,
-        width: 0,
-        height: 0
+        type: -1
       },
     };
+
+    this._workspace = React.createRef();
 
     this.showTransitionNode = this.showTransitionNode.bind(this);
     this.hideTransitionNode = this.hideTransitionNode.bind(this);
@@ -36,37 +34,53 @@ class App extends React.Component {
   }
   
   showTransitionNode(e) {
+    console.log('Starting transition');
     const x = e.clientX;
     const y = e.clientY;
-    let nodeType = e.currentTarget.getAttribute('data-type');
+    const nodeType = parseInt(e.currentTarget.getAttribute('data-type'));
     const dimensions = Shapes.getDefaultDimensions(nodeType);
     this.setState(prevState => ({
       transitionNode: {
         ...prevState.transitionNode,
         inTransition: true,
         width: dimensions.width,
-        height: dimensions.height
+        height: dimensions.height,
+        type: nodeType
       }
     }), () => { 
       this.setTransitionNodePosition(x, y);
     });
   }
 
+  transitionBeyondToolbar(x, y) {
+    return x - (Constants.cursorCentered ? (this.state.transitionNode.width / 2) : 0) > Constants.viewportToPixels('20vw');
+  }
+
   hideTransitionNode(e) {
-    const x = e.clientX;
-    const y = e.clientY;
-    this.setState(prevState => ({
-      transitionNode: {
-        ...prevState.transitionNode,
-        inTransition: false
-      }
-    }), () => { 
-      if (this.state.transitionNode.x - (Constants.cursorCentered ? (this.state.transitionNode.width / 2) : 0) > Constants.viewportToPixels('20vw')) {
-        console.log("OUTSIDE TOOLBAR");
-      } else {
-        console.log("INSIDE TOOLBAR");
-      }
-    });
+    if (this.state.transitionNode.inTransition) {
+      const x = e.clientX;
+      const y = e.clientY;
+      this.setState(prevState => ({
+        transitionNode: {
+          ...prevState.transitionNode,
+          inTransition: false
+        }
+      }), () => { 
+        if (this.transitionBeyondToolbar(x, y)) {
+          let width = this.state.transitionNode.width;
+          let height = this.state.transitionNode.height;
+          this._workspace.current.addNode({
+            width: width,
+            height: height,
+            x: x,
+            y: y,
+            type: this.state.transitionNode.type
+          });
+        } else {
+          console.log("INSIDE TOOLBAR");
+        }
+      });
+    }
   }
 
   updateTransitionNode(e) {
@@ -98,12 +112,14 @@ class App extends React.Component {
             <ToolbarNode type={Shapes.TYPES.ELLIPSE}/>
             <ToolbarNode type={Shapes.TYPES.CIRCLE}/>
         </Toolbar>
+        <Workspace ref={this._workspace}/>
         {this.state.transitionNode.inTransition ? 
           <TransitionNode
             x={this.state.transitionNode.x}
             y={this.state.transitionNode.y}
             width={this.state.transitionNode.width}
-            height={this.state.transitionNode.height}/> : null}
+            height={this.state.transitionNode.height}/> : null
+        }
       </div>
     );
   }

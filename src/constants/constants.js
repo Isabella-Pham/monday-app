@@ -1,11 +1,16 @@
-import React from 'react';
+import mondaySdk from "monday-sdk-js";
 
-const cursorCentered = true;
+const cursorCentered = false;
+const monday = mondaySdk();
+monday.setToken(process.env.REACT_APP_MONDAY_TOKEN);
 
 class Constants {
-
   static get cursorCentered() {
       return cursorCentered;
+  }
+
+  static get monday() {
+    return monday;
   }
 
   // TODO: Change to relative percentage
