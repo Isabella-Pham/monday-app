@@ -26,15 +26,15 @@ class Toolbar extends React.Component {
     return (
       <div className={'toolbar' + (this.state.hidden ? ' hidden' : '')}>
         <div className="nodes">
-          <div class='node-col node-col-one'>
+          <div className='node-col node-col-one'>
             <ToolbarNode type={Shapes.TYPES.RECT} />
             <ToolbarNode type={Shapes.TYPES.ROUND_RECT} />
           </div>
-          <div class='node-col node-col-two'>
+          <div className='node-col node-col-two'>
             <ToolbarNode type={Shapes.TYPES.DIAMOND} />
             <ToolbarNode type={Shapes.TYPES.ELLIPSE} />
           </div>
-          <div class='node-col node-col-three'>
+          <div className='node-col node-col-three'>
             <ToolbarNode type={Shapes.TYPES.CIRCLE} />
           </div>
         </div>

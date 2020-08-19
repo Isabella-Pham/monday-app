@@ -1,12 +1,19 @@
 .work-node {
   position: absolute;
+  display: block;
+  overflow: hidden;
   cursor: pointer !important;
   background-color: transparent;
-  outline: 1px dashed black;
 }
 
 .work-node > svg {
   display: block;
+  overflow: visible;
+}
+
+.work-node.selected {
+  display: block;
+  border: 1px dashed #257AFD;
 }
 
 .work-node > svg > path {
@@ -15,7 +22,7 @@
   stroke: black;
 }
 
-.work-node-selected > svg > path {
+.work-node > svg > path {
   fill: transparent;
   stroke-width: 1px;
   stroke: black;

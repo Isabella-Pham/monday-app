@@ -92,7 +92,6 @@ class App extends React.Component {
   }
 
   setTransitionNodePosition(x, y) {
-    console.log(x, y);
     this.setState(prevState => ({
       transitionNode: {
         ...prevState.transitionNode,

@@ -11,6 +11,7 @@
 
 .toolbar-node > svg {
   display: block;
+  overflow: visible;
 }
 
 .toolbar-node > svg > path {
