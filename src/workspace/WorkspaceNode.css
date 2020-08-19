@@ -1,3 +1,16 @@
 .work-node {
   position: absolute;
+  cursor: pointer;
+  background-color: transparent;
+  outline: 1px dashed black;
+}
+
+.work-node > svg {
+  display: block;
+}
+
+.work-node > svg > path {
+  fill: transparent;
+  stroke-width: 1px;
+  stroke: black;
 }
