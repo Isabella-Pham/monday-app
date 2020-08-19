@@ -6,6 +6,10 @@ import Shapes from '../assets/Shapes';
 class WorkspaceNode extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      isSelected: true
+    }
   }
 
   componentDidMount() {
@@ -14,7 +18,7 @@ class WorkspaceNode extends React.Component {
 
   render() {
     return (
-      <div className="work-node" style={{top: this.props.attributes.y, left: this.props.attributes.x, width: this.props.attributes.width, height: this.props.attributes.height}}>
+      <div className={'work-node' + (this.state.isSelected ? ' selected' : '')} style={{top: this.props.attributes.y, left: this.props.attributes.x, width: this.props.attributes.width, height: this.props.attributes.height}}>
         <svg viewBox="0 0 100 100">
           {Shapes.renderShape(this.props.attributes.type)}
         </svg>
