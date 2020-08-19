@@ -1,87 +1,94 @@
 import React from 'react';
 
-class Shapes {
-    static TYPES = {
-        RECT: 0,
-        ROUND_RECT: 1,
-        ELLIPSE: 2,
-        DIAMOND: 3,
-        POST_IT: 4,
-        UPRIGHT_CYCLINDER: 5,
-        TEXTBOX: 6,
-        IMAGE: 7,
-        CIRCLE: 8
-    };
+const TYPES = Object.freeze({
+  RECT: 0,
+  ROUND_RECT: 1,
+  ELLIPSE: 2,
+  DIAMOND: 3,
+  POST_IT: 4,
+  UPRIGHT_CYCLINDER: 5,
+  TEXTBOX: 6,
+  IMAGE: 7,
+  CIRCLE: 8
+});
 
-    static getRect() {
-        // 70x50 rectangle
+class Shapes {
+    static get TYPES() {
+      return TYPES;
+    }
+
+    static getRect(fitInSquare) {
+        // 100x50 rectangle
         return (
-            <path d="
-            M15,25
-            l70,0
+            <path d={`
+            M0,${fitInSquare ? 25 : 0}
+            l100,0
             l0,50
-            l-70,0
-            Z"></path>
+            l-100,0
+            Z`}></path>
         )
     }
 
-    static getRoundedRect() {
-        // 70x50 rectangle w/ 10 radius corner
+    static getRoundedRect(fitInSquare) {
+        // 100x50 rectangle w/ 10 radius corner
         return (
-            <path d="
-            M15,35
+            <path d={`
+            M0,${fitInSquare ? 35 : 10}
             a10,10 0 0 1 10,-10 
-            l50,0 
+            l80,0 
             a10,10 0 0 1 10,10
             l0,30
             a10,10 0 0 1 -10,10
-            l-50,0
+            l-80,0
             a10,10 0 0 1 -10,-10
-            Z"></path>
+            Z`}></path>
         )
     }
 
     static getCircle() {
+        // radius = 50
         return (
-            <path d="
+            <path d={`
             M50,50
-            m-35,0
-            a35,35 0 0 1 70,0
-            a35,35 0 0 1 -70,0
-            Z"></path>
+            m-50,0
+            a50,50 0 0 1 100,0
+            a50,50 0 0 1 -100,0
+            Z`}></path>
         )
     }
 
-    static getEllipse() {
+    static getEllipse(fitInSquare) {
+      // radius 1 = 50
+      // radius 2 = 25
         return (
-            <path d="
-            M50,50
-            m-35,0
-            a35,25 0 0 1 70,0
-            a35,25 0 0 1 -70,0
-            Z"></path>
+            <path d={`
+            M50,${fitInSquare ? 50 : 25}
+            m-50,0
+            a50,25 0 0 1 100,0
+            a50,25 0 0 1 -100,0
+            Z`}></path>
         )
     }
 
     static getDiamond() {
-        // 70x70 space
+        // 100x100 space
         return (
-            <path d="
-            M15,50
-            l35,-35
-            l35,35
-            l-35,35
-            Z"></path>
+            <path d={`
+            M0,50
+            l50,-50
+            l50,50
+            l-50,50
+            Z`}></path>
         )
     }
 
-    static renderShape(type) {
+    static renderShape(type, fitInSquare=true) {
         type = parseInt(type);
         switch (type) {
-            case Shapes.TYPES.RECT: return Shapes.getRect();
-            case Shapes.TYPES.ROUND_RECT: return Shapes.getRoundedRect();
+            case Shapes.TYPES.RECT: return Shapes.getRect(fitInSquare);
+            case Shapes.TYPES.ROUND_RECT: return Shapes.getRoundedRect(fitInSquare);
             case Shapes.TYPES.CIRCLE: return Shapes.getCircle();
-            case Shapes.TYPES.ELLIPSE: return Shapes.getEllipse();
+            case Shapes.TYPES.ELLIPSE: return Shapes.getEllipse(fitInSquare);
             case Shapes.TYPES.DIAMOND: return Shapes.getDiamond();
             default: return null;
         }

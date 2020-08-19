@@ -2,22 +2,11 @@
   position: absolute;
   cursor: pointer !important;
   background-color: transparent;
-  outline: 2px solid black;
-  z-index: 500;
-  pointer-events: none;
+  outline: 1px dashed black;
 }
 
-.work-node.selected {
-  position: absolute;
-  cursor: pointer !important;
-  background-color: transparent;
-  outline: 2px dotted #00a9ff;
-  z-index: 500;
-  pointer-events: none;
-}
-
-.work-node-selected:hover {
-  outline: 3px solid red;
+.work-node > svg {
+  display: block;
 }
 
 .work-node > svg > path {

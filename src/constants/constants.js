@@ -4,6 +4,8 @@ const cursorCentered = false;
 const monday = mondaySdk();
 monday.setToken(process.env.REACT_APP_MONDAY_TOKEN);
 
+const verticalBoxCount = 100;
+
 class Constants {
   static get cursorCentered() {
       return cursorCentered;
@@ -11,6 +13,10 @@ class Constants {
 
   static get monday() {
     return monday;
+  }
+
+  static get verticalBoxCount() {
+    return verticalBoxCount;
   }
 
   // TODO: Change to relative percentage

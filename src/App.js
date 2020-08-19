@@ -35,8 +35,8 @@ class App extends React.Component {
   
   showTransitionNode(e) {
     console.log('Starting transition');
-    const x = e.clientX;
-    const y = e.clientY;
+    const x = e.pageX;
+    const y = e.pageY;
     const nodeType = parseInt(e.currentTarget.getAttribute('data-type'));
     const dimensions = Shapes.getDefaultDimensions(nodeType);
     this.setState(prevState => ({
@@ -58,8 +58,8 @@ class App extends React.Component {
 
   hideTransitionNode(e) {
     if (this.state.transitionNode.inTransition) {
-      const x = e.clientX;
-      const y = e.clientY;
+      const x = e.pageX;
+      const y = e.pageY;
       this.setState(prevState => ({
         transitionNode: {
           ...prevState.transitionNode,
@@ -85,13 +85,14 @@ class App extends React.Component {
 
   updateTransitionNode(e) {
     if (this.state.transitionNode.inTransition) {
-      this.setTransitionNodePosition(e.clientX, e.clientY);
+      this.setTransitionNodePosition(e.pageX, e.pageY);
     } else {
 
     }
   }
 
   setTransitionNodePosition(x, y) {
+    console.log(x, y);
     this.setState(prevState => ({
       transitionNode: {
         ...prevState.transitionNode,
@@ -105,13 +106,7 @@ class App extends React.Component {
     ToolbarNode.onMouseDown = this.showTransitionNode;
     return(
       <div className="App non-drag" onMouseMove={this.updateTransitionNode} onMouseUp={this.hideTransitionNode}>
-        <Toolbar>
-            <ToolbarNode type={Shapes.TYPES.RECT}/>
-            <ToolbarNode type={Shapes.TYPES.ROUND_RECT}/>
-            <ToolbarNode type={Shapes.TYPES.DIAMOND}/>
-            <ToolbarNode type={Shapes.TYPES.ELLIPSE}/>
-            <ToolbarNode type={Shapes.TYPES.CIRCLE}/>
-        </Toolbar>
+        <Toolbar/>
         <Workspace ref={this._workspace}/>
         {this.state.transitionNode.inTransition ? 
           <TransitionNode

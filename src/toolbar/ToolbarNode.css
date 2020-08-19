@@ -1,19 +1,20 @@
-.node {
+.toolbar-node {
     border-radius: 25%;
     cursor: pointer;
     background-color: transparent;
+    padding: 5px;
 }
 
-.node:hover {
+.toolbar-node:hover {
   background-color: lightgray;
 }
 
-.node > svg > path {
+.toolbar-node > svg {
+  display: block;
+}
+
+.toolbar-node > svg > path {
   fill: transparent;
   stroke-width: 1px;
   stroke: black;
-}
-
-.node > svg:hover > path {
-  /* stroke-width: 2px; */
 }

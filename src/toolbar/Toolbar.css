@@ -18,8 +18,28 @@
 
 .nodes {
   padding: 5px;
-  column-count: 3;
-  float: left;
+  display: flex;
+  /* float: left; */
+}
+
+.node-col {
+  flex: 1;
+  padding-right: 2%;
+}
+
+.node-col:last-child {
+  padding-right: 0;
+}
+
+.node-col-one {
+  order: 1;
+}
+
+.node-col-two {
+  order: 2;
+}
+.node-col-three {
+  order: 3;
 }
 
 .toolbar-toggle {
