@@ -10,6 +10,7 @@ class WorkspaceNode extends React.Component {
 
   componentDidMount() {
     // add svg to node
+    // use attributes to create svg using d3
   }
 
   render() {
