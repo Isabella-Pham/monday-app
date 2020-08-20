@@ -2,6 +2,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import "./WorkspaceNode.css";
 import Shapes from '../assets/Shapes';
+import Constants from '../constants/constants';
 
 class WorkspaceNode extends React.Component {
   constructor(props) {
@@ -33,7 +34,7 @@ class WorkspaceNode extends React.Component {
 
   handleClick(e) {
     if (this.node.contains(e.target)) {
-      this.setState({ isSelected: true, offset: {x: e.pageX - this.state.x, y: e.pageY - this.state.y}, isMoving: true });
+      this.setState({ isSelected: true, offset: { x: e.pageX - this.state.x, y: e.pageY - this.state.y }, isMoving: true });
     } else {
       this.setState({ isSelected: false });
     }
@@ -42,9 +43,12 @@ class WorkspaceNode extends React.Component {
 
   moveNode(e) {
     if (this.state.isSelected && this.state.isMoving) {
-      const newX = e.pageX;
-      const newY = e.pageY;
-      this.setState({ x: newX - this.state.offset.x, y: newY - this.state.offset.y })
+      const newCoord = Constants.getClosestCoord(
+        e.pageX - this.state.offset.x,
+        e.pageY - this.state.offset.y,
+        Constants.ZOOM_SETTINGS.DEFAULT
+      );
+      this.setState({ x: newCoord.x, y: newCoord.y })
     }
   }
 
@@ -55,9 +59,9 @@ class WorkspaceNode extends React.Component {
   render() {
     return (
       <div
-           ref={node => this.node = node}
-           className={'work-node' + (this.state.isSelected ? ' selected' : '')}
-           style={{top: this.state.y, left: this.state.x, width: this.props.attributes.width, height: this.props.attributes.height}}>
+        ref={node => this.node = node}
+        className={'work-node' + (this.state.isSelected ? ' selected' : '')}
+        style={{ top: this.state.y, left: this.state.x, width: this.props.attributes.width, height: this.props.attributes.height }}>
         <svg viewBox="0 0 100 100">
           {Shapes.renderShape(this.props.attributes.type, false)}
         </svg>
