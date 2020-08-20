@@ -1,22 +1,16 @@
-import mondaySdk from "monday-sdk-js";
-
 const cursorCentered = false;
-const monday = mondaySdk();
-monday.setToken(process.env.REACT_APP_MONDAY_TOKEN);
 
-const verticalBoxCount = 100;
+const ZOOM_SETTINGS = Object.freeze({
+  DEFAULT: window.screen.width / 100
+});
 
 class Constants {
   static get cursorCentered() {
       return cursorCentered;
   }
 
-  static get monday() {
-    return monday;
-  }
-
-  static get verticalBoxCount() {
-    return verticalBoxCount;
+  static get ZOOM_SETTINGS() {
+    return ZOOM_SETTINGS;
   }
 
   // TODO: Change to relative percentage

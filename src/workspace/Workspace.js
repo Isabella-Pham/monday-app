@@ -2,6 +2,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import './Workspace.css';
 import WorkspaceNode from './WorkspaceNode';
+import Constants from '../constants/constants';
 
 class Workspace extends React.Component {
   constructor(props) {
@@ -12,10 +13,50 @@ class Workspace extends React.Component {
     }
 
     this.addNode = this.addNode.bind(this);
+    this.drawGrid = this.drawGrid.bind(this);
   }
 
   componentDidMount() {
+    this.drawGrid();
+    window.addEventListener('resize', this.drawGrid);
+  }
 
+  drawGrid() {
+    console.log('Drawing grid...');
+    let gridDimension = Constants.ZOOM_SETTINGS.DEFAULT;
+    let width = parseFloat(d3.select('.workspace').style('width').split('px')[0]);
+    let height = parseFloat(d3.select('.workspace').style('height').split('px')[0]);
+    console.log(width, height);
+    let horizontalBoxCount = Math.ceil(width/gridDimension);
+    let verticalBoxCount = Math.ceil(height/gridDimension);
+    
+    d3.select('.workspace').select('.grid').remove();
+
+    let svg = d3.select('.workspace')
+      .append('svg')
+      .attr('class', 'grid')
+      .attr('width', '100%')
+      .attr('height', '100%');
+    svg.selectAll('line')
+      .data(d3.range(horizontalBoxCount))
+      .enter()
+      .append('line')
+      .attr('x1', (d, i) => gridDimension * i)
+      .attr('y1', '0')
+      .attr('x2', (d, i) => gridDimension * i)
+      .attr('y2', height)
+      .attr('stroke', '#000000')
+      .attr('stroke-width', '0.5')
+      .exit()
+      .data(d3.range(verticalBoxCount))
+      .enter()
+      .append('line')
+      .attr('x1', '0')
+      .attr('y1', (d, i) => gridDimension * i)
+      .attr('x2', width)
+      .attr('y2', (d, i) => gridDimension * i)
+      .attr('stroke', '#000000')
+      .attr('stroke-width', '0.5');
   }
 
   addNode(attributes) {

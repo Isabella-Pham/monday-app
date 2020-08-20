@@ -2,11 +2,12 @@
   position: absolute;
   cursor: pointer;
   background-color: transparent;
-  outline: 1px dashed black;
+  /* outline: 1px dashed black; */
 }
 
 .work-node > svg {
   display: block;
+  overflow: visible;
 }
 
 .work-node > svg > path {

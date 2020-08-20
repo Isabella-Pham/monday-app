@@ -3,6 +3,11 @@
     cursor: pointer;
     background-color: transparent;
     padding: 5px;
+    margin-bottom: 5px;
+}
+
+.toolbar-node:last-of-type {
+  margin-bottom: 0;
 }
 
 .toolbar-node:hover {
@@ -11,6 +16,7 @@
 
 .toolbar-node > svg {
   display: block;
+  overflow: visible;
 }
 
 .toolbar-node > svg > path {

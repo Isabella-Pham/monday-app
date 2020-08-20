@@ -9,6 +9,16 @@ import Constants from '../constants/constants';
 
 const monday = Constants.monday;
 
+// fills in left to right, top to bottom
+const TOOLBAR_ORDER = [
+  Shapes.TYPES.RECT,
+  Shapes.TYPES.ROUND_RECT,
+  Shapes.TYPES.ELLIPSE,
+  Shapes.TYPES.DIAMOND,
+  Shapes.TYPES.CIRCLE
+];
+const COL_COUNT = 3;
+
 class Toolbar extends React.Component {
   constructor(props) {
     super(props);
@@ -16,6 +26,13 @@ class Toolbar extends React.Component {
       hidden: false,
     };
     this.hide = this.hide.bind(this);
+    this.cols = new Array(COL_COUNT);
+    for (var i = 0; i < COL_COUNT; i++) {
+      this.cols[i] = [];
+    }
+    for (var i = 0; i < TOOLBAR_ORDER.length; i++) {
+      this.cols[i % COL_COUNT].push(TOOLBAR_ORDER[i]);
+    }
   }
 
   hide() {
@@ -26,17 +43,13 @@ class Toolbar extends React.Component {
     return (
       <div className={'toolbar' + (this.state.hidden ? ' hidden' : '')}>
         <div className="nodes">
-          <div class='node-col node-col-one'>
-            <ToolbarNode type={Shapes.TYPES.RECT} />
-            <ToolbarNode type={Shapes.TYPES.ROUND_RECT} />
-          </div>
-          <div class='node-col node-col-two'>
-            <ToolbarNode type={Shapes.TYPES.DIAMOND} />
-            <ToolbarNode type={Shapes.TYPES.ELLIPSE} />
-          </div>
-          <div class='node-col node-col-three'>
-            <ToolbarNode type={Shapes.TYPES.CIRCLE} />
-          </div>
+          {
+            this.cols.map((types, i) => (
+              <div key={i} className="node-col" style={{ order: i+1 }}>
+                { types.map((type, typeIndex) => <ToolbarNode key={typeIndex} type={type} />) }
+              </div>
+           ))
+          }
         </div>
         <FontAwesomeIcon
           icon={this.state.hidden ? faChevronRight : faChevronLeft}
