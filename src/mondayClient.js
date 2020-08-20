@@ -5,19 +5,26 @@ class mondayClient {
     }
     async post(apiQuery) {
         try {
-            const response = await fetch(this.endpoint, {
+            const res = await fetch(this.endpoint, {
                 method: "POST",
                 body: JSON.stringify({ query: apiQuery }),
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": this.api_key
                 }
-            });
-            const json = await response.json();
-            return json;
+            }).then((response) => response.json())
+                .then((responseJSON) => {
+                    console.log(responseJSON);
+                    return responseJSON;
+                });
+            return res;
         } catch (error) {
             console.error(error);
         }
+    }
+    getTeammates() {
+        const teammates = this.post("{users{name,email,photo_original}}");
+        return teammates;
     }
 }
 
