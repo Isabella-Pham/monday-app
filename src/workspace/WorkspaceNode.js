@@ -22,14 +22,21 @@ class WorkspaceNode extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.moveNode = this.moveNode.bind(this);
     this.placeNode = this.placeNode.bind(this);
+    this.deleteSelf = this.deleteSelf.bind(this);
   }
 
   componentDidMount() {
     document.addEventListener('mousedown', this.handleClick, false);
     document.addEventListener('mouseup', this.placeNode, false);
     document.addEventListener('mousemove', this.moveNode, false);
-    // add svg to node
-    // use attributes to create svg using d3
+    document.addEventListener('keydown', this.deleteSelf, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClick, false);
+    document.removeEventListener('mouseup', this.placeNode, false);
+    document.removeEventListener('mousemove', this.moveNode, false);
+    document.removeEventListener('keydown', this.deleteSelf, false);
   }
 
   handleClick(e) {
@@ -39,7 +46,6 @@ class WorkspaceNode extends React.Component {
       this.setState({ isSelected: false });
     }
   }
-
 
   moveNode(e) {
     if (this.state.isSelected && this.state.isMoving) {
@@ -54,6 +60,12 @@ class WorkspaceNode extends React.Component {
 
   placeNode() {
     this.setState({ isMoving: false });
+  }
+
+  deleteSelf(e) {
+    if (this.state.isSelected && (e.key == 'Backspace' || e.key == 'Delete')) {
+      this.props.onDelete(this.props.index);
+    }
   }
 
   render() {

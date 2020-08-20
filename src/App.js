@@ -36,7 +36,6 @@ class App extends React.Component {
   }
   
   showTransitionNode(e) {
-    console.log('Starting transition');
     const x = e.pageX;
     const y = e.pageY;
     const nodeType = parseInt(e.currentTarget.getAttribute('data-type'));

@@ -14,6 +14,9 @@ class Workspace extends React.Component {
 
     this.addNode = this.addNode.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
+    this.deleteNode = this.deleteNode.bind(this);
+
+    this.counter = 0;
   }
 
   componentDidMount() {
@@ -26,7 +29,6 @@ class Workspace extends React.Component {
     let gridDimension = Constants.ZOOM_SETTINGS.DEFAULT;
     let width = parseFloat(d3.select('.workspace').style('width').split('px')[0]);
     let height = parseFloat(d3.select('.workspace').style('height').split('px')[0]);
-    console.log(width, height);
     let horizontalBoxCount = Math.ceil(width/gridDimension);
     let verticalBoxCount = Math.ceil(height/gridDimension);
     
@@ -60,17 +62,28 @@ class Workspace extends React.Component {
   }
 
   addNode(attributes) {
+    attributes.key = Constants.getUniqueReactKey();
     let newNodes = this.state.nodes.concat(attributes);
     this.setState({
         nodes: newNodes
     });
   }
 
+  deleteNode(index) {
+    this.setState({nodes: this.state.nodes.filter((v, i) => {
+      return i !== index;
+    })});
+  }
+
   render() {
     return (
       <div className="workspace">
           {this.state.nodes.map((item, i) =>
-            <WorkspaceNode key={i} attributes={item}/>
+            <WorkspaceNode
+            onDelete={this.deleteNode}
+            index={i}
+            key={item.key}
+            attributes={item}/>
           )}
       </div>
     )
