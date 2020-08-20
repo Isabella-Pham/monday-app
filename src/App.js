@@ -18,6 +18,8 @@ class App extends React.Component {
         inTransition: false,
         x: -1,
         y: -1,
+        width: 0,
+        height: 0,
         type: -1
       },
     };
@@ -56,24 +58,31 @@ class App extends React.Component {
     return x - (Constants.cursorCentered ? (this.state.transitionNode.width / 2) : 0) > Constants.viewportToPixels('20vw');
   }
 
+  getNewPoint(val, dimension) {
+    return val - (Constants.cursorCentered ? dimension / 2 : 0);
+  }
+
   hideTransitionNode(e) {
     if (this.state.transitionNode.inTransition) {
-      const x = e.pageX;
-      const y = e.pageY;
+      const pageX = e.pageX;
+      const pageY = e.pageY;
+      const clientX = e.clientX;
+      const clientY = e.clientY;
       this.setState(prevState => ({
         transitionNode: {
           ...prevState.transitionNode,
           inTransition: false
         }
-      }), () => { 
-        if (this.transitionBeyondToolbar(x, y)) {
+      }), () => {
+        let closestCoord = Constants.getClosestCoord(pageX, pageY, Constants.ZOOM_SETTINGS.DEFAULT);
+        if (this.transitionBeyondToolbar(clientX, clientY)) {
           let width = this.state.transitionNode.width;
           let height = this.state.transitionNode.height;
           this._workspace.current.addNode({
             width: width,
             height: height,
-            x: x,
-            y: y,
+            x: this.getNewPoint(closestCoord.x, width),
+            y: this.getNewPoint(closestCoord.y, height),
             type: this.state.transitionNode.type
           });
         } else {
@@ -92,11 +101,12 @@ class App extends React.Component {
   }
 
   setTransitionNodePosition(x, y) {
+    let closestCoord = Constants.getClosestCoord(x, y, Constants.ZOOM_SETTINGS.DEFAULT);
     this.setState(prevState => ({
       transitionNode: {
         ...prevState.transitionNode,
-        x: x,
-        y: y
+        x: closestCoord.x,
+        y: closestCoord.y
       }
     }));
   }

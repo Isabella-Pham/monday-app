@@ -13,7 +13,11 @@
 
 .work-node.selected {
   display: block;
-  outline: 2px dashed #549bf8;
+  outline: 2px dashed #4a98fd;
+}
+
+.work-node:not(.selected):hover {
+  outline: 2px dashed #bedafd;
 }
 
 .work-node > svg > path {
