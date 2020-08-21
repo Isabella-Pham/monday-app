@@ -1,7 +1,13 @@
+import mondaySdk from "monday-sdk-js";
+
+/*
+ * To import write the following at the top of a file: import { mondayClient } from './mondayClient';
+*/
+
 class mondayClient {
     constructor() {
+        this.monday = mondaySdk();
         this.api_key = process.env.REACT_APP_MONDAY_TOKEN;
-        this.endpoint = "https://api.monday.com/v2";
     }
     async post(apiQuery) {
         try {
@@ -23,9 +29,34 @@ class mondayClient {
         }
     }
     getTeammates() {
-        const teammates = this.post("{users{name,email,photo_original}}");
-        return teammates;
+        return this.monday.api("{users{name,email,photo_original}}");
+    }
+    getAllGraphs() {
+        return this.monday.storage.instance.getItem("all_graphs");
+    }
+    saveGraph(graphName, graphJSON) {
+        this.monday.storage.instance.setItem(graphName, graphJSON);
+        this.monday.storage.instance.getItem("all_graphs").then(res => {
+            if (res["success"].localeCompare("false")) {
+                this.monday.storage.instance.setItem("all_graphs", graphName);
+            } else {
+                var updatedGraphList = res.data + ", " + graphName;
+                this.monday.storage.instance.setItem("all_graphs", updatedGraphList);
+            }
+        });
+    }
+    getGraph(graphName) {
+        return this.monday.storage.instance.getItem(graphName);
+    }
+    containsGraph(graphName) {
+        this.monday.storage.instance.getItem(graphName).then(res => {
+            if (res["success"].localeCompare("false")) {
+                return false;
+            } else {
+                return true;
+            }
+        });
     }
 }
 
-module.exports = mondayClient;
+export { mondayClient };
