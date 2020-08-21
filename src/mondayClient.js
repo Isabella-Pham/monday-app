@@ -38,10 +38,10 @@ class mondayClient {
         this.monday.storage.instance.setItem(graphName, graphJSON);
         this.monday.storage.instance.getItem("all_graphs").then(res => {
             if (res["success"].localeCompare("false")) {
-                this.monday.storage.instance.setItem("all_graphs", graphName);
+                this.monday.storage.instance.setItem("all_graphs", [graphName]);
             } else {
-                var updatedGraphList = res.data + ", " + graphName;
-                this.monday.storage.instance.setItem("all_graphs", updatedGraphList);
+                var graphList = res.data.push(graphName);
+                this.monday.storage.instance.setItem("all_graphs", graphList);
             }
         });
     }
