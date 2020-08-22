@@ -73,24 +73,34 @@ class App extends React.Component {
           inTransition: false
         }
       }), () => {
-        let closestCoord = Constants.getClosestCoord(pageX, pageY, Constants.ZOOM_SETTINGS.DEFAULT);
         if (this.transitionBeyondToolbar(clientX, clientY)) {
           let width = this.state.transitionNode.width;
           let height = this.state.transitionNode.height;
-          this._workspace.current.addNode({
-            width: width,
-            height: height,
-            x: this.getNewPoint(closestCoord.x, width),
-            y: this.getNewPoint(closestCoord.y, height),
-            type: this.state.transitionNode.type
-          });
+          if (Constants.gridEnabled) {
+            let closestCoord = Constants.getClosestCoord(pageX, pageY, Constants.ZOOM_SETTINGS.DEFAULT);
+            this._workspace.current.addNode({
+              width: width,
+              height: height,
+              x: this.getNewPoint(closestCoord.x, width),
+              y: this.getNewPoint(closestCoord.y, height),
+              type: this.state.transitionNode.type
+            });
+          } else {
+            this._workspace.current.addNode({
+              width: width,
+              height: height,
+              x: this.getNewPoint(pageX, width),
+              y: this.getNewPoint(pageY, height),
+              type: this.state.transitionNode.type
+            });
+          }
         } else {
           console.log("INSIDE TOOLBAR");
         }
       });
     }
   }
-
+  
   updateTransitionNode(e) {
     if (this.state.transitionNode.inTransition) {
       this.setTransitionNodePosition(e.pageX, e.pageY);
@@ -100,14 +110,24 @@ class App extends React.Component {
   }
 
   setTransitionNodePosition(x, y) {
-    let closestCoord = Constants.getClosestCoord(x, y, Constants.ZOOM_SETTINGS.DEFAULT);
-    this.setState(prevState => ({
-      transitionNode: {
-        ...prevState.transitionNode,
-        x: closestCoord.x,
-        y: closestCoord.y
-      }
-    }));
+    if (Constants.gridEnabled) {
+      let closestCoord = Constants.getClosestCoord(x, y, Constants.ZOOM_SETTINGS.DEFAULT);
+      this.setState(prevState => ({
+        transitionNode: {
+          ...prevState.transitionNode,
+          x: closestCoord.x,
+          y: closestCoord.y
+        }
+      }));
+    } else {
+      this.setState(prevState => ({
+        transitionNode: {
+          ...prevState.transitionNode,
+          x: x,
+          y: y
+        }
+      }));
+    }
   }
 
   render() {

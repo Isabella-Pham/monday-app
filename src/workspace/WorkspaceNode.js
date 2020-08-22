@@ -49,11 +49,19 @@ class WorkspaceNode extends React.Component {
 
   moveNode(e) {
     if (this.state.isSelected && this.state.isMoving) {
-      const newCoord = Constants.getClosestCoord(
-        e.pageX - this.state.offset.x,
-        e.pageY - this.state.offset.y,
-        Constants.ZOOM_SETTINGS.DEFAULT
-      );
+      let newCoord = {}
+      if (Constants.gridEnabled) {
+        newCoord = Constants.getClosestCoord(
+          e.pageX - this.state.offset.x,
+          e.pageY - this.state.offset.y,
+          Constants.ZOOM_SETTINGS.DEFAULT
+        );
+      } else {
+        newCoord = {
+          x: e.pageX - this.state.offset.x,
+          y: e.pageY - this.state.offset.y,
+        }
+      }
       this.setState({ x: newCoord.x, y: newCoord.y })
     }
   }
@@ -63,7 +71,7 @@ class WorkspaceNode extends React.Component {
   }
 
   deleteSelf(e) {
-    if (this.state.isSelected && (e.key == 'Backspace' || e.key == 'Delete')) {
+    if (this.state.isSelected && (e.key === 'Backspace' || e.key === 'Delete')) {
       this.props.onDelete(this.props.index);
     }
   }

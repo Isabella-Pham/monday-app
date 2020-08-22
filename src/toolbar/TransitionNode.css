@@ -1,6 +1,6 @@
 .transition-node {
     position: absolute;
-    outline: 1px dashed black;
+    outline: 2px dashed black;
     cursor: grabbing;
     z-index: 2;
 }

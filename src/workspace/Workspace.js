@@ -2,6 +2,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import './Workspace.css';
 import WorkspaceNode from './WorkspaceNode';
+import WorkSpaceSettings from './WorkspaceSettings';
 import Constants from '../constants/constants';
 
 class Workspace extends React.Component {
@@ -15,6 +16,8 @@ class Workspace extends React.Component {
     this.addNode = this.addNode.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
     this.deleteNode = this.deleteNode.bind(this);
+    this.removeGrid = this.removeGrid.bind(this);
+    this.toggleGrid = this.toggleGrid.bind(this);
 
     this.counter = 0;
   }
@@ -29,8 +32,8 @@ class Workspace extends React.Component {
     let gridDimension = Constants.ZOOM_SETTINGS.DEFAULT;
     let width = parseFloat(d3.select('.workspace').style('width').split('px')[0]);
     let height = parseFloat(d3.select('.workspace').style('height').split('px')[0]);
-    let horizontalBoxCount = Math.ceil(width/gridDimension);
-    let verticalBoxCount = Math.ceil(height/gridDimension);
+    let horizontalBoxCount = Math.ceil(width / gridDimension);
+    let verticalBoxCount = Math.ceil(height / gridDimension);
     
     d3.select('.workspace').select('.grid').remove();
 
@@ -58,7 +61,11 @@ class Workspace extends React.Component {
       .attr('x2', width)
       .attr('y2', (d, i) => gridDimension * i)
       .attr('stroke', '#000000')
-      .attr('stroke-width', '0.5');
+      .attr('stroke-width', '0.5')
+  }
+
+  removeGrid() {
+    d3.select('.workspace').select('.grid').remove();
   }
 
   addNode(attributes) {
@@ -75,9 +82,20 @@ class Workspace extends React.Component {
     })});
   }
 
+  toggleGrid() {
+    if (Constants.gridToggle()) {
+      this.drawGrid();
+      window.addEventListener('resize', this.drawGrid);
+    } else {
+      this.removeGrid();
+      window.removeEventListener('resize', this.drawGrid);
+    }
+  }
+
   render() {
     return (
       <div className="workspace">
+          <WorkSpaceSettings onClick={this.toggleGrid}/>
           {this.state.nodes.map((item, i) =>
             <WorkspaceNode
             onDelete={this.deleteNode}

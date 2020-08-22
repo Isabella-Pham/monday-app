@@ -1,5 +1,7 @@
 const cursorCentered = true;
 
+let gridEnabled = true;
+
 const ZOOM_SETTINGS = Object.freeze({
   DEFAULT: window.screen.width / 100
 });
@@ -7,6 +9,16 @@ const ZOOM_SETTINGS = Object.freeze({
 class Constants {
   static get cursorCentered() {
     return cursorCentered;
+  }
+
+  static get gridEnabled() {
+    return gridEnabled;
+  }
+
+  static gridToggle() {
+    gridEnabled = !gridEnabled;
+    
+    return gridEnabled;
   }
 
   static get ZOOM_SETTINGS() {
@@ -26,7 +38,7 @@ class Constants {
 
   static getUniqueReactKey() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
   }
