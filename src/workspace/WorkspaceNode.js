@@ -15,14 +15,18 @@ class WorkspaceNode extends React.Component {
         y: -1
       },
       isMoving: false,
-      x: this.props.attributes.x,
-      y: this.props.attributes.y
+      scrolling: {
+        enabled: false,
+        xDis: 0,
+        yDis: 0
+      }
     }
 
     this.handleClick = this.handleClick.bind(this);
     this.moveNode = this.moveNode.bind(this);
     this.placeNode = this.placeNode.bind(this);
     this.deleteSelf = this.deleteSelf.bind(this);
+    this.getDimensions = this.getDimensions.bind(this);
   }
 
   componentDidMount() {
@@ -41,9 +45,56 @@ class WorkspaceNode extends React.Component {
 
   handleClick(e) {
     if (this.node.contains(e.target)) {
-      this.setState({ isSelected: true, offset: { x: e.pageX - this.state.x, y: e.pageY - this.state.y }, isMoving: true });
+      this.setState({
+        isSelected: true,
+        offset: {
+          x: e.pageX - this.props.attributes.x,
+          y: e.pageY - this.props.attributes.y
+        },
+        isMoving: true
+      });
     } else {
       this.setState({ isSelected: false });
+    }
+  }
+
+  getDimensions() {
+    let dimensions = Shapes.getDefaultDimensions(this.props.attributes.type);
+    let width = dimensions.width * Constants.ZOOM_SETTINGS;
+    let height = dimensions.height * Constants.ZOOM_SETTINGS;
+    return {
+      width: width,
+      height: height
+    };
+  }
+
+  // x and y and current page coordinates of WorkspaceNode
+  // xDif is difference between current pageX and clientX
+  // yDif is difference between current pageY and clientY
+  scrollWorkspace(x, y, xDif, yDif) {
+    let dimensions = this.getDimensions();
+    let width = dimensions.width;
+    let height = dimensions.height;
+
+    let scrollXDis = 0;
+    let scrollYDis = 0;
+
+    if (x + width > window.innerWidth + xDif) {
+      scrollXDis = Constants.ZOOM_SETTINGS;
+    }
+    else if (x < xDif) {
+      scrollXDis = -Constants.ZOOM_SETTINGS;
+    }
+
+    if (y + height > window.innerHeight + yDif) {
+      scrollYDis = Constants.ZOOM_SETTINGS;
+    }
+    else if (y < yDif) {
+      scrollYDis = -Constants.ZOOM_SETTINGS;
+    }
+
+    if (scrollXDis || scrollYDis) {
+      this.props.startScroll(scrollXDis, scrollYDis);
     }
   }
 
@@ -52,30 +103,46 @@ class WorkspaceNode extends React.Component {
       const newCoord = Constants.getClosestCoord(
         e.pageX - this.state.offset.x,
         e.pageY - this.state.offset.y,
-        Constants.ZOOM_SETTINGS.DEFAULT
+        Constants.ZOOM_SETTINGS
       );
-      this.setState({ x: newCoord.x, y: newCoord.y })
+      this.props.updateSelf(this.props.index, newCoord.x, newCoord.y);
+      this.scrollWorkspace(
+        newCoord.x,
+        newCoord.y,
+        e.pageX - e.clientX,
+        e.pageY - e.clientY
+      );
     }
   }
 
   placeNode() {
-    this.setState({ isMoving: false });
+    this.setState({
+      isMoving: false
+    });
+    this.props.endScroll();
   }
 
   deleteSelf(e) {
-    if (this.state.isSelected && (e.key == 'Backspace' || e.key == 'Delete')) {
+    if (this.state.isSelected && (e.key === 'Backspace' || e.key === 'Delete')) {
       this.props.onDelete(this.props.index);
     }
   }
 
   render() {
+    let dimensions = this.getDimensions();
+    
     return (
       <div
         ref={node => this.node = node}
         className={'work-node' + (this.state.isSelected ? ' selected' : '')}
-        style={{ top: this.state.y, left: this.state.x, width: this.props.attributes.width, height: this.props.attributes.height }}>
+        style={{
+          top: this.props.attributes.y,
+          left: this.props.attributes.x,
+          width: dimensions.width,
+          height: dimensions.height
+        }}>
         <svg viewBox="0 0 100 100">
-          {Shapes.renderShape(this.props.attributes.type, false)}
+          { Shapes.renderShape(this.props.attributes.type, false) }
         </svg>
       </div>
     );

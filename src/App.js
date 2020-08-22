@@ -21,7 +21,7 @@ class App extends React.Component {
         width: 0,
         height: 0,
         type: -1
-      },
+      }
     };
 
     this._workspace = React.createRef();
@@ -32,7 +32,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    // TODO: set up event listeners
+    
   }
   
   showTransitionNode(e) {
@@ -44,8 +44,8 @@ class App extends React.Component {
       transitionNode: {
         ...prevState.transitionNode,
         inTransition: true,
-        width: dimensions.width,
-        height: dimensions.height,
+        width: dimensions.width * Constants.ZOOM_SETTINGS,
+        height: dimensions.height * Constants.ZOOM_SETTINGS,
         type: nodeType
       }
     }), () => { 
@@ -73,13 +73,11 @@ class App extends React.Component {
           inTransition: false
         }
       }), () => {
-        let closestCoord = Constants.getClosestCoord(pageX, pageY, Constants.ZOOM_SETTINGS.DEFAULT);
+        let closestCoord = Constants.getClosestCoord(pageX, pageY, Constants.ZOOM_SETTINGS);
         if (this.transitionBeyondToolbar(clientX, clientY)) {
           let width = this.state.transitionNode.width;
           let height = this.state.transitionNode.height;
           this._workspace.current.addNode({
-            width: width,
-            height: height,
             x: this.getNewPoint(closestCoord.x, width),
             y: this.getNewPoint(closestCoord.y, height),
             type: this.state.transitionNode.type
@@ -100,7 +98,7 @@ class App extends React.Component {
   }
 
   setTransitionNodePosition(x, y) {
-    let closestCoord = Constants.getClosestCoord(x, y, Constants.ZOOM_SETTINGS.DEFAULT);
+    let closestCoord = Constants.getClosestCoord(x, y, Constants.ZOOM_SETTINGS);
     this.setState(prevState => ({
       transitionNode: {
         ...prevState.transitionNode,

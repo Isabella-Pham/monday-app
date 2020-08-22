@@ -21,13 +21,7 @@
 }
 
 .work-node > svg > path {
-  fill: transparent;
-  stroke-width: 1px;
-  stroke: black;
-}
-
-.work-node > svg > path {
-  fill: transparent;
+  fill: white;
   stroke-width: 1px;
   stroke: black;
 }
