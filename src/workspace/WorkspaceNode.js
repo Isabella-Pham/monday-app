@@ -3,6 +3,8 @@ import * as d3 from 'd3';
 import "./WorkspaceNode.css";
 import Shapes from '../assets/Shapes';
 import Constants from '../constants/constants';
+import { Menu, Item, Separator, Submenu, MenuProvider, theme, animation } from 'react-contexify';
+import 'react-contexify/dist/ReactContexify.min.css';
 
 class WorkspaceNode extends React.Component {
   constructor(props) {
@@ -82,9 +84,9 @@ class WorkspaceNode extends React.Component {
         ref={node => this.node = node}
         className={'work-node' + (this.state.isSelected ? ' selected' : '')}
         style={{ top: this.state.y, left: this.state.x, width: this.props.attributes.width, height: this.props.attributes.height }}>
-        <svg viewBox="0 0 100 100">
-          {Shapes.renderShape(this.props.attributes.type, false)}
-        </svg>
+          <svg viewBox="0 0 100 100">
+            {Shapes.renderShape(this.props.attributes.type, false)}
+          </svg>
       </div>
     );
   }
