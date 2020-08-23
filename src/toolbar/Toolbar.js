@@ -2,12 +2,9 @@ import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-import "./Toolbar.css";
 import ToolbarNode from './ToolbarNode';
 import Shapes from '../assets/Shapes';
-import Constants from '../constants/constants';
-
-const monday = Constants.monday;
+import "./Toolbar.css";
 
 // fills in left to right, top to bottom
 const TOOLBAR_ORDER = [
@@ -27,10 +24,11 @@ class Toolbar extends React.Component {
     };
     this.hide = this.hide.bind(this);
     this.cols = new Array(COL_COUNT);
-    for (var i = 0; i < COL_COUNT; i++) {
+    var i;
+    for (i = 0; i < COL_COUNT; i++) {
       this.cols[i] = [];
     }
-    for (var i = 0; i < TOOLBAR_ORDER.length; i++) {
+    for (i = 0; i < TOOLBAR_ORDER.length; i++) {
       this.cols[i % COL_COUNT].push(TOOLBAR_ORDER[i]);
     }
   }

@@ -1,9 +1,7 @@
 import React from 'react';
-import "./ToolbarNode.css";
-import Shapes from '../assets/Shapes';
 
-// TODO: Top row bleeds into bottom left spot
-// possibly an attribute of column-count
+import Shapes from '../assets/Shapes';
+import "./ToolbarNode.css";
 
 class ToolbarNode extends React.Component {
   static onMouseDown;

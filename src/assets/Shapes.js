@@ -1,7 +1,5 @@
 import React from 'react';
 
-import Constants from '../constants/constants';
-
 const TYPES = Object.freeze({
   RECT: 0,
   ROUND_RECT: 1,
@@ -99,7 +97,6 @@ class Shapes {
     static getDefaultDimensions(type) {
       type = parseInt(type);
       let dimensions = [0, 0];
-      let gridDimension = Constants.ZOOM_SETTINGS.DEFAULT;
       switch (type) {
         case Shapes.TYPES.RECT:
           dimensions = [8, 4];
@@ -119,8 +116,8 @@ class Shapes {
         default: break;        
       }
       return {
-        width: dimensions[0] * gridDimension,
-        height: dimensions[1] * gridDimension
+        width: dimensions[0],
+        height: dimensions[1]
       };
     }
 }

@@ -22,7 +22,7 @@
     "dotenv": "^8.2.0",
     "monday-sdk-js": "0.0.16",
     "react": "^16.13.0",
-    "react-contexify": "^4.1.1",
+    "react-contextmenu": "^2.14.0",
     "react-dom": "^16.13.0",
     "react-scripts": "^3.4.3"
   },

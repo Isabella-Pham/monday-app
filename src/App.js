@@ -1,11 +1,12 @@
 import React from "react";
-import "./App.css";
+
 import Workspace from './workspace/Workspace';
 import Toolbar from './toolbar/Toolbar';
 import ToolbarNode from './toolbar/ToolbarNode';
 import Shapes from './assets/Shapes';
 import TransitionNode from './toolbar/TransitionNode';
 import Constants from './constants/constants';
+import "./App.css";
 
 class App extends React.Component {
   constructor(props) {
@@ -21,7 +22,7 @@ class App extends React.Component {
         width: 0,
         height: 0,
         type: -1
-      },
+      }
     };
 
     this._workspace = React.createRef();
@@ -32,7 +33,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    // TODO: set up event listeners
+    
   }
   
   showTransitionNode(e) {
@@ -44,8 +45,8 @@ class App extends React.Component {
       transitionNode: {
         ...prevState.transitionNode,
         inTransition: true,
-        width: dimensions.width,
-        height: dimensions.height,
+        width: dimensions.width * Constants.ZOOM_SETTINGS,
+        height: dimensions.height * Constants.ZOOM_SETTINGS,
         type: nodeType
       }
     }), () => { 
@@ -74,26 +75,26 @@ class App extends React.Component {
         }
       }), () => {
         if (this.transitionBeyondToolbar(clientX, clientY)) {
-          let width = this.state.transitionNode.width;
-          let height = this.state.transitionNode.height;
           if (Constants.gridEnabled) {
-            let closestCoord = Constants.getClosestCoord(pageX, pageY, Constants.ZOOM_SETTINGS.DEFAULT);
+            let closestCoord = Constants.getClosestCoord(pageX, pageY, Constants.ZOOM_SETTINGS);
+            let width = this.state.transitionNode.width;
+            let height = this.state.transitionNode.height;
             this._workspace.current.addNode({
-              width: width,
-              height: height,
               x: this.getNewPoint(closestCoord.x, width),
               y: this.getNewPoint(closestCoord.y, height),
               type: this.state.transitionNode.type
             });
-          } else {
+          }
+          else {
+            let width = this.state.transitionNode.width;
+            let height = this.state.transitionNode.height;
             this._workspace.current.addNode({
-              width: width,
-              height: height,
               x: this.getNewPoint(pageX, width),
               y: this.getNewPoint(pageY, height),
               type: this.state.transitionNode.type
             });
           }
+
         } else {
           console.log("INSIDE TOOLBAR");
         }
@@ -110,24 +111,17 @@ class App extends React.Component {
   }
 
   setTransitionNodePosition(x, y) {
-    if (Constants.gridEnabled) {
-      let closestCoord = Constants.getClosestCoord(x, y, Constants.ZOOM_SETTINGS.DEFAULT);
-      this.setState(prevState => ({
-        transitionNode: {
-          ...prevState.transitionNode,
-          x: closestCoord.x,
-          y: closestCoord.y
-        }
-      }));
-    } else {
-      this.setState(prevState => ({
-        transitionNode: {
-          ...prevState.transitionNode,
-          x: x,
-          y: y
-        }
-      }));
-    }
+    let closestCoord = Constants.gridEnabled ? Constants.getClosestCoord(x, y, Constants.ZOOM_SETTINGS) : {
+      x: x,
+      y: y
+    };
+    this.setState(prevState => ({
+      transitionNode: {
+        ...prevState.transitionNode,
+        x: closestCoord.x,
+        y: closestCoord.y
+      }
+    }));
   }
 
   render() {

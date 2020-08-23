@@ -1,6 +1,7 @@
 import React from 'react';
-import './TransitionNode.css';
+
 import Constants from '../constants/constants'
+import './TransitionNode.css';
 
 class TransitionNode extends React.Component {
     constructor(props) {

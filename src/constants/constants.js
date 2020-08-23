@@ -3,10 +3,65 @@ const cursorCentered = true;
 let gridEnabled = true;
 
 const ZOOM_SETTINGS = Object.freeze({
-  DEFAULT: window.screen.width / 100
+  LIST: [
+    window.screen.width / 40,
+    window.screen.width / 60,
+    window.screen.width / 80,
+    window.screen.width / 100,
+    window.screen.width / 125,
+    window.screen.width / 150,
+    window.screen.width / 175,
+    window.screen.width / 200,
+    window.screen.width / 300
+  ],
+  DEFAULT: 3
 });
 
+class WorkspaceSettings {
+  constructor() {
+    this.zoomIndex = ZOOM_SETTINGS.DEFAULT;
+  }
+
+  canInc() {
+    return this.zoomIndex - 1 > -1;
+  }
+
+  canDec() {
+    return this.zoomIndex + 1 < ZOOM_SETTINGS.LIST.length;
+  }
+
+  /*
+    increase zoom index if possible
+    returns zoom settings prior to any changes
+  */
+  decZoom() {
+    let oldZoom = this.getZoom();
+    if (this.canDec()) {
+      this.zoomIndex++;
+    }
+    return oldZoom;
+  }
+
+  /*
+    decreases zoom index if possible
+    returns zoom settings prior to any changes
+  */
+  incZoom() {
+    let oldZoom = this.getZoom();
+    if (this.canInc()) {
+      this.zoomIndex--;
+    }
+    return oldZoom;
+  }
+
+  getZoom() {
+    return ZOOM_SETTINGS.LIST[this.zoomIndex];
+  }
+}
+
 class Constants {
+  static WORKSPACE_SETTINGS = new WorkspaceSettings();
+
   static get cursorCentered() {
     return cursorCentered;
   }
@@ -22,7 +77,7 @@ class Constants {
   }
 
   static get ZOOM_SETTINGS() {
-    return ZOOM_SETTINGS;
+    return Constants.WORKSPACE_SETTINGS.getZoom();
   }
 
   static getClosestCoord(x, y, dimension) {
@@ -34,6 +89,30 @@ class Constants {
       x: closeX,
       y: closeY
     };
+  }
+
+  static isLeftClick(event) {
+    if ('which' in event) {
+      return event.which === 1;
+    }
+    else if ('type' in event) {
+      return event.type === 'click';
+    }
+    else if ('button' in event) {
+      return event.button === 0;
+    }
+  }
+
+  static isRightClick(event) {
+    if ('which' in event) {
+      return event.which === 3;
+    }
+    else if ('type' in event) {
+      return event.type === 'contextmenu';
+    }
+    else if ('button' in event) {
+      return event.button === 2;
+    }
   }
 
   static getUniqueReactKey() {
