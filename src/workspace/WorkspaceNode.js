@@ -1,8 +1,8 @@
 import React from 'react';
-import * as d3 from 'd3';
-import "./WorkspaceNode.css";
+
 import Shapes from '../assets/Shapes';
 import Constants from '../constants/constants';
+import "./WorkspaceNode.css";
 
 class WorkspaceNode extends React.Component {
   constructor(props) {
@@ -100,11 +100,20 @@ class WorkspaceNode extends React.Component {
 
   moveNode(e) {
     if (this.state.isSelected && this.state.isMoving) {
-      const newCoord = Constants.getClosestCoord(
-        e.pageX - this.state.offset.x,
-        e.pageY - this.state.offset.y,
-        Constants.ZOOM_SETTINGS
-      );
+      let newCoord = {}
+      if (Constants.gridEnabled) {
+        newCoord = Constants.getClosestCoord(
+          e.pageX - this.state.offset.x,
+          e.pageY - this.state.offset.y,
+          Constants.ZOOM_SETTINGS
+        );
+      } else {
+        newCoord = {
+          x: e.pageX - this.state.offset.x,
+          y: e.pageY - this.state.offset.y,
+        }
+      }
+      this.setState({ x: newCoord.x, y: newCoord.y });
       this.props.updateSelf(this.props.index, newCoord.x, newCoord.y);
       this.scrollWorkspace(
         newCoord.x,

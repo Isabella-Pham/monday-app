@@ -1,11 +1,10 @@
 import React from 'react';
 import * as d3 from 'd3';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearchMinus, faSearchPlus } from '@fortawesome/free-solid-svg-icons';
 
-import './Workspace.css';
 import WorkspaceNode from './WorkspaceNode';
+import WorkspaceTools from './WorkspaceTools';
 import Constants from '../constants/constants';
+import './Workspace.css';
 
 class Workspace extends React.Component {
   constructor(props) {
@@ -28,6 +27,8 @@ class Workspace extends React.Component {
     this.updateNode = this.updateNode.bind(this);
     this.incZoom = this.incZoom.bind(this);
     this.decZoom = this.decZoom.bind(this);
+    this.removeGrid = this.removeGrid.bind(this);
+    this.toggleGrid = this.toggleGrid.bind(this);
 
     this.counter = 0;
   }
@@ -90,10 +91,10 @@ class Workspace extends React.Component {
     let gridDimension = Constants.ZOOM_SETTINGS;
     let width = parseFloat(d3.select('.workspace').style('width').split('px')[0]);
     let height = parseFloat(d3.select('.workspace').style('height').split('px')[0]);
-    let horizontalBoxCount = Math.ceil(width/gridDimension);
-    let verticalBoxCount = Math.ceil(height/gridDimension);
+    let horizontalBoxCount = Math.ceil(width / gridDimension);
+    let verticalBoxCount = Math.ceil(height / gridDimension);
     
-    d3.select('.workspace').select('.grid').remove();
+    this.removeGrid();
 
     let svg = d3.select('.workspace')
       .append('svg')
@@ -119,7 +120,11 @@ class Workspace extends React.Component {
       .attr('x2', width)
       .attr('y2', (d, i) => gridDimension * i)
       .attr('stroke', '#000000')
-      .attr('stroke-width', '0.5');
+      .attr('stroke-width', '0.5')
+  }
+
+  removeGrid() {
+    d3.select('.workspace').select('.grid').remove();
   }
 
   addNode(attributes) {
@@ -143,23 +148,26 @@ class Workspace extends React.Component {
     this.setState({nodes: newNodes});
   }
 
+  toggleGrid() {
+    if (Constants.gridToggle()) {
+      this.drawGrid();
+      window.addEventListener('resize', this.drawGrid);
+    } else {
+      this.removeGrid();
+      window.removeEventListener('resize', this.drawGrid);
+    }
+  }
+
   render() {
     if (this.state.scrolling.enabled) {
       window.scrollBy(this.state.scrolling.xDis, this.state.scrolling.yDis);
     }
     return (
       <div className="workspace">
-        <FontAwesomeIcon
-          icon={faSearchPlus}
-          onClick={this.incZoom}
-          size="lg"
-          style={{
-            position: 'absolute',
-            border: 'none',
-            left: '20%',
-            top: '5%',
-            transform: 'translate(10px, -5%)'
-          }}/>
+          <WorkspaceTools
+            incZoom={this.incZoom}
+            decZoom={this.decZoom}
+            toggleGrid={this.toggleGrid}/>
           {this.state.nodes.map((item, i) =>
             <WorkspaceNode
             startScroll={this.startScroll}

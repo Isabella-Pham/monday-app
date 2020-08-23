@@ -1,5 +1,7 @@
 const cursorCentered = true;
 
+let gridEnabled = true;
+
 const ZOOM_SETTINGS = Object.freeze({
   LIST: [
     window.screen.width / 40,
@@ -62,6 +64,16 @@ class Constants {
 
   static get cursorCentered() {
     return cursorCentered;
+  }
+
+  static get gridEnabled() {
+    return gridEnabled;
+  }
+
+  static gridToggle() {
+    gridEnabled = !gridEnabled;
+    
+    return gridEnabled;
   }
 
   static get ZOOM_SETTINGS() {

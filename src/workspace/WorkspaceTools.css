@@ -1,0 +1,84 @@
+.settings {
+  position: fixed;
+  display: block;
+  top: 5px;
+  right: 0;
+  background-color: transparent;
+  z-index: 1000;
+}
+
+.setting > * {
+  display: inline-block;
+}
+
+.grid-button {
+  outline: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  position: relative;
+  -webkit-transition: none;
+  -moz-transition: none;
+  transition: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  background: lightgray;
+}
+.grid-button:last-of-type {
+  margin-left: 0;
+}
+
+.grid-button.on {
+  background: #2ecc71;
+  color: #fff
+}
+
+.grid-button.off {
+  background: #f06060;
+  color: #000
+}
+
+.grid-button:hover {
+  top: 2px;
+}
+
+.grid-button:active {
+  top: 6px;
+}
+
+.tooltip {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.grid-button .tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.grid-button:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}

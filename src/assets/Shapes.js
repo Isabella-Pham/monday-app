@@ -1,7 +1,5 @@
 import React from 'react';
 
-import Constants from '../constants/constants';
-
 const TYPES = Object.freeze({
   RECT: 0,
   ROUND_RECT: 1,
