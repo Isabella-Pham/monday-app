@@ -8,6 +8,7 @@ class mondayClient {
     constructor() {
         this.monday = mondaySdk();
         this.api_key = process.env.REACT_APP_MONDAY_TOKEN;
+        this.monday.storage.instance.setItem("all_graphs", null);
     }
     async post(apiQuery) {
         try {
@@ -29,33 +30,45 @@ class mondayClient {
         }
     }
     getTeammates() {
-        return this.monday.api("{users{name,email,photo_original}}");
+        const teammates = this.monday.api("{users{name,email,photo_original}}").then(res => {
+            return res;
+        });
+        return teammates;
     }
-    getAllGraphs() {
-        return this.monday.storage.instance.getItem("all_graphs");
+    async getAllGraphs() {
+        const allGraphs = this.monday.storage.instance.getItem("all_graphs").then(res => {
+            return res["data"]["value"];
+        });
+        return allGraphs;
     }
     saveGraph(graphName, graphJSON) {
-        this.monday.storage.instance.setItem(graphName, graphJSON);
+        this.monday.storage.instance.setItem(graphName, JSON.stringify( graphJSON ));
         this.monday.storage.instance.getItem("all_graphs").then(res => {
-            if (res["success"].localeCompare("false")) {
-                this.monday.storage.instance.setItem("all_graphs", [graphName]);
+            const data = res["data"];
+            if (data["value"] == null) {
+                this.monday.storage.instance.setItem("all_graphs", graphName);
             } else {
-                var graphList = res.data.push(graphName);
+                var graphList= data["value"] + "," + graphName;
                 this.monday.storage.instance.setItem("all_graphs", graphList);
             }
         });
     }
-    getGraph(graphName) {
-        return this.monday.storage.instance.getItem(graphName);
+    async getGraph(graphName) {
+        const graphJSON = await this.monday.storage.instance.getItem(graphName).then(res => {
+            const graph = JSON.parse(res["data"]["value"]);
+            return graph;
+        });
+        return graphJSON;
     }
-    containsGraph(graphName) {
-        this.monday.storage.instance.getItem(graphName).then(res => {
-            if (res["success"].localeCompare("false")) {
+    async containsGraph(graphName) {
+        const contains = this.monday.storage.instance.getItem(graphName).then(res => {
+            if (!res["data"]["success"]){
                 return false;
             } else {
                 return true;
             }
         });
+        return contains;
     }
 }
 
