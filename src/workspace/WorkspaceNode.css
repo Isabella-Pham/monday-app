@@ -23,5 +23,11 @@
 .work-node > svg > path {
   fill: white;
   stroke-width: 1px;
-  stroke: black
+  stroke: black;
+}
+
+.work-node > svg > path {
+  fill: white;
+  stroke-width: 1px;
+  stroke: black;
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearchMinus, faSearchPlus, faTh } from '@fortawesome/free-solid-svg-icons';
+import { faSearchMinus, faSearchPlus, faBorderAll } from '@fortawesome/free-solid-svg-icons';
 
 import Constants from '../constants/constants';
 import './WorkspaceTools.css';
@@ -38,7 +38,7 @@ class WorkplaceTools extends React.Component {
         </button>
         <button className={"grid-button" + (this.state.enabled ? " on" : " off")} onClick={this.updateEnabled}>
           <FontAwesomeIcon
-            icon={faTh}
+            icon={faBorderAll}
             size="lg" />
           {/* <span className="tooltip">{this.state.enabled ? "Disable" : "Enable"} Grid</span> */}
         </button>

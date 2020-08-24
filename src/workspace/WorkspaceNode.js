@@ -1,8 +1,12 @@
 import React from 'react';
+import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
 
 import Shapes from '../assets/Shapes';
 import Constants from '../constants/constants';
-import "./WorkspaceNode.css";
+import './WorkspaceNode.css';
+import './react-contextmenu.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faExpand, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 
 class WorkspaceNode extends React.Component {
   constructor(props) {
@@ -27,7 +31,11 @@ class WorkspaceNode extends React.Component {
     this.placeNode = this.placeNode.bind(this);
     this.deleteSelf = this.deleteSelf.bind(this);
     this.duplicateSelf = this.duplicateSelf.bind(this);
-    this.getDimensions = this.getDimensions.bind(this);
+    this.getRealDimensions = this.getRealDimensions.bind(this);
+    this.dummyMethod = this.dummyMethod.bind(this);
+    this.copyNode = this.copyNode.bind(this);
+    this.moveToBack = this.moveToBack.bind(this);
+    this.moveToFront = this.moveToFront.bind(this);
   }
 
   componentDidMount() {
@@ -60,44 +68,21 @@ class WorkspaceNode extends React.Component {
     }
   }
 
-  getDimensions() {
-    let dimensions = Shapes.getDefaultDimensions(this.props.attributes.type);
-    let width = dimensions.width * Constants.ZOOM_SETTINGS;
-    let height = dimensions.height * Constants.ZOOM_SETTINGS;
+  getRealDimensions() {
+    let width = this.props.attributes.width * Constants.ZOOM_SETTINGS;
+    let height = this.props.attributes.height * Constants.ZOOM_SETTINGS;
     return {
       width: width,
       height: height
     };
   }
 
-  // x and y and current page coordinates of WorkspaceNode
-  // xDif is difference between current pageX and clientX
-  // yDif is difference between current pageY and clientY
-  scrollWorkspace(x, y, xDif, yDif) {
-    let dimensions = this.getDimensions();
-    let width = dimensions.width;
-    let height = dimensions.height;
-
-    let scrollXDis = 0;
-    let scrollYDis = 0;
-
-    if (x + width > window.innerWidth + xDif) {
-      scrollXDis = Constants.ZOOM_SETTINGS;
-    }
-    else if (x < xDif) {
-      scrollXDis = -Constants.ZOOM_SETTINGS;
-    }
-
-    if (y + height > window.innerHeight + yDif) {
-      scrollYDis = Constants.ZOOM_SETTINGS;
-    }
-    else if (y < yDif) {
-      scrollYDis = -Constants.ZOOM_SETTINGS;
-    }
-
-    if (scrollXDis || scrollYDis) {
-      this.props.startScroll(scrollXDis, scrollYDis);
-    }
+  getPosition() {
+    let offset = Constants.getGridOffset();
+    return {
+      x: this.props.attributes.x * Constants.ZOOM_SETTINGS + offset.x,
+      y: this.props.attributes.y * Constants.ZOOM_SETTINGS + offset.y
+    };
   }
 
   moveNode(e) {
@@ -115,28 +100,34 @@ class WorkspaceNode extends React.Component {
         }
       }
       let offset = Constants.getGridOffset();
-      let dimensions = this.getDimensions();
-      let xPos = Constants.getGridCoord(
+      let dimensions = this.getRealDimensions();
+      let xCord = Constants.getGridCoord(
         position.x,
         dimensions.width,
         offset.x
       );
-      let yPos = Constants.getGridCoord(
+      let yCord = Constants.getGridCoord(
         position.y,
         dimensions.height,
         offset.y
       );
+      if (xCord < 0) {
+        xCord = 0;
+      }
+      else if (xCord+this.props.attributes.width > Constants.WORKSPACE_SETTINGS.horizontalBoxes) {
+        xCord = Constants.WORKSPACE_SETTINGS.horizontalBoxes - this.props.attributes.width;
+      }
+      if (yCord < 0) {
+        yCord = 0;
+      }
+      else if (yCord+this.props.attributes.height > Constants.WORKSPACE_SETTINGS.verticalBoxes) {
+        yCord = Constants.WORKSPACE_SETTINGS.verticalBoxes - this.props.attributes.height;
+      }
       this.props.updateSelf(
         this.props.index,
-        xPos,
-        yPos
+        xCord,
+        yCord
       );
-      // this.scrollWorkspace(
-      //   newCoord.x,
-      //   newCoord.y,
-      //   e.pageX - e.clientX,
-      //   e.pageY - e.clientY
-      // );
     }
   }
 
@@ -153,10 +144,6 @@ class WorkspaceNode extends React.Component {
     }
   }
 
-  duplicateSelf(e) {
-    this.props.onDuplicate(this.props.index);
-  }
-
   moveToFront(e) {
     this.props.onShift(this.props.index, true);
   }
@@ -165,30 +152,107 @@ class WorkspaceNode extends React.Component {
     this.props.onShift(this.props.index, false);
   }
 
-  getPosition() {
-    let offset = Constants.getGridOffset();
-    return {
-      x: this.props.attributes.x * Constants.ZOOM_SETTINGS + offset.x,
-      y: this.props.attributes.y * Constants.ZOOM_SETTINGS + offset.y
-    };
+  duplicateSelf(e) {
+    this.props.onDuplicate(this.props.index);
+  }
+
+  copyNode() {
+    this.props.copySelf(this.props.index);
+  }
+
+  dummyMethod() {
+    console.log("Dummy method");
   }
 
   render() {
-    let dimensions = this.getDimensions();
+    let dimensions = this.getRealDimensions();
     let position = this.getPosition();
     return (
-      <div
-        ref={node => this.node = node}
-        className={'work-node' + (this.state.isSelected ? ' selected' : '')}
-        style={{
-          top: position.y,
-          left: position.x,
-          width: dimensions.width,
-          height: dimensions.height
-        }}>
-        <svg viewBox="0 0 100 100">
-          { Shapes.renderShape(this.props.attributes.type, false) }
-        </svg>
+      <div>
+        <ContextMenuTrigger id={this.props.menu_id} holdToDisplay={-1}>
+          <div
+            ref={node => this.node = node}
+            className={'work-node' + (this.state.isSelected ? ' selected' : '')}
+            style={{
+              top: position.y,
+              left: position.x,
+              width: dimensions.width,
+              height: dimensions.height
+            }}>
+            <svg viewBox="0 0 100 100">
+              { Shapes.renderShape(this.props.attributes.type, false) }
+            </svg>
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenu id={this.props.menu_id} className="react-contextmenu">
+          <MenuItem className="react-contextmenu-item" onClick={() => {this.props.onDelete(this.props.index)}}>
+              <FontAwesomeIcon icon={faTrashAlt} style={{paddingRight: 10}}/>
+              Delete
+          </MenuItem>
+          <SubMenu 
+            title={
+              <div style={{display: "inline"}}>
+                <FontAwesomeIcon icon={faEdit} style={{paddingRight: 10}}/>
+                <span>Edit</span>
+              </div>
+            }
+            hoverDelay={100}>
+            <MenuItem className="react-contextmenu-item" onClick={this.copyNode}>
+              <FontAwesomeIcon icon={faCopy} style={{paddingRight: 10}}/>
+              Copy
+            </MenuItem>
+            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+              <FontAwesomeIcon icon={faCut} style={{paddingRight: 10}}/>
+              Cut
+            </MenuItem>
+            <MenuItem className="react-contextmenu-item" onClick={this.duplicateSelf}>
+              <FontAwesomeIcon icon={faClone} style={{paddingRight: 10}}/>
+              Duplicate
+            </MenuItem>
+            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+              <FontAwesomeIcon icon={faTextHeight} style={{paddingRight: 10}}/>
+              Text
+            </MenuItem>
+          </SubMenu>
+          <SubMenu 
+            title={
+              <div style={{display: "inline"}}>
+                <FontAwesomeIcon icon={faFileAlt} style={{paddingRight: 10}}/>
+                <span>Wrapping</span>
+              </div>
+            }
+            hoverDelay={100}>
+            <MenuItem className="react-contextmenu-item" onClick={this.moveToFront}>
+              <FontAwesomeIcon icon={faSortAmountUpAlt} style={{paddingRight: 10}}/>
+              Bring To Front
+            </MenuItem>
+            <MenuItem className="react-contextmenu-item" onClick={this.moveToBack}>
+              <FontAwesomeIcon icon={faSortAmountDownAlt} style={{paddingRight: 10}}/>
+              Send To Back
+            </MenuItem>
+          </SubMenu>
+          <SubMenu 
+            title={
+              <div style={{display: "inline"}}>
+                <FontAwesomeIcon icon={faVectorSquare} style={{paddingRight: 10}}/>
+                <span>Styling</span>
+              </div>
+            }
+            hoverDelay={100}>
+            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+              <FontAwesomeIcon icon={faUndo} style={{paddingRight: 10}}/>
+              Rotate
+            </MenuItem>
+            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+              <FontAwesomeIcon icon={faExpand} style={{paddingRight: 10}}/>
+              Resize
+            </MenuItem>
+            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+              <FontAwesomeIcon icon={faPalette} style={{paddingRight: 10}}/>
+              Change Color
+            </MenuItem>
+          </SubMenu>
+        </ContextMenu>
       </div>
     );
   }

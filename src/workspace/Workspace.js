@@ -5,7 +5,6 @@ import WorkspaceNode from './WorkspaceNode';
 import WorkspaceTools from './WorkspaceTools';
 import Constants from '../constants/constants';
 import './Workspace.css';
-import { parse } from 'path';
 
 class Workspace extends React.Component {
   constructor(props) {
@@ -18,8 +17,8 @@ class Workspace extends React.Component {
           xDis: 0,
           yDis: 0
         },
-        horizontalBoxCount: 100,
-        verticalBoxCount: 50
+        horizontalBoxCount: Constants.WORKSPACE_SETTINGS.horizontalBoxes,
+        verticalBoxCount: Constants.WORKSPACE_SETTINGS.verticalBoxes
     };
 
     this.addNode = this.addNode.bind(this);
@@ -34,7 +33,7 @@ class Workspace extends React.Component {
     this.decZoom = this.decZoom.bind(this);
     this.removeGrid = this.removeGrid.bind(this);
     this.toggleGrid = this.toggleGrid.bind(this);
-    this.getGraphJson = this.getGraphJson.bind(this);
+    this.storeCopiedNode = this.storeCopiedNode.bind(this);
   }
 
   componentDidMount() {
@@ -113,11 +112,9 @@ class Workspace extends React.Component {
 
     gridSvg.style('transform', `translate(-${translateX}, -${translateY})`)
 
-    console.log('Width: '+widthTooSmall+': '+windowWidth+', '+gridWidth);
-    console.log('Height: '+heightTooSmall+': '+windowHeight+', '+gridHeight);
-
-    let gridRect = gridSvg.node().getBoundingClientRect();
-    Constants.setGridOffset(gridRect.x, gridRect.y);
+    let offsetX = widthTooSmall ? 0 : parseFloat(windowWidth-gridWidth)/2;
+    let offsetY = heightTooSmall ? 0 : parseFloat(windowHeight-gridHeight)/2;
+    Constants.setGridOffset(offsetX, offsetY);
 
     if (Constants.gridEnabled) {
       gridSvg.selectAll('line')
@@ -161,8 +158,8 @@ class Workspace extends React.Component {
 
   duplicateNode(index) {
     let attributes = Object.assign({}, this.state.nodes[index]);
-    attributes.x += Constants.ZOOM_SETTINGS;
-    attributes.y += Constants.ZOOM_SETTINGS;
+    attributes.x++;
+    attributes.y++;
     this.addNode(attributes);
   }
 
@@ -213,6 +210,11 @@ class Workspace extends React.Component {
     }
   }
 
+  storeCopiedNode(index) {
+    window.copiedNode = this.state.nodes[index];
+    console.log("Storing index", index);
+  }
+
   render() {
     return (
       <div className="workspace">
@@ -230,10 +232,13 @@ class Workspace extends React.Component {
               onDelete={this.deleteNode}
               onDuplicate={this.duplicateNode}
               onShift={this.shiftNode}
+              copySelf={this.storeCopiedNode}
               index={i}
+              menu_id={item.key}
               key={item.key}
-              attributes={item}/>
-            )}
+              attributes={item}
+            />
+          )}
       </div>
     );
   }

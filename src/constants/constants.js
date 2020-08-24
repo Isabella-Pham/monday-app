@@ -1,5 +1,5 @@
 const cursorCentered = false;
-
+const ROUND_DECIMALS = 4;
 let gridEnabled = true;
 
 const ZOOM_SETTINGS = Object.freeze({
@@ -22,6 +22,8 @@ class WorkspaceSettings {
     this.zoomIndex = ZOOM_SETTINGS.DEFAULT;
     this.offsetX = 0;
     this.offsetY = 0;
+    this.horizontalBoxes = 100;
+    this.verticalBoxes = 50;
   }
 
   getOffset() {
@@ -31,6 +33,22 @@ class WorkspaceSettings {
     };
   }
 
+  getHorizontalBoxes() {
+    return this.horizontalBoxes;
+  }
+
+  getVerticalBoxes() {
+    return this.verticalBoxes;
+  }
+
+  setHorizontalBoxes(boxes) {
+    this.horizontalBoxes = boxes;
+  }
+
+  setVerticalBoxes(boxes) {
+    this.verticalBoxes = boxes;
+  }
+  
   setOffset(x, y) {
     this.offsetX = x;
     this.offsetY = y;
@@ -110,44 +128,28 @@ class Constants {
     closeY -= closeY % dimension;
     let offset = Constants.WORKSPACE_SETTINGS.getOffset();
     return {
-      x: closeX + (offset.x % dimension),
-      y: closeY + (offset.y % dimension)
+      x: Constants.roundFloat(closeX + (offset.x % dimension), ROUND_DECIMALS),
+      y: Constants.roundFloat(closeY + (offset.y % dimension), ROUND_DECIMALS)
     };
   }
 
-  static getGridCoord(val, dimension, offset) {
-    return ((val - (Constants.cursorCentered ? dimension / 2 : 0)) - offset) / Constants.ZOOM_SETTINGS;
+  static getGridCoord(mouseCoord, length, gridOffset) {
+    let coord = ((mouseCoord - (Constants.cursorCentered ? length / 2 : 0)) - gridOffset) / Constants.ZOOM_SETTINGS;
+    return Constants.roundFloat(coord, ROUND_DECIMALS);
   }
 
   static setGridOffset(x, y) {
     Constants.WORKSPACE_SETTINGS.setOffset(x, y);
   }
+
   static getGridOffset() {
     return Constants.WORKSPACE_SETTINGS.getOffset();
   }
 
-  static isLeftClick(event) {
-    if ('which' in event) {
-      return event.which === 1;
-    }
-    else if ('type' in event) {
-      return event.type === 'click';
-    }
-    else if ('button' in event) {
-      return event.button === 0;
-    }
-  }
-
-  static isRightClick(event) {
-    if ('which' in event) {
-      return event.which === 3;
-    }
-    else if ('type' in event) {
-      return event.type === 'contextmenu';
-    }
-    else if ('button' in event) {
-      return event.button === 2;
-    }
+  static coordIsValid(x, y, width, height) {
+    let xValid = x >= 0 && x+width <= Constants.WORKSPACE_SETTINGS.horizontalBoxes;
+    let yValid = y >= 0 && y+height <= Constants.WORKSPACE_SETTINGS.verticalBoxes;
+    return xValid && yValid;
   }
 
   static getUniqueReactKey() {
@@ -163,6 +165,10 @@ class Constants {
     var q = Number(parts[1])
     var side = window[['innerHeight', 'innerWidth'][['vh', 'vw'].indexOf(parts[2])]]
     return side * (q / 100)
+  }
+
+  static roundFloat(num, decimals) {
+    return Number(Math.round(num+'e'+decimals)+'e-'+decimals);
   }
 }
 

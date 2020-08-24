@@ -74,22 +74,32 @@ class App extends React.Component {
           let offset = Constants.getGridOffset();
           let width = this.state.transitionNode.width;
           let height = this.state.transitionNode.height;
+          let xCoord, yCoord;
+
           if (Constants.gridEnabled) {
             let closestCoord = Constants.getClosestPosition(pageX, pageY);
-            this._workspace.current.addNode({
-              x: Constants.getGridCoord(closestCoord.x, width, offset.x),
-              y: Constants.getGridCoord(closestCoord.y, height, offset.y),
-              type: this.state.transitionNode.type
-            });
+            xCoord = Constants.getGridCoord(closestCoord.x, width, offset.x);
+            yCoord = Constants.getGridCoord(closestCoord.y, height, offset.y);
           }
           else {
-            this._workspace.current.addNode({
-              x: Constants.getGridCoord(pageX, width, offset.x),
-              y: Constants.getGridCoord(pageY, height, offset.y),
-              type: this.state.transitionNode.type
-            });
+            xCoord = Constants.getGridCoord(pageX, width, offset.x)
+            yCoord = Constants.getGridCoord(pageY, height, offset.y);
           }
 
+          let nodeType = this.state.transitionNode.type;
+          let dimensions = Shapes.getDefaultDimensions(nodeType);
+          if (Constants.coordIsValid(xCoord, yCoord, dimensions.width, dimensions.height)) {
+            this._workspace.current.addNode({
+              x: xCoord,
+              y: yCoord,
+              type: nodeType,
+              width: dimensions.width,
+              height: dimensions.height
+            })
+          }
+          else {
+            console.log('Out of grid');
+          }
         } else {
           console.log("INSIDE TOOLBAR");
         }
