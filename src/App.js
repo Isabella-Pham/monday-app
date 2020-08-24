@@ -58,10 +58,6 @@ class App extends React.Component {
     return x - (Constants.cursorCentered ? (this.state.transitionNode.width / 2) : 0) > Constants.viewportToPixels('20vw');
   }
 
-  getNewPoint(val, dimension) {
-    return val - (Constants.cursorCentered ? dimension / 2 : 0);
-  }
-
   hideTransitionNode(e) {
     if (this.state.transitionNode.inTransition) {
       const pageX = e.pageX;
@@ -75,22 +71,21 @@ class App extends React.Component {
         }
       }), () => {
         if (this.transitionBeyondToolbar(clientX, clientY)) {
+          let offset = Constants.getGridOffset();
+          let width = this.state.transitionNode.width;
+          let height = this.state.transitionNode.height;
           if (Constants.gridEnabled) {
-            let closestCoord = Constants.getClosestCoord(pageX, pageY, Constants.ZOOM_SETTINGS);
-            let width = this.state.transitionNode.width;
-            let height = this.state.transitionNode.height;
+            let closestCoord = Constants.getClosestPosition(pageX, pageY);
             this._workspace.current.addNode({
-              x: this.getNewPoint(closestCoord.x, width),
-              y: this.getNewPoint(closestCoord.y, height),
+              x: Constants.getGridCoord(closestCoord.x, width, offset.x),
+              y: Constants.getGridCoord(closestCoord.y, height, offset.y),
               type: this.state.transitionNode.type
             });
           }
           else {
-            let width = this.state.transitionNode.width;
-            let height = this.state.transitionNode.height;
             this._workspace.current.addNode({
-              x: this.getNewPoint(pageX, width),
-              y: this.getNewPoint(pageY, height),
+              x: Constants.getGridCoord(pageX, width, offset.x),
+              y: Constants.getGridCoord(pageY, height, offset.y),
               type: this.state.transitionNode.type
             });
           }
@@ -111,7 +106,7 @@ class App extends React.Component {
   }
 
   setTransitionNodePosition(x, y) {
-    let closestCoord = Constants.gridEnabled ? Constants.getClosestCoord(x, y, Constants.ZOOM_SETTINGS) : {
+    let closestCoord = Constants.gridEnabled ? Constants.getClosestPosition(x, y) : {
       x: x,
       y: y
     };

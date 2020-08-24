@@ -1,4 +1,4 @@
-const cursorCentered = true;
+const cursorCentered = false;
 
 let gridEnabled = true;
 
@@ -20,6 +20,20 @@ const ZOOM_SETTINGS = Object.freeze({
 class WorkspaceSettings {
   constructor() {
     this.zoomIndex = ZOOM_SETTINGS.DEFAULT;
+    this.offsetX = 0;
+    this.offsetY = 0;
+  }
+
+  getOffset() {
+    return {
+      x: this.offsetX,
+      y: this.offsetY
+    };
+  }
+
+  setOffset(x, y) {
+    this.offsetX = x;
+    this.offsetY = y;
   }
 
   canInc() {
@@ -57,6 +71,10 @@ class WorkspaceSettings {
   getZoom() {
     return ZOOM_SETTINGS.LIST[this.zoomIndex];
   }
+
+  getDefaultZoom() {
+    return ZOOM_SETTINGS.LIST[ZOOM_SETTINGS.DEFAULT];
+  }
 }
 
 class Constants {
@@ -80,15 +98,32 @@ class Constants {
     return Constants.WORKSPACE_SETTINGS.getZoom();
   }
 
-  static getClosestCoord(x, y, dimension) {
+  static get DEFAULT_ZOOM() {
+    return Constants.WORKSPACE_SETTINGS.getDefaultZoom();
+  }
+
+  static getClosestPosition(x, y) {
+    let dimension = Constants.ZOOM_SETTINGS;
     let closeX = x + dimension / 2;
     closeX -= closeX % dimension;
     let closeY = y + dimension / 2;
     closeY -= closeY % dimension;
+    let offset = Constants.WORKSPACE_SETTINGS.getOffset();
     return {
-      x: closeX,
-      y: closeY
+      x: closeX + (offset.x % dimension),
+      y: closeY + (offset.y % dimension)
     };
+  }
+
+  static getGridCoord(val, dimension, offset) {
+    return ((val - (Constants.cursorCentered ? dimension / 2 : 0)) - offset) / Constants.ZOOM_SETTINGS;
+  }
+
+  static setGridOffset(x, y) {
+    Constants.WORKSPACE_SETTINGS.setOffset(x, y);
+  }
+  static getGridOffset() {
+    return Constants.WORKSPACE_SETTINGS.getOffset();
   }
 
   static isLeftClick(event) {

@@ -1,8 +1,11 @@
 .workspace {
-    height: 200%;
-    width: 200%;
     position: absolute;
-    background-color: #FFFFFF;
+    background-color: #dddddd;
     z-index: 1;
-    overflow: hidden;
+    overflow: visible;
+}
+
+.grid {
+  background-color: #ffffff;
+  position: absolute;
 }

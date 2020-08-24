@@ -10,9 +10,16 @@ import "./Toolbar.css";
 const TOOLBAR_ORDER = [
   Shapes.TYPES.RECT,
   Shapes.TYPES.ROUND_RECT,
-  Shapes.TYPES.ELLIPSE,
+  Shapes.TYPES.SQUARE,
+  Shapes.TYPES.ROUNDED_SQUARE,
   Shapes.TYPES.DIAMOND,
-  Shapes.TYPES.CIRCLE
+  Shapes.TYPES.ROUNDED_DIAMOND,
+  Shapes.TYPES.CIRCLE,
+  Shapes.TYPES.ELLIPSE,
+  Shapes.TYPES.LEFT_ARROW,
+  Shapes.TYPES.RIGHT_ARROW,
+  Shapes.TYPES.DOUBLE_ARROW,
+  Shapes.TYPES.FOUR_ARROW,
 ];
 const COL_COUNT = 3;
 
