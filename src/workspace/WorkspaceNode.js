@@ -1,12 +1,12 @@
 import React from 'react';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faExpand, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 
 import Shapes from '../assets/Shapes';
 import Constants from '../constants/constants';
 import './WorkspaceNode.css';
 import './react-contextmenu.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faExpand, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 
 class WorkspaceNode extends React.Component {
   constructor(props) {
@@ -34,6 +34,7 @@ class WorkspaceNode extends React.Component {
     this.getRealDimensions = this.getRealDimensions.bind(this);
     this.dummyMethod = this.dummyMethod.bind(this);
     this.copyNode = this.copyNode.bind(this);
+    this.cutNode = this.cutNode.bind(this);
     this.moveToBack = this.moveToBack.bind(this);
     this.moveToFront = this.moveToFront.bind(this);
   }
@@ -111,22 +112,16 @@ class WorkspaceNode extends React.Component {
         dimensions.height,
         offset.y
       );
-      if (xCord < 0) {
-        xCord = 0;
-      }
-      else if (xCord+this.props.attributes.width > Constants.WORKSPACE_SETTINGS.horizontalBoxes) {
-        xCord = Constants.WORKSPACE_SETTINGS.horizontalBoxes - this.props.attributes.width;
-      }
-      if (yCord < 0) {
-        yCord = 0;
-      }
-      else if (yCord+this.props.attributes.height > Constants.WORKSPACE_SETTINGS.verticalBoxes) {
-        yCord = Constants.WORKSPACE_SETTINGS.verticalBoxes - this.props.attributes.height;
-      }
+      let adjustedCord = Constants.getAdjustedCoord(
+        xCord,
+        yCord,
+        this.props.attributes.width,
+        this.props.attributes.height
+      )
       this.props.updateSelf(
         this.props.index,
-        xCord,
-        yCord
+        adjustedCord.x,
+        adjustedCord.y
       );
     }
   }
@@ -160,6 +155,11 @@ class WorkspaceNode extends React.Component {
     this.props.copySelf(this.props.index);
   }
 
+  cutNode() {
+    this.props.copySelf(this.props.index);
+    this.props.onDelete(this.props.index);
+  }
+
   dummyMethod() {
     console.log("Dummy method");
   }
@@ -169,7 +169,7 @@ class WorkspaceNode extends React.Component {
     let position = this.getPosition();
     return (
       <div>
-        <ContextMenuTrigger id={this.props.menu_id} holdToDisplay={-1}>
+        <ContextMenuTrigger id={this.props.menuId} holdToDisplay={-1}>
           <div
             ref={node => this.node = node}
             className={'work-node' + (this.state.isSelected ? ' selected' : '')}
@@ -184,7 +184,7 @@ class WorkspaceNode extends React.Component {
             </svg>
           </div>
         </ContextMenuTrigger>
-        <ContextMenu id={this.props.menu_id} className="react-contextmenu">
+        <ContextMenu id={this.props.menuId} className="react-contextmenu">
           <MenuItem className="react-contextmenu-item" onClick={() => {this.props.onDelete(this.props.index)}}>
               <FontAwesomeIcon icon={faTrashAlt} style={{paddingRight: 10}}/>
               Delete
@@ -201,7 +201,7 @@ class WorkspaceNode extends React.Component {
               <FontAwesomeIcon icon={faCopy} style={{paddingRight: 10}}/>
               Copy
             </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+            <MenuItem className="react-contextmenu-item" onClick={this.cutNode}>
               <FontAwesomeIcon icon={faCut} style={{paddingRight: 10}}/>
               Cut
             </MenuItem>

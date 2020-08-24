@@ -1,10 +1,14 @@
 import React from 'react';
 import * as d3 from 'd3';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClipboard, faEdit } from '@fortawesome/free-solid-svg-icons';
 
 import WorkspaceNode from './WorkspaceNode';
 import WorkspaceTools from './WorkspaceTools';
 import Constants from '../constants/constants';
 import './Workspace.css';
+import './react-contextmenu.css';
 
 class Workspace extends React.Component {
   constructor(props) {
@@ -34,6 +38,8 @@ class Workspace extends React.Component {
     this.removeGrid = this.removeGrid.bind(this);
     this.toggleGrid = this.toggleGrid.bind(this);
     this.storeCopiedNode = this.storeCopiedNode.bind(this);
+    this.dummyMethod = this.dummyMethod(this);
+    this.pasteNode = this.pasteNode.bind(this);
   }
 
   componentDidMount() {
@@ -150,6 +156,7 @@ class Workspace extends React.Component {
 
   addNode(attributes) {
     attributes.key = Constants.getUniqueReactKey();
+    console.log(attributes);
     let newNodes = this.state.nodes.concat(attributes);
     this.setState({
         nodes: newNodes
@@ -158,8 +165,11 @@ class Workspace extends React.Component {
 
   duplicateNode(index) {
     let attributes = Object.assign({}, this.state.nodes[index]);
-    attributes.x++;
-    attributes.y++;
+    let newX = attributes.x + 1;
+    let newY = attributes.y + 1;
+    let adjustedCoord = Constants.getAdjustedCoord(newX, newY, attributes.width, attributes.height);
+    attributes.x = adjustedCoord.x;
+    attributes.y = adjustedCoord.y;
     this.addNode(attributes);
   }
 
@@ -211,8 +221,41 @@ class Workspace extends React.Component {
   }
 
   storeCopiedNode(index) {
-    window.copiedNode = this.state.nodes[index];
-    console.log("Storing index", index);
+    window.copiedNode = Object.assign({}, this.state.nodes[index]);
+  }
+
+  dummyMethod() {
+    console.log('Dummy method');
+  }
+
+  pasteNode(e) {
+    let copiedNode = Object.assign({}, window.copiedNode);
+    if (copiedNode !== undefined) {
+      let width = copiedNode.width * Constants.ZOOM_SETTINGS;
+      let height = copiedNode.height * Constants.ZOOM_SETTINGS;
+      let offset = Constants.getGridOffset();
+      let xCoord, yCoord;
+
+      if (Constants.gridEnabled) {
+        let closestCoord = Constants.getClosestPosition(e.pageX, e.pageY);
+        xCoord = Constants.getGridCoord(closestCoord.x, width, offset.x);
+        yCoord = Constants.getGridCoord(closestCoord.y, height, offset.y);
+      }
+      else {
+        xCoord = Constants.getGridCoord(e.pageX, width, offset.x)
+        yCoord = Constants.getGridCoord(e.pageY, height, offset.y);
+      }
+
+      let adjustedCord = Constants.getAdjustedCoord(
+        xCoord,
+        yCoord,
+        copiedNode.width,
+        copiedNode.height
+      );
+      copiedNode.x = adjustedCord.x;
+      copiedNode.y = adjustedCord.y;
+      this.addNode(copiedNode);
+    }
   }
 
   render() {
@@ -222,8 +265,19 @@ class Workspace extends React.Component {
             incZoom={this.incZoom}
             decZoom={this.decZoom}
             toggleGrid={this.toggleGrid}/>
-          <svg className="grid">
-          </svg>
+          <ContextMenuTrigger id="gridContextMenu" holdToDisplay={-1}>
+          <svg className="grid"></svg>
+        </ContextMenuTrigger>
+        <ContextMenu id="gridContextMenu" className="react-contextmenu">
+          <MenuItem disabled={window.copiedNode === undefined} className="react-contextmenu-item" onClick={this.pasteNode}>
+              <FontAwesomeIcon icon={faClipboard} style={{paddingRight: 10}}/>
+              Paste
+          </MenuItem>
+          <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+              <FontAwesomeIcon icon={faEdit} style={{paddingRight: 10}}/>
+              Edit Grid
+          </MenuItem>
+        </ContextMenu>
           {this.state.nodes.map((item, i) =>
               <WorkspaceNode
               startScroll={this.startScroll}
@@ -234,7 +288,7 @@ class Workspace extends React.Component {
               onShift={this.shiftNode}
               copySelf={this.storeCopiedNode}
               index={i}
-              menu_id={item.key}
+              menuId={item.key}
               key={item.key}
               attributes={item}
             />
