@@ -29,6 +29,7 @@ class Workspace extends React.Component {
     this.decZoom = this.decZoom.bind(this);
     this.removeGrid = this.removeGrid.bind(this);
     this.toggleGrid = this.toggleGrid.bind(this);
+    this.storeCopiedNode = this.storeCopiedNode.bind(this);
 
     this.counter = 0;
   }
@@ -161,6 +162,11 @@ class Workspace extends React.Component {
     }
   }
 
+  storeCopiedNode(index) {
+    window.copiedNode = this.state.nodes[index];
+    console.log("Storing index", index);
+  }
+
   render() {
     if (this.state.scrolling.enabled) {
       window.scrollBy(this.state.scrolling.xDis, this.state.scrolling.yDis);
@@ -177,7 +183,9 @@ class Workspace extends React.Component {
               endScroll={this.endScroll}
               updateSelf={this.updateNode}
               onDelete={this.deleteNode}
+              copySelf={this.storeCopiedNode}
               index={i}
+              menu_id={item.key}
               key={item.key}
               attributes={item}
             />

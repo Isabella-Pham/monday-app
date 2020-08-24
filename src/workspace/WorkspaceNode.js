@@ -32,6 +32,7 @@ class WorkspaceNode extends React.Component {
     this.deleteSelf = this.deleteSelf.bind(this);
     this.getDimensions = this.getDimensions.bind(this);
     this.dummyMethod = this.dummyMethod.bind(this);
+    this.copyNode = this.copyNode.bind(this);
   }
 
   componentDidMount() {
@@ -142,7 +143,12 @@ class WorkspaceNode extends React.Component {
     }
   }
 
+  copyNode() {
+    this.props.copySelf(this.props.index);
+  }
+
   dummyMethod() {
+    console.log("HERE");
     this.props.onDelete(this.props.index);
   }
 
@@ -151,7 +157,7 @@ class WorkspaceNode extends React.Component {
     
     return (
       <div>
-        <ContextMenuTrigger id="same_unique_identifier" holdToDisplay={-1}>
+        <ContextMenuTrigger id={this.props.menu_id} holdToDisplay={-1}>
           <div
             ref={node => this.node = node}
             className={'work-node' + (this.state.isSelected ? ' selected' : '')}
@@ -166,7 +172,7 @@ class WorkspaceNode extends React.Component {
             </svg>
           </div>
         </ContextMenuTrigger>
-        <ContextMenu id="same_unique_identifier" className="react-contextmenu">
+        <ContextMenu id={this.props.menu_id} className="react-contextmenu">
           <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
               <FontAwesomeIcon icon={faTrashAlt} style={{paddingRight: 10}}/>
               Delete
@@ -179,7 +185,7 @@ class WorkspaceNode extends React.Component {
               </div>
             }
             hoverDelay={100}>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+            <MenuItem className="react-contextmenu-item" onClick={this.copyNode}>
               <FontAwesomeIcon icon={faCopy} style={{paddingRight: 10}}/>
               Copy
             </MenuItem>
