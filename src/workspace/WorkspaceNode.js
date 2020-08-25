@@ -3,10 +3,16 @@ import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contex
 
 import Shapes from '../assets/Shapes';
 import Constants from '../constants/constants';
+import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faExpand, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 import './WorkspaceNode.css';
 import './react-contextmenu.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faExpand, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import Button from '@material-ui/core/Button';
+import './node-modals/NodeColorModal.css';
+import SketchPicker from 'react-color'
 
 class WorkspaceNode extends React.Component {
   constructor(props) {
@@ -23,7 +29,10 @@ class WorkspaceNode extends React.Component {
         enabled: false,
         xDis: 0,
         yDis: 0
-      }
+      },
+      colorModalShow: false,
+      color: '#ffffff',
+      newColor: '#ffffff'
     }
 
     this.handleClick = this.handleClick.bind(this);
@@ -114,13 +123,13 @@ class WorkspaceNode extends React.Component {
       if (xCord < 0) {
         xCord = 0;
       }
-      else if (xCord+this.props.attributes.width > Constants.WORKSPACE_SETTINGS.horizontalBoxes) {
+      else if (xCord + this.props.attributes.width > Constants.WORKSPACE_SETTINGS.horizontalBoxes) {
         xCord = Constants.WORKSPACE_SETTINGS.horizontalBoxes - this.props.attributes.width;
       }
       if (yCord < 0) {
         yCord = 0;
       }
-      else if (yCord+this.props.attributes.height > Constants.WORKSPACE_SETTINGS.verticalBoxes) {
+      else if (yCord + this.props.attributes.height > Constants.WORKSPACE_SETTINGS.verticalBoxes) {
         yCord = Constants.WORKSPACE_SETTINGS.verticalBoxes - this.props.attributes.height;
       }
       this.props.updateSelf(
@@ -247,12 +256,39 @@ class WorkspaceNode extends React.Component {
               <FontAwesomeIcon icon={faExpand} style={{paddingRight: 10}}/>
               Resize
             </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+            <MenuItem className="react-contextmenu-item" onClick={() => this.setState({ colorModalShow: true })}>
               <FontAwesomeIcon icon={faPalette} style={{paddingRight: 10}}/>
               Change Color
             </MenuItem>
           </SubMenu>
         </ContextMenu>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className="modal"
+          open={this.state.colorModalShow}
+          onClose={() => this.setState({ colorModalShow: false })}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
+          }}
+        >
+          <Fade in={this.state.colorModalShow}>
+            <div className="paper">
+              <p id="transition-modal-title">Select Color</p>
+              <SketchPicker color={this.state.newColor} onChange={(color) => this.setState({ newColor: color.hex })} className="sketch"/>
+              <span className="buttons">
+                <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ colorModalShow: false })} className="done">
+                  CANCEL
+                </Button>
+                <Button variant="outlined" size="medium" color="primary" onClick={() => { this.setState({ colorModalShow: false, color: this.state.newColor }) }} className="done">
+                  SUBMIT
+                </Button>
+              </span>
+            </div>
+          </Fade>
+        </Modal>
       </div>
     );
   }
