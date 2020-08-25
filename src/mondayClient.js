@@ -28,7 +28,11 @@ class mondayClient {
     //returns an array containing all graphs saved 
     async getAllGraphs() {
         const allGraphs = this.monday.storage.instance.getItem("all_graphs").then(res => {
-            return res["data"]["value"].split(",");
+            var all = res["data"]["value"];
+            if (all != null) {
+                return all.split(",");
+            }
+            return [];
         });
         return allGraphs;
     }
@@ -101,7 +105,7 @@ class mondayClient {
     //checks if there is a graph by the name of graphName
     async containsGraph(graphName) {
         const contains = this.monday.storage.instance.getItem(graphName).then(res => {
-            if (!res["data"]["success"] || res["data"] == null || res["data"]["value"].toString().localeCompare("null") == 0){
+            if (!res["data"]["success"] || res["data"] == null){
                 return false;
             } else {
                 return true;
