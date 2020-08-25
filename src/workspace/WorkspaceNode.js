@@ -1,18 +1,12 @@
 import React from 'react';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faExpand, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 
 import Shapes from '../assets/Shapes';
 import Constants from '../constants/constants';
-import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faExpand, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 import './WorkspaceNode.css';
 import './react-contextmenu.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Modal from '@material-ui/core/Modal';
-import Backdrop from '@material-ui/core/Backdrop';
-import Fade from '@material-ui/core/Fade';
-import Button from '@material-ui/core/Button';
-import './node-modals/NodeColorModal.css';
-import SketchPicker from 'react-color'
 
 class WorkspaceNode extends React.Component {
   constructor(props) {
@@ -30,9 +24,6 @@ class WorkspaceNode extends React.Component {
         xDis: 0,
         yDis: 0
       },
-      colorModalShow: false,
-      color: '#ffffff',
-      newColor: '#ffffff'
     }
 
     this.handleClick = this.handleClick.bind(this);
@@ -43,8 +34,21 @@ class WorkspaceNode extends React.Component {
     this.getRealDimensions = this.getRealDimensions.bind(this);
     this.dummyMethod = this.dummyMethod.bind(this);
     this.copyNode = this.copyNode.bind(this);
+    this.cutNode = this.cutNode.bind(this);
     this.moveToBack = this.moveToBack.bind(this);
     this.moveToFront = this.moveToFront.bind(this);
+    this.colorChange = this.colorChange.bind(this);
+  }
+
+  static getDefault(x, y, type) {
+    return {
+      x: x,
+      y: y,
+      type: type,
+      multiplier: 1,
+      fillColor: '#FFFFFF',
+      borderColor: '#000000'
+    }
   }
 
   componentDidMount() {
@@ -77,12 +81,19 @@ class WorkspaceNode extends React.Component {
     }
   }
 
-  getRealDimensions() {
-    let width = this.props.attributes.width * Constants.ZOOM_SETTINGS;
-    let height = this.props.attributes.height * Constants.ZOOM_SETTINGS;
+  getGridDimensions() {
+    let gridDimensions = Shapes.getDefaultDimensions(this.props.attributes.type);
     return {
-      width: width,
-      height: height
+      width: gridDimensions.width * this.props.attributes.multiplier,
+      height: gridDimensions.height * this.props.attributes.multiplier,
+    }
+  }
+
+  getRealDimensions() {
+    let dimensions = this.getGridDimensions();
+    return {
+      width: dimensions.width * Constants.ZOOM_SETTINGS,
+      height: dimensions.height * Constants.ZOOM_SETTINGS
     };
   }
 
@@ -109,33 +120,28 @@ class WorkspaceNode extends React.Component {
         }
       }
       let offset = Constants.getGridOffset();
-      let dimensions = this.getRealDimensions();
+      let realDimensions = this.getRealDimensions();
       let xCord = Constants.getGridCoord(
         position.x,
-        dimensions.width,
+        realDimensions.width,
         offset.x
       );
       let yCord = Constants.getGridCoord(
         position.y,
-        dimensions.height,
+        realDimensions.height,
         offset.y
       );
-      if (xCord < 0) {
-        xCord = 0;
-      }
-      else if (xCord + this.props.attributes.width > Constants.WORKSPACE_SETTINGS.horizontalBoxes) {
-        xCord = Constants.WORKSPACE_SETTINGS.horizontalBoxes - this.props.attributes.width;
-      }
-      if (yCord < 0) {
-        yCord = 0;
-      }
-      else if (yCord + this.props.attributes.height > Constants.WORKSPACE_SETTINGS.verticalBoxes) {
-        yCord = Constants.WORKSPACE_SETTINGS.verticalBoxes - this.props.attributes.height;
-      }
+      let gridDimensions = this.getGridDimensions();
+      let adjustedCord = Constants.getAdjustedCoord(
+        xCord,
+        yCord,
+        gridDimensions.width,
+        gridDimensions.height
+      )
       this.props.updateSelf(
         this.props.index,
-        xCord,
-        yCord
+        adjustedCord.x,
+        adjustedCord.y
       );
     }
   }
@@ -169,8 +175,17 @@ class WorkspaceNode extends React.Component {
     this.props.copySelf(this.props.index);
   }
 
+  cutNode() {
+    this.props.copySelf(this.props.index);
+    this.props.onDelete(this.props.index);
+  }
+
   dummyMethod() {
     console.log("Dummy method");
+  }
+
+  colorChange() {
+    this.props.onContextChange(this.props.index, "color")
   }
 
   render() {
@@ -178,22 +193,25 @@ class WorkspaceNode extends React.Component {
     let position = this.getPosition();
     return (
       <div>
-        <ContextMenuTrigger id={this.props.menu_id} holdToDisplay={-1}>
+        <ContextMenuTrigger id={this.props.menuId} holdToDisplay={-1}>
           <div
-            ref={node => this.node = node}
             className={'work-node' + (this.state.isSelected ? ' selected' : '')}
             style={{
               top: position.y,
               left: position.x,
               width: dimensions.width,
-              height: dimensions.height
+              height: dimensions.height,
+              fill: this.props.attributes.fillColor,
+              stroke: this.props.attributes.borderColor
             }}>
-            <svg viewBox="0 0 100 100">
+            <svg 
+            ref={node => this.node = node}
+            viewBox="0 0 100 100">
               { Shapes.renderShape(this.props.attributes.type, false) }
             </svg>
           </div>
         </ContextMenuTrigger>
-        <ContextMenu id={this.props.menu_id} className="react-contextmenu">
+        <ContextMenu id={this.props.menuId} className="react-contextmenu">
           <MenuItem className="react-contextmenu-item" onClick={() => {this.props.onDelete(this.props.index)}}>
               <FontAwesomeIcon icon={faTrashAlt} style={{paddingRight: 10}}/>
               Delete
@@ -210,7 +228,7 @@ class WorkspaceNode extends React.Component {
               <FontAwesomeIcon icon={faCopy} style={{paddingRight: 10}}/>
               Copy
             </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+            <MenuItem className="react-contextmenu-item" onClick={this.cutNode}>
               <FontAwesomeIcon icon={faCut} style={{paddingRight: 10}}/>
               Cut
             </MenuItem>
@@ -256,39 +274,12 @@ class WorkspaceNode extends React.Component {
               <FontAwesomeIcon icon={faExpand} style={{paddingRight: 10}}/>
               Resize
             </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={() => this.setState({ colorModalShow: true })}>
+            <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
               <FontAwesomeIcon icon={faPalette} style={{paddingRight: 10}}/>
               Change Color
             </MenuItem>
           </SubMenu>
         </ContextMenu>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          className="modal"
-          open={this.state.colorModalShow}
-          onClose={() => this.setState({ colorModalShow: false })}
-          closeAfterTransition
-          BackdropComponent={Backdrop}
-          BackdropProps={{
-            timeout: 500,
-          }}
-        >
-          <Fade in={this.state.colorModalShow}>
-            <div className="paper">
-              <p id="transition-modal-title">Select Color</p>
-              <SketchPicker color={this.state.newColor} onChange={(color) => this.setState({ newColor: color.hex })} className="sketch"/>
-              <span className="buttons">
-                <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ colorModalShow: false })} className="done">
-                  CANCEL
-                </Button>
-                <Button variant="outlined" size="medium" color="primary" onClick={() => { this.setState({ colorModalShow: false, color: this.state.newColor }) }} className="done">
-                  SUBMIT
-                </Button>
-              </span>
-            </div>
-          </Fade>
-        </Modal>
       </div>
     );
   }

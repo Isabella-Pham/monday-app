@@ -3,31 +3,25 @@
   display: block;
   cursor: pointer !important;
   background-color: transparent;
-}
-
-.work-node > svg {
-  display: block;
-  overflow: visible;
   pointer-events: none;
 }
 
-.work-node.selected {
+.work-node > svg {
+  position: absolute;
   display: block;
-  outline: 2px dashed #4a98fd;
+  overflow: visible;
+  pointer-events: none;
 }
 
 .work-node:not(.selected):hover {
   outline: 2px dashed #bedafd;
 }
 
-.work-node > svg > path {
-  fill: white;
-  stroke-width: 1px;
-  stroke: black;
+.work-node.selected {
+  outline: 2px dashed #4a98fd;
 }
 
 .work-node > svg > path {
-  fill: white;
   stroke-width: 1px;
-  stroke: black;
+  pointer-events: auto;
 }

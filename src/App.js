@@ -1,6 +1,7 @@
 import React from "react";
 
 import Workspace from './workspace/Workspace';
+import WorkspaceNode from './workspace/WorkspaceNode';
 import Toolbar from './toolbar/Toolbar';
 import ToolbarNode from './toolbar/ToolbarNode';
 import Shapes from './assets/Shapes';
@@ -89,13 +90,7 @@ class App extends React.Component {
           let nodeType = this.state.transitionNode.type;
           let dimensions = Shapes.getDefaultDimensions(nodeType);
           if (Constants.coordIsValid(xCoord, yCoord, dimensions.width, dimensions.height)) {
-            this._workspace.current.addNode({
-              x: xCoord,
-              y: yCoord,
-              type: nodeType,
-              width: dimensions.width,
-              height: dimensions.height
-            })
+            this._workspace.current.addNode(WorkspaceNode.getDefault(xCoord, yCoord, nodeType));
           }
           else {
             console.log('Out of grid');
