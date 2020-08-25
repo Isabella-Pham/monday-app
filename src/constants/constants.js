@@ -23,7 +23,7 @@ class WorkspaceSettings {
     this.offsetX = 0;
     this.offsetY = 0;
     this.horizontalBoxes = 100;
-    this.verticalBoxes = 50;
+    this.verticalBoxes = 100;
   }
 
   getOffset() {
@@ -150,6 +150,25 @@ class Constants {
     let xValid = x >= 0 && x+width <= Constants.WORKSPACE_SETTINGS.horizontalBoxes;
     let yValid = y >= 0 && y+height <= Constants.WORKSPACE_SETTINGS.verticalBoxes;
     return xValid && yValid;
+  }
+
+  static getAdjustedCoord(xCord, yCord, width, height) {
+    if (xCord < 0) {
+      xCord = 0;
+    }
+    else if (xCord+width > Constants.WORKSPACE_SETTINGS.horizontalBoxes) {
+      xCord = Constants.WORKSPACE_SETTINGS.horizontalBoxes - width;
+    }
+    if (yCord < 0) {
+      yCord = 0;
+    }
+    else if (yCord+height > Constants.WORKSPACE_SETTINGS.verticalBoxes) {
+      yCord = Constants.WORKSPACE_SETTINGS.verticalBoxes - height;
+    }
+    return {
+      x: xCord,
+      y: yCord
+    };
   }
 
   static getUniqueReactKey() {
