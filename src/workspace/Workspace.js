@@ -156,7 +156,6 @@ class Workspace extends React.Component {
 
   addNode(attributes) {
     attributes.key = Constants.getUniqueReactKey();
-    console.log(attributes);
     let newNodes = this.state.nodes.concat(attributes);
     this.setState({
         nodes: newNodes

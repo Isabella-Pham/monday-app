@@ -55,7 +55,6 @@ class WorkspaceNode extends React.Component {
 
   handleClick(e) {
     if (this.node.contains(e.target)) {
-      console.log('selecting')
       let position = this.getPosition();
       this.setState({
         isSelected: true,
@@ -70,12 +69,19 @@ class WorkspaceNode extends React.Component {
     }
   }
 
-  getRealDimensions() {
-    let width = this.props.attributes.width * Constants.ZOOM_SETTINGS;
-    let height = this.props.attributes.height * Constants.ZOOM_SETTINGS;
+  getGridDimensions() {
+    let gridDimensions = Shapes.getDefaultDimensions(this.props.attributes.type);
     return {
-      width: width,
-      height: height
+      width: gridDimensions.width * this.props.attributes.multiplier,
+      height: gridDimensions.height * this.props.attributes.multiplier,
+    }
+  }
+
+  getRealDimensions() {
+    let dimensions = this.getGridDimensions();
+    return {
+      width: dimensions.width * Constants.ZOOM_SETTINGS,
+      height: dimensions.height * Constants.ZOOM_SETTINGS
     };
   }
 
@@ -102,22 +108,23 @@ class WorkspaceNode extends React.Component {
         }
       }
       let offset = Constants.getGridOffset();
-      let dimensions = this.getRealDimensions();
+      let realDimensions = this.getRealDimensions();
       let xCord = Constants.getGridCoord(
         position.x,
-        dimensions.width,
+        realDimensions.width,
         offset.x
       );
       let yCord = Constants.getGridCoord(
         position.y,
-        dimensions.height,
+        realDimensions.height,
         offset.y
       );
+      let gridDimensions = this.getGridDimensions();
       let adjustedCord = Constants.getAdjustedCoord(
         xCord,
         yCord,
-        this.props.attributes.width,
-        this.props.attributes.height
+        gridDimensions.width,
+        gridDimensions.height
       )
       this.props.updateSelf(
         this.props.index,

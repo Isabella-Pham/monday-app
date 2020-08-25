@@ -93,8 +93,7 @@ class App extends React.Component {
               x: xCoord,
               y: yCoord,
               type: nodeType,
-              width: dimensions.width,
-              height: dimensions.height
+              multiplier: 1
             })
           }
           else {
