@@ -7,6 +7,7 @@ import mondaySdk from "monday-sdk-js";
 class mondayClient {
     constructor() {
         this.monday = mondaySdk();
+        this.monday.
         this.api_key = process.env.REACT_APP_MONDAY_TOKEN;
         this.setAllGraphs();
         this.sleep(10000);

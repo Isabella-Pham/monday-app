@@ -16,7 +16,8 @@ const TYPES = Object.freeze({
   RIGHT_ARROW: 12,
   LEFT_ARROW: 13,
   DOUBLE_ARROW: 14,
-  FOUR_ARROW: 15
+  FOUR_ARROW: 15,
+  LINE: 16
 });
 
 class Shapes {
