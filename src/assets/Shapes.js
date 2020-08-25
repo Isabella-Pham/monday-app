@@ -138,6 +138,82 @@ class Shapes {
     )
   }
 
+  static getLeftArrow(fitInSquare) {
+    return (
+      <path d={`
+        M0,${fitInSquare ? 50 : 25}
+        l25,-25
+        l0,12.5
+        l75,0
+        l0,25
+        l-75,0
+        l0,12.5
+        Z`}></path>
+    )
+  }
+
+  static getRightArrow(fitInSquare) {
+    return (
+      <path d={`
+        M100,${fitInSquare ? 50 : 25}
+        l-25,-25
+        l0,12.5
+        l-75,0
+        l0,25
+        l75,0
+        l0,12.5
+        Z`}></path>
+    )
+  }
+
+  static getDoubleArrow(fitInSquare) {
+    return (
+      <path d={`
+        M0,${fitInSquare ? 50 : 25}
+        l25,-25
+        l0,12.5
+        l50,0
+        l0,-12.5
+        l25,25
+        l-25,25
+        l0,-12.5
+        l-50,0
+        l0,12.5
+        Z`}></path>
+    )
+  }
+
+  static getFourArrow() {
+    return (
+      <path d={`
+        M0,50
+        l18.75,-18.75
+        l0,12.5
+        l25,0
+        l0,-25
+        l-12.5,0
+        l18.75,-18.75
+        l18.75,18.75
+        l-12.5,0
+        l0,25
+        l25,0
+        l0,-12.5
+        l18.75,18.75
+        l-18.75,18.75
+        l0,-12.5
+        l-25,0
+        l0,25
+        l12.5,0
+        l-18.75,18.75
+        l-18.75,-18.75
+        l12.5,0
+        l0,-25
+        l-25,0
+        l0,12.5
+        Z`}></path>
+    )
+  }
+
   static renderShape(type, fitInSquare = true) {
     type = parseInt(type);
     switch (type) {
@@ -149,6 +225,10 @@ class Shapes {
       case Shapes.TYPES.ROUNDED_DIAMOND: return Shapes.getRoundedDiamond();
       case Shapes.TYPES.SQUARE: return Shapes.getSquare(fitInSquare);
       case Shapes.TYPES.ROUNDED_SQUARE: return Shapes.getRoundedSquare(fitInSquare);
+      case Shapes.TYPES.LEFT_ARROW: return Shapes.getLeftArrow(fitInSquare);
+      case Shapes.TYPES.RIGHT_ARROW: return Shapes.getRightArrow(fitInSquare);
+      case Shapes.TYPES.DOUBLE_ARROW: return Shapes.getDoubleArrow(fitInSquare);
+      case Shapes.TYPES.FOUR_ARROW: return Shapes.getFourArrow();
       default: return null;
     }
   }
@@ -179,6 +259,18 @@ class Shapes {
         dimensions = [8, 8];
         break;
       case Shapes.TYPES.ROUNDED_DIAMOND:
+        dimensions = [8, 8];
+        break;
+      case Shapes.TYPES.LEFT_ARROW:
+        dimensions = [8, 4];
+        break;
+      case Shapes.TYPES.RIGHT_ARROW:
+        dimensions = [8, 4];
+        break;
+      case Shapes.TYPES.DOUBLE_ARROW:
+        dimensions = [8, 4];
+        break;
+      case Shapes.TYPES.FOUR_ARROW:
         dimensions = [8, 8];
         break;
       default: break;

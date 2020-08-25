@@ -55,6 +55,7 @@ class WorkspaceNode extends React.Component {
 
   handleClick(e) {
     if (this.node.contains(e.target)) {
+      console.log('selecting')
       let position = this.getPosition();
       this.setState({
         isSelected: true,
@@ -171,7 +172,6 @@ class WorkspaceNode extends React.Component {
       <div>
         <ContextMenuTrigger id={this.props.menuId} holdToDisplay={-1}>
           <div
-            ref={node => this.node = node}
             className={'work-node' + (this.state.isSelected ? ' selected' : '')}
             style={{
               top: position.y,
@@ -179,7 +179,9 @@ class WorkspaceNode extends React.Component {
               width: dimensions.width,
               height: dimensions.height
             }}>
-            <svg viewBox="0 0 100 100">
+            <svg 
+            ref={node => this.node = node}
+            viewBox="0 0 100 100">
               { Shapes.renderShape(this.props.attributes.type, false) }
             </svg>
           </div>
