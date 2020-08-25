@@ -25,21 +25,26 @@ class Workspace extends React.Component {
         verticalBoxCount: Constants.WORKSPACE_SETTINGS.verticalBoxes
     };
 
-    this.addNode = this.addNode.bind(this);
-    this.drawGrid = this.drawGrid.bind(this);
-    this.deleteNode = this.deleteNode.bind(this);
-    this.duplicateNode = this.duplicateNode.bind(this);
-    this.shiftNode = this.shiftNode.bind(this);
-    this.startScroll = this.startScroll.bind(this);
-    this.endScroll = this.endScroll.bind(this);
-    this.updateNode = this.updateNode.bind(this);
-    this.incZoom = this.incZoom.bind(this);
-    this.decZoom = this.decZoom.bind(this);
-    this.removeGrid = this.removeGrid.bind(this);
-    this.toggleGrid = this.toggleGrid.bind(this);
-    this.storeCopiedNode = this.storeCopiedNode.bind(this);
-    this.dummyMethod = this.dummyMethod(this);
-    this.pasteNode = this.pasteNode.bind(this);
+    let bindFunctions = [
+      this.addNode,
+      this.drawGrid,
+      this.deleteNode,
+      this.duplicateNode,
+      this.shiftNode,
+      this.startScroll,
+      this.endScroll,
+      this.updateNode,
+      this.incZoom,
+      this.decZoom,
+      this.toggleGrid,
+      this.storeCopiedNode,
+      this.dummyMethod,
+      this.pasteNode
+    ];
+
+    for (let func of bindFunctions) {
+      this[func.name] = this[func.name].bind(this);
+    }
   }
 
   componentDidMount() {

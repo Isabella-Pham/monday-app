@@ -26,17 +26,34 @@ class WorkspaceNode extends React.Component {
       }
     }
 
-    this.handleClick = this.handleClick.bind(this);
-    this.moveNode = this.moveNode.bind(this);
-    this.placeNode = this.placeNode.bind(this);
-    this.deleteSelf = this.deleteSelf.bind(this);
-    this.duplicateSelf = this.duplicateSelf.bind(this);
-    this.getRealDimensions = this.getRealDimensions.bind(this);
-    this.dummyMethod = this.dummyMethod.bind(this);
-    this.copyNode = this.copyNode.bind(this);
-    this.cutNode = this.cutNode.bind(this);
-    this.moveToBack = this.moveToBack.bind(this);
-    this.moveToFront = this.moveToFront.bind(this);
+    let bindFunctions = [
+      this.handleClick,
+      this.moveNode,
+      this.placeNode,
+      this.deleteSelf,
+      this.duplicateSelf,
+      this.getRealDimensions,
+      this.dummyMethod,
+      this.copyNode,
+      this.cutNode,
+      this.cutNode,
+      this.moveToBack,
+      this.moveToFront
+    ];
+    for (let func of bindFunctions) {
+      this[func.name] = this[func.name].bind(this);
+    }
+  }
+
+  static getDefault(x, y, type) {
+    return {
+      x: x,
+      y: y,
+      type: type,
+      multiplier: 1,
+      fillColor: '#FFFFFF',
+      borderColor: '#000000'
+    }
   }
 
   componentDidMount() {
@@ -184,11 +201,14 @@ class WorkspaceNode extends React.Component {
               top: position.y,
               left: position.x,
               width: dimensions.width,
-              height: dimensions.height
+              height: dimensions.height,
+              fill: this.props.attributes.fillColor,
+              stroke: this.props.attributes.borderColor
             }}>
             <svg 
             ref={node => this.node = node}
-            viewBox="0 0 100 100">
+            viewBox="0 0 100 100"
+            >
               { Shapes.renderShape(this.props.attributes.type, false) }
             </svg>
           </div>
