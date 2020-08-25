@@ -45,7 +45,7 @@ class mondayClient {
 
     async getAllGraphs() {
         const allGraphs = this.monday.storage.instance.getItem("all_graphs").then(res => {
-            return res["data"]["value"];
+            return res["data"]["value"].split(",");
         });
         return allGraphs;
     }
@@ -65,8 +65,9 @@ class mondayClient {
                 console.log("Invalid graph name, name must not contain any commmas");
                 return false;
             }
-            if (data["value"] == null || data["value"].toString().localeCompare("null")) {
+            if (graphList == null || data["value"].toString().localeCompare("null") == 0) {
                 this.monday.storage.instance.setItem("all_graphs", graphName);
+                console.log("Adding ", graphName, " as first graph of graph list");
                 return true;
             } else {
                 if (graphList.split(",").includes(graphName)) {
@@ -74,12 +75,13 @@ class mondayClient {
                     return false;
                 } else {
                     this.monday.storage.instance.setItem(graphName, JSON.stringify(graphJSON));
-                    console.log("else statement graph list: " + graphList);
                     graphList = graphList + "," + graphName;
+                    console.log("Adding ", graphName, " to graph list");
                     this.monday.storage.instance.setItem("all_graphs", graphList);
                     return true;
                 }
             }
+            this.sleep(5000);
         });
         return success;
     }
