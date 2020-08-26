@@ -47,14 +47,16 @@ class Workspace extends React.Component {
       this.updateNode,
       this.incZoom,
       this.decZoom,
+      this.removeGrid,
       this.toggleGrid,
       this.storeCopiedNode,
+      this.contextChange,
+      this.changeColor,
       this.dummyMethod,
       this.pasteNode,
-      this.contextChange,
-      this.changeColor
+      this.resizeNode,
     ];
-
+    
     for (let func of bindFunctions) {
       this[func.name] = this[func.name].bind(this);
     }
@@ -174,6 +176,7 @@ class Workspace extends React.Component {
 
   addNode(attributes) {
     attributes.key = Constants.getUniqueReactKey();
+    console.log(attributes);
     let newNodes = this.state.nodes.concat(attributes);
     this.setState({
         nodes: newNodes
@@ -278,18 +281,26 @@ class Workspace extends React.Component {
   contextChange(index, action) {
     switch(action) {
       case "color":
-        this.setState({ colorModalShow: true, contextIndex: index, newColor: this.state.nodes[index].fillColor })
+        this.setState({ colorModalShow: true, contextIndex: index });
+        break;
+      default:
         break;
     }
   }
 
   changeColor() {
-    this.setState({ colorModalShow: false, color: this.state.newColor }, () => {
+    this.setState({ colorModalShow: false, color: this.state.newColor, newColor: "#FFFFFF" }, () => {
       console.log(this.state.color);
       let newNodes = this.state.nodes.slice();
       newNodes[this.state.contextIndex].fillColor = this.state.color;
       this.setState({ nodes: newNodes });  
     }); 
+  }
+
+  resizeNode(index, multiplier) {
+    let newNodes = this.state.nodes.slice();
+    newNodes[index].multiplier = multiplier;
+    this.setState({ nodes: newNodes });
   }
 
   render() {
@@ -319,6 +330,7 @@ class Workspace extends React.Component {
           open={this.state.colorModalShow}
           onClose={() => this.setState({ colorModalShow: false })}
           closeAfterTransition
+          disableEnforceFocus={true}
           BackdropComponent={Backdrop}
           BackdropProps={{
             timeout: 500,
@@ -327,11 +339,7 @@ class Workspace extends React.Component {
           <Fade in={this.state.colorModalShow}>
             <div className="paper">
               <p id="transition-modal-title">Select Color</p>
-              <SketchPicker
-              color={this.state.newColor}
-              onChange={(color) => this.setState({ newColor: color.hex })}
-              className="sketch"
-              disableAlpha={true}/>
+              <SketchPicker color={this.state.newColor} onChange={(color) => this.setState({ newColor: color.hex })} disableAlpha={true} className="sketch"/>
               <span className="buttons">
                 <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ colorModalShow: false })} className="done">
                   CANCEL
@@ -344,7 +352,7 @@ class Workspace extends React.Component {
           </Fade>
         </Modal>
           {this.state.nodes.map((item, i) =>
-              <WorkspaceNode
+            <WorkspaceNode
               startScroll={this.startScroll}
               endScroll={this.endScroll}
               updateSelf={this.updateNode}
@@ -352,6 +360,7 @@ class Workspace extends React.Component {
               onDuplicate={this.duplicateNode}
               onShift={this.shiftNode}
               onContextChange={this.contextChange}
+              onResize={this.resizeNode}
               copySelf={this.storeCopiedNode}
               index={i}
               menuId={item.key}

@@ -1,12 +1,14 @@
 import React from 'react';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faExpand, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
+import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
+import { Resizable } from 'react-resizable';
 
 import Shapes from '../assets/Shapes';
 import Constants from '../constants/constants';
 import './WorkspaceNode.css';
 import './react-contextmenu.css';
+import '../../node_modules/react-resizable/css/styles.css';
 
 class WorkspaceNode extends React.Component {
   constructor(props) {
@@ -24,6 +26,7 @@ class WorkspaceNode extends React.Component {
         xDis: 0,
         yDis: 0
       },
+      isResizing: false
     }
 
     let bindFunctions = [
@@ -36,11 +39,12 @@ class WorkspaceNode extends React.Component {
       this.dummyMethod,
       this.copyNode,
       this.cutNode,
-      this.cutNode,
       this.moveToBack,
       this.moveToFront,
-      this.colorChange
+      this.colorChange,
+      this.resize,
     ];
+
     for (let func of bindFunctions) {
       this[func.name] = this[func.name].bind(this);
     }
@@ -83,7 +87,9 @@ class WorkspaceNode extends React.Component {
         isMoving: true
       });
     } else {
-      this.setState({ isSelected: false });
+      if (!this.state.isResizing) {
+        this.setState({ isSelected: false });
+      }
     }
   }
 
@@ -105,6 +111,7 @@ class WorkspaceNode extends React.Component {
 
   getPosition() {
     let offset = Constants.getGridOffset();
+    
     return {
       x: this.props.attributes.x * Constants.ZOOM_SETTINGS + offset.x,
       y: this.props.attributes.y * Constants.ZOOM_SETTINGS + offset.y
@@ -194,29 +201,60 @@ class WorkspaceNode extends React.Component {
     this.props.onContextChange(this.props.index, "color")
   }
 
+  resize(e, {size}) {
+    let defaultDimensions = Shapes.getDefaultDimensions(this.props.attributes.type);
+    let newMultiplier = parseFloat(size.width) / (defaultDimensions.width * Constants.ZOOM_SETTINGS);
+    let isTooSmall = newMultiplier < Constants.MIN_MULTIPLIER;
+    let isTooLarge = newMultiplier > Constants.MAX_MULTIPLIER;
+
+    if (isTooSmall) {
+      newMultiplier = Constants.MIN_MULTIPLIER;
+    }
+    else if(isTooLarge) {
+      newMultiplier = Constants.MAX_MULTIPLIER;
+    }
+
+    let isOutsideGridWidth = (this.props.attributes.x + (newMultiplier * defaultDimensions.width)) > Constants.WORKSPACE_SETTINGS.getHorizontalBoxes();
+    let isOutsideGridHeight = (this.props.attributes.y + (newMultiplier * defaultDimensions.height)) > Constants.WORKSPACE_SETTINGS.getVerticalBoxes();
+  
+    if (!(isOutsideGridWidth || isOutsideGridHeight)) {
+      this.props.onResize(this.props.index, newMultiplier);
+    }
+  }
+
   render() {
     let dimensions = this.getRealDimensions();
     let position = this.getPosition();
     return (
       <div>
         <ContextMenuTrigger id={this.props.menuId} holdToDisplay={-1}>
-          <div
-            className={'work-node' + (this.state.isSelected ? ' selected' : '')}
-            style={{
-              top: position.y,
-              left: position.x,
-              width: dimensions.width,
-              height: dimensions.height,
-              fill: this.props.attributes.fillColor,
-              stroke: this.props.attributes.borderColor
-            }}>
-            <svg 
-            ref={node => this.node = node}
-            viewBox="0 0 100 100"
-            >
-              { Shapes.renderShape(this.props.attributes.type, false) }
-            </svg>
-          </div>
+          <Resizable
+            className={'resize-' + (this.state.isSelected ? 'active' : 'inactive')}
+            width={dimensions.width} 
+            height={dimensions.height} 
+            lockAspectRatio={true}
+            onResize={this.resize}
+            draggableOpts={{offsetParent: document.body}}
+            onResizeStart={() => this.setState({ isResizing: true })}
+            onResizeStop={() => this.setState({ isResizing: false })}
+          >
+            <div
+              className={'work-node' + (this.state.isSelected ? ' selected' : '')}
+              style={{
+                top: position.y,
+                left: position.x,
+                width: dimensions.width,
+                height: dimensions.height,
+                fill: this.props.attributes.fillColor,
+                stroke: this.props.attributes.borderColor
+              }}>
+              <svg 
+              ref={node => this.node = node}
+              viewBox="0 0 100 100">
+                { Shapes.renderShape(this.props.attributes.type, false) }
+              </svg>
+            </div>
+          </Resizable>
         </ContextMenuTrigger>
         <ContextMenu id={this.props.menuId} className="react-contextmenu">
           <MenuItem className="react-contextmenu-item" onClick={() => {this.props.onDelete(this.props.index)}}>
@@ -276,10 +314,6 @@ class WorkspaceNode extends React.Component {
             <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
               <FontAwesomeIcon icon={faUndo} style={{paddingRight: 10}}/>
               Rotate
-            </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
-              <FontAwesomeIcon icon={faExpand} style={{paddingRight: 10}}/>
-              Resize
             </MenuItem>
             <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
               <FontAwesomeIcon icon={faPalette} style={{paddingRight: 10}}/>

@@ -1,8 +1,8 @@
 .work-node {
-  position: absolute;
-  display: block;
+  position: absolute !important;
+  display: block !important;
   cursor: pointer !important;
-  background-color: transparent;
+  background-color: transparent !important;
   pointer-events: none;
 }
 
@@ -19,9 +19,18 @@
 
 .work-node.selected {
   outline: 2px dashed #4a98fd;
+  pointer-events: all;
 }
 
 .work-node > svg > path {
   stroke-width: 1px;
   pointer-events: auto;
+}
+
+.resize-active {
+  display: block !important;
+}
+
+.resize-inactive > span {
+  display: none !important;
 }
