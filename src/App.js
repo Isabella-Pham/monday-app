@@ -1,13 +1,13 @@
 import React from "react";
 
 import Workspace from './workspace/Workspace';
+import WorkspaceNode from './workspace/WorkspaceNode';
 import Toolbar from './toolbar/Toolbar';
 import ToolbarNode from './toolbar/ToolbarNode';
 import Shapes from './assets/Shapes';
 import TransitionNode from './toolbar/TransitionNode';
 import Constants from './constants/constants';
 import "./App.css";
-import WorkspaceNode from "./workspace/WorkspaceNode";
 
 class App extends React.Component {
   constructor(props) {

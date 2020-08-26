@@ -2,6 +2,8 @@ import mondaySdk from "monday-sdk-js";
 
 /*
  * To import write the following at the top of a file: import { mondayClient } from './mondayClient';
+ * If you are trying to save two NEW graphs in a row, you must wait at least 10,000 milliseconds in between 
+ * saving or else this can lead to problems. You can use sleep() to do so.
 */
 
 class mondayClient {
@@ -9,7 +11,7 @@ class mondayClient {
         this.monday = mondaySdk();
         this.api_key = process.env.REACT_APP_MONDAY_TOKEN;
         this.setAllGraphs();
-        this.sleep(10000);
+        this.sleep(5000);
     }
 
     //used to delay the executation of code by a specified number of milliseconds
@@ -19,8 +21,8 @@ class mondayClient {
     }
 
     //returns JSON array containing each user on the team and their name, email, and url to their photo
-    getTeammates() {
-        const teammates = this.monday.api("{users{name,email,photo_original}}").then(res => {
+    async getTeammates() {
+        const teammates = await this.monday.api("{users{name,email,photo_original}}").then(res => {
             return res;
         });
         return teammates;
@@ -28,7 +30,7 @@ class mondayClient {
 
     //returns an array containing all graphs saved 
     async getAllGraphs() {
-        const allGraphs = this.monday.storage.instance.getItem("all_graphs").then(res => {
+        const allGraphs = await this.monday.storage.instance.getItem("all_graphs").then(res => {
             var all = res["data"]["value"];
             if (all != null) {
                 return all.split(",");
@@ -39,17 +41,16 @@ class mondayClient {
     }
 
     //deletes all graphs saved
-    deleteAllGraphs() {
-        const success = this.monday.storage.instance.setItem("all_graphs", "null").then(res => {
+    async deleteAllGraphs() {
+        const success = await this.monday.storage.instance.setItem("all_graphs", "null").then(res => {
             return res["data"]["success"];
         });
-        this.sleep(10000);
         return success;
     }
 
     //delete the graph by the name graphName
-    deleteGraph(graphName) {
-        const success = this.monday.storage.instance.getItem("all_graphs").then(res => {
+    async deleteGraph(graphName) {
+        const success = await this.monday.storage.instance.getItem("all_graphs").then(res => {
             console.log("Deleting graph ", graphName);
             const data = res["data"];
             var graphList = data["value"].split(",");
@@ -59,13 +60,12 @@ class mondayClient {
             this.monday.storage.instance.setItem(graphName, "null");
             return true; 
         });
-        this.sleep(10000);
         return success;
     }
 
     //returns true/false if a graph is successfully saved. Will save new graphs, if a graph already exists then graph will be updated
-    saveGraph(graphName, graphJSON) {
-        const success = this.monday.storage.instance.getItem("all_graphs").then(res => {
+    async saveGraph(graphName, graphJSON) {
+        const success = await this.monday.storage.instance.getItem("all_graphs").then(res => {
             const data = res["data"];
             var graphList = data["value"];
             if (graphName.includes(",")) {
@@ -89,7 +89,6 @@ class mondayClient {
                 return true;            
             }
         });
-        this.sleep(10000);
         return success;
     }
 
@@ -99,13 +98,12 @@ class mondayClient {
             const graph = (res["data"]["value"]);
             return graph;
         });
-        console.log("saving this data graphJSON: ", graphJSON);
         return JSON.parse(graphJSON);
     }
 
     //checks if there is a graph by the name of graphName
     async containsGraph(graphName) {
-        const contains = this.monday.storage.instance.getItem(graphName).then(res => {
+        const contains = await this.monday.storage.instance.getItem(graphName).then(res => {
             if (!res["data"]["success"] || res["data"] == null){
                 return false;
             } else {
@@ -115,8 +113,8 @@ class mondayClient {
         return contains;
     }
 
-    setAllGraphs() {
-        const success = this.containsGraph("all_graphs").then(res => {
+    async setAllGraphs() {
+        const success = await this.containsGraph("all_graphs").then(res => {
             if (res == false) {
                 this.monday.storage.instance.setItem("all_graphs", "null");
                 return true;

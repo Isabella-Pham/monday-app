@@ -23,7 +23,7 @@ class WorkspaceNode extends React.Component {
         enabled: false,
         xDis: 0,
         yDis: 0
-      }
+      },
     }
 
     let bindFunctions = [
@@ -38,7 +38,8 @@ class WorkspaceNode extends React.Component {
       this.cutNode,
       this.cutNode,
       this.moveToBack,
-      this.moveToFront
+      this.moveToFront,
+      this.colorChange
     ];
     for (let func of bindFunctions) {
       this[func.name] = this[func.name].bind(this);
@@ -189,6 +190,10 @@ class WorkspaceNode extends React.Component {
     console.log("Dummy method");
   }
 
+  colorChange() {
+    this.props.onContextChange(this.props.index, "color")
+  }
+
   render() {
     let dimensions = this.getRealDimensions();
     let position = this.getPosition();
@@ -276,7 +281,7 @@ class WorkspaceNode extends React.Component {
               <FontAwesomeIcon icon={faExpand} style={{paddingRight: 10}}/>
               Resize
             </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+            <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
               <FontAwesomeIcon icon={faPalette} style={{paddingRight: 10}}/>
               Change Color
             </MenuItem>
