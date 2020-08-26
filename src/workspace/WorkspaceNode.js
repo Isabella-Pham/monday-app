@@ -23,7 +23,7 @@ class WorkspaceNode extends React.Component {
         enabled: false,
         xDis: 0,
         yDis: 0
-      }
+      },
     }
 
     this.handleClick = this.handleClick.bind(this);
@@ -37,6 +37,18 @@ class WorkspaceNode extends React.Component {
     this.cutNode = this.cutNode.bind(this);
     this.moveToBack = this.moveToBack.bind(this);
     this.moveToFront = this.moveToFront.bind(this);
+    this.colorChange = this.colorChange.bind(this);
+  }
+
+  static getDefault(x, y, type) {
+    return {
+      x: x,
+      y: y,
+      type: type,
+      multiplier: 1,
+      fillColor: '#FFFFFF',
+      borderColor: '#000000'
+    }
   }
 
   componentDidMount() {
@@ -172,6 +184,10 @@ class WorkspaceNode extends React.Component {
     console.log("Dummy method");
   }
 
+  colorChange() {
+    this.props.onContextChange(this.props.index, "color")
+  }
+
   render() {
     let dimensions = this.getRealDimensions();
     let position = this.getPosition();
@@ -184,7 +200,9 @@ class WorkspaceNode extends React.Component {
               top: position.y,
               left: position.x,
               width: dimensions.width,
-              height: dimensions.height
+              height: dimensions.height,
+              fill: this.props.attributes.fillColor,
+              stroke: this.props.attributes.borderColor
             }}>
             <svg 
             ref={node => this.node = node}
@@ -256,7 +274,7 @@ class WorkspaceNode extends React.Component {
               <FontAwesomeIcon icon={faExpand} style={{paddingRight: 10}}/>
               Resize
             </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+            <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
               <FontAwesomeIcon icon={faPalette} style={{paddingRight: 10}}/>
               Change Color
             </MenuItem>

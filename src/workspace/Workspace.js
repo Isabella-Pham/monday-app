@@ -10,6 +10,13 @@ import Constants from '../constants/constants';
 import './Workspace.css';
 import './react-contextmenu.css';
 
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import Button from '@material-ui/core/Button';
+import SketchPicker from 'react-color';
+import './node-modals/NodeColorModal.css';
+
 class Workspace extends React.Component {
   constructor(props) {
     super(props);
@@ -22,7 +29,11 @@ class Workspace extends React.Component {
           yDis: 0
         },
         horizontalBoxCount: Constants.WORKSPACE_SETTINGS.horizontalBoxes,
-        verticalBoxCount: Constants.WORKSPACE_SETTINGS.verticalBoxes
+        verticalBoxCount: Constants.WORKSPACE_SETTINGS.verticalBoxes,
+        colorModalShow: false,
+        color: '#ffffff',
+        newColor: '#ffffff',
+        contextIndex: -1
     };
 
     this.addNode = this.addNode.bind(this);
@@ -38,6 +49,8 @@ class Workspace extends React.Component {
     this.removeGrid = this.removeGrid.bind(this);
     this.toggleGrid = this.toggleGrid.bind(this);
     this.storeCopiedNode = this.storeCopiedNode.bind(this);
+    this.contextChange = this.contextChange.bind(this);
+    this.changeColor = this.changeColor.bind(this);
     this.dummyMethod = this.dummyMethod(this);
     this.pasteNode = this.pasteNode.bind(this);
   }
@@ -257,6 +270,23 @@ class Workspace extends React.Component {
     }
   }
 
+  contextChange(index, action) {
+    switch(action) {
+      case "color":
+        this.setState({ colorModalShow: true, contextIndex: index })
+      break;
+    }
+  }
+
+  changeColor() {
+    this.setState({ colorModalShow: false, color: this.state.newColor }, () => {
+      console.log(this.state.color);
+      let newNodes = this.state.nodes.slice();
+      newNodes[this.state.contextIndex].fillColor = this.state.color;
+      this.setState({ nodes: newNodes });  
+    }); 
+  }
+
   render() {
     return (
       <div className="workspace">
@@ -277,6 +307,33 @@ class Workspace extends React.Component {
               Edit Grid
           </MenuItem>
         </ContextMenu>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className="modal"
+          open={this.state.colorModalShow}
+          onClose={() => this.setState({ colorModalShow: false })}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
+          }}
+        >
+          <Fade in={this.state.colorModalShow}>
+            <div className="paper">
+              <p id="transition-modal-title">Select Color</p>
+              <SketchPicker color={this.state.newColor} onChange={(color) => this.setState({ newColor: color.hex })} className="sketch"/>
+              <span className="buttons">
+                <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ colorModalShow: false })} className="done">
+                  CANCEL
+                </Button>
+                <Button variant="outlined" size="medium" color="primary" onClick={this.changeColor} className="done">
+                  SUBMIT
+                </Button>
+              </span>
+            </div>
+          </Fade>
+        </Modal>
           {this.state.nodes.map((item, i) =>
               <WorkspaceNode
               startScroll={this.startScroll}
@@ -285,6 +342,7 @@ class Workspace extends React.Component {
               onDelete={this.deleteNode}
               onDuplicate={this.duplicateNode}
               onShift={this.shiftNode}
+              onContextChange={this.contextChange}
               copySelf={this.storeCopiedNode}
               index={i}
               menuId={item.key}
