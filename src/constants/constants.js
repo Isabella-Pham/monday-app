@@ -1,5 +1,8 @@
 const cursorCentered = false;
 const ROUND_DECIMALS = 4;
+const MIN_MULTIPLIER = 0.5;
+const MAX_MULTIPLIER = 4;
+
 let gridEnabled = true;
 
 const ZOOM_SETTINGS = Object.freeze({
@@ -112,6 +115,14 @@ class Constants {
     return gridEnabled;
   }
 
+  static get MIN_MULTIPLIER() {
+    return MIN_MULTIPLIER;
+  }
+
+  static get MAX_MULTIPLIER() {
+    return MAX_MULTIPLIER;
+  }
+
   static get ZOOM_SETTINGS() {
     return Constants.WORKSPACE_SETTINGS.getZoom();
   }
@@ -147,8 +158,8 @@ class Constants {
   }
 
   static coordIsValid(x, y, width, height) {
-    let xValid = x >= 0 && x+width <= Constants.WORKSPACE_SETTINGS.horizontalBoxes;
-    let yValid = y >= 0 && y+height <= Constants.WORKSPACE_SETTINGS.verticalBoxes;
+    let xValid = x >= 0 && x + width <= Constants.WORKSPACE_SETTINGS.horizontalBoxes;
+    let yValid = y >= 0 && y + height <= Constants.WORKSPACE_SETTINGS.verticalBoxes;
     return xValid && yValid;
   }
 
@@ -156,13 +167,13 @@ class Constants {
     if (xCord < 0) {
       xCord = 0;
     }
-    else if (xCord+width > Constants.WORKSPACE_SETTINGS.horizontalBoxes) {
+    else if (xCord + width > Constants.WORKSPACE_SETTINGS.horizontalBoxes) {
       xCord = Constants.WORKSPACE_SETTINGS.horizontalBoxes - width;
     }
     if (yCord < 0) {
       yCord = 0;
     }
-    else if (yCord+height > Constants.WORKSPACE_SETTINGS.verticalBoxes) {
+    else if (yCord + height > Constants.WORKSPACE_SETTINGS.verticalBoxes) {
       yCord = Constants.WORKSPACE_SETTINGS.verticalBoxes - height;
     }
     return {

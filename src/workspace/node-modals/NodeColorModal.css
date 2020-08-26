@@ -4,6 +4,11 @@
     justify-content: center;
     margin-bottom: 10%;
     outline: 0;
+    user-select: none !important;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
 }
 
 .paper {
@@ -14,11 +19,22 @@
     padding-right: 1%;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     padding-bottom: 1%;
+    border-radius: 5px;
+    user-select: none !important;
+    -moz-user-select: none !important;
+    -khtml-user-select: none !important;
+    -webkit-user-select: none !important;
+    -o-user-select: none !important;
 }
 
 .sketch {
     padding: 10px;
     margin-bottom: 10%;
+    user-select: none !important; 
+    -moz-user-select: none !important;
+    -khtml-user-select: none !important;
+    -webkit-user-select: none !important;
+    -o-user-select: none !important;
 }
 
 .buttons {
