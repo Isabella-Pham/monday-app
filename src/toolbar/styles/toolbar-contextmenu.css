@@ -1,4 +1,4 @@
-.react-contextmenu {
+.toolbar-contextmenu {
     background-color: #fff;
     background-clip: padding-box;
     border: 1px solid rgba(0,0,0,.15);
@@ -6,7 +6,7 @@
     color: #373a3c;
     font-size: 14px;
     margin: 2px 0 0;
-    min-width: 160px;
+    min-width: 240px;
     outline: none;
     opacity: 0;
     padding: 5px 0;
@@ -15,13 +15,13 @@
     transition: opacity 100ms ease !important;
 }
 
-.react-contextmenu.react-contextmenu--visible {
+.toolbar-contextmenu.react-contextmenu--visible {
     opacity: 1;
     pointer-events: auto;
     z-index: 9999;
 }
 
-.react-contextmenu-item {
+.toolbar-contextmenu-item  {
     background: 0 0;
     border: 0;
     color: #373a3c;
@@ -30,48 +30,39 @@
     padding: 3px 10px;
     text-align: inherit;
     white-space: nowrap;
+    background-color: none !important;
+    border-color: none !important;
 }
 
-.shapes {
-    background: 0 0;
-    border: 0;
-    line-height: 2;
-    padding: 3px 10px;
-    text-align: inherit;
-    white-space: nowrap;   
-}
-
-.react-contextmenu-item.react-contextmenu-item--active,
-.react-contextmenu-item.react-contextmenu-item--selected {
+.toolbar-contextmenu-item.react-contextmenu-item.react-contextmenu-item--active,
+.toolbar-contextmenu-item.react-contextmenu-item.react-contextmenu-item--selected {
     color: #fff;
-    background-color: #20a0ff;
-    border-color: #20a0ff;
     text-decoration: none;
 }
 
-.react-contextmenu-item.react-contextmenu-item--disabled,
-.react-contextmenu-item.react-contextmenu-item--disabled:hover {
+.toolbar-contextmenu-item.react-contextmenu-item--disabled,
+.toolbar-contextmenu-item.react-contextmenu-item--disabled:hover {
     background-color: transparent;
     border-color: rgba(0,0,0,.15);
     color: #878a8c;
 }
 
-.react-contextmenu-item--divider {
+.toolbar-contextmenu-item--divider {
     border-bottom: 1px solid rgba(0,0,0,.15);
     cursor: inherit;
     margin-bottom: 3px;
     padding: 2px 0;
 }
-.react-contextmenu-item--divider:hover {
+.toolbar-contextmenu-item--divider:hover {
     background-color: transparent;
     border-color: rgba(0,0,0,.15);
 }
 
-.react-contextmenu-item.react-contextmenu-submenu {
+.toolbar-contextmenu-item.react-contextmenu-submenu {
 	padding: 0;
 }
 
-.react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item:after {
+.toolbar-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item:after {
     content: ">";
     font-weight: bold;
     width: 10px;

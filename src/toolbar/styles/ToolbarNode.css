@@ -10,10 +10,6 @@
   margin-bottom: 0;
 }
 
-.toolbar-node:hover {
-  background-color: lightgray;
-}
-
 .toolbar-node > svg {
   display: block;
   overflow: visible;
@@ -21,6 +17,6 @@
 
 .toolbar-node > svg > path {
   fill: white;
-  stroke-width: 1px;
+  stroke-width: 4px;
   stroke: black;
 }

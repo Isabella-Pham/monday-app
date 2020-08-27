@@ -1,7 +1,7 @@
 import React from 'react';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
+import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 import { Resizable } from 'react-resizable';
 
 import Shapes from '../../assets/shapes';
@@ -214,7 +214,7 @@ class WorkspaceNode extends React.Component {
     if (isTooSmall) {
       newMultiplier = Constants.MIN_MULTIPLIER;
     }
-    else if(isTooLarge) {
+    else if (isTooLarge) {
       newMultiplier = Constants.MAX_MULTIPLIER;
     }
 
@@ -248,7 +248,7 @@ class WorkspaceNode extends React.Component {
             onResizeStop={() => this.setState({ isResizing: false })}
           >
             <div
-              className={'work-node' + (this.state.isSelected ? ' selected' : '')}
+              className={'work-node' + (this.state.isResizing ? ' resizing' : '') + (this.state.isSelected ? ' selected' : '')}
               style={{
                 top: position.y,
                 left: position.x,
@@ -295,6 +295,10 @@ class WorkspaceNode extends React.Component {
               <FontAwesomeIcon icon={faTextHeight} style={{paddingRight: 10}}/>
               Text
             </MenuItem>
+            <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
+              <FontAwesomeIcon icon={faPalette} style={{paddingRight: 10}}/>
+              Color
+            </MenuItem>
           </SubMenu>
           <SubMenu 
             title={
@@ -311,23 +315,6 @@ class WorkspaceNode extends React.Component {
             <MenuItem className="react-contextmenu-item" onClick={this.moveToBack}>
               <FontAwesomeIcon icon={faSortAmountDownAlt} style={{paddingRight: 10}}/>
               Send To Back
-            </MenuItem>
-          </SubMenu>
-          <SubMenu 
-            title={
-              <div style={{display: "inline"}}>
-                <FontAwesomeIcon icon={faVectorSquare} style={{paddingRight: 10}}/>
-                <span>Styling</span>
-              </div>
-            }
-            hoverDelay={100}>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
-              <FontAwesomeIcon icon={faUndo} style={{paddingRight: 10}}/>
-              Rotate
-            </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
-              <FontAwesomeIcon icon={faPalette} style={{paddingRight: 10}}/>
-              Change Color
             </MenuItem>
           </SubMenu>
         </ContextMenu>
