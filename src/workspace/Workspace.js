@@ -281,8 +281,10 @@ class Workspace extends React.Component {
   contextChange(index, action) {
     switch(action) {
       case "color":
-        this.setState({ colorModalShow: true, contextIndex: index })
-      break;
+        this.setState({ colorModalShow: true, contextIndex: index });
+        break;
+      default:
+        break;
     }
   }
 
