@@ -27,7 +27,9 @@ const SHAPES_ORDER = [
 const SHAPE_COL_COUNT = 3;
 
 const LINES_ORDER = [
-  Shapes.TYPES.LINE
+  Shapes.TYPES.LINE,
+  Shapes.TYPES.ARROW_LINE,
+  Shapes.TYPES.DOUBLE_LINE
 ];
 const LINE_COL_COUNT = 3;
 

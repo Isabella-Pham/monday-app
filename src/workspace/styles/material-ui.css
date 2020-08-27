@@ -9,15 +9,16 @@
     -khtml-user-select: none;
     -webkit-user-select: none;
     -o-user-select: none;
+    font-family: "Roboto", sans-serif;
 }
 
 .paper {
+  font-family: inherit;
     text-align: center;
     background-color: #ffffff;
     border: 0px solid #fff;
     padding-left: 1%;
     padding-right: 1%;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
     padding-bottom: 1%;
     border-radius: 5px;
     user-select: none !important;
@@ -28,6 +29,7 @@
 }
 
 .sketch {
+  font-family: inherit;
     padding: 10px;
     margin-bottom: 10%;
     user-select: none !important; 
@@ -42,4 +44,8 @@
     justify-content: space-between;
     padding-left: 25px;
     padding-right: 25px
+}
+
+.buttons > button {
+  font-family: inherit;
 }

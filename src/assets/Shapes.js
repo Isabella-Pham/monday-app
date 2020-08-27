@@ -1,5 +1,8 @@
 import React from 'react';
 
+const LINE_ARROW_UNIT = 0.3;
+const LINE_ARROW_ANGLE = Math.PI / 6;
+
 const TYPES = Object.freeze({
   RECT: 0,
   ROUND_RECT: 1,
@@ -17,7 +20,9 @@ const TYPES = Object.freeze({
   LEFT_ARROW: 13,
   DOUBLE_ARROW: 14,
   FOUR_ARROW: 15,
-  LINE: 16
+  LINE: 16,
+  ARROW_LINE: 17,
+  DOUBLE_LINE: 18
 });
 
 class Shapes {
@@ -26,7 +31,9 @@ class Shapes {
   }
 
   static isLine(type) {
-    return type === TYPES.LINE;
+    return type === TYPES.LINE ||
+      type === TYPES.ARROW_LINE ||
+      type === TYPES.DOUBLE_LINE;
   }
 
   static getRect(fitInSquare) {
@@ -227,21 +234,109 @@ class Shapes {
             fill: '#000000'
           }}
           d={`
-          M12.5,87.5
-          l70,-70
-          l-5,-5
-          l10,0
-          l0,10
-          l-5,-5
+          M0,100
+          l100,-100
         `} />
       )
     }
     return (
       <path
         d={`
+        M${props.x},${props.y}
+        L${props.endX},${props.endY}
+      Z`} />
+    );
+  }
+
+  static getArrowLine(props) {
+    if (props.toolbar) {
+      return (
+        <path
+          style={{
+            fill: '#000000'
+          }}
+          d={`
+          M0,100
+          l95,-95
+          m5,-5
+          l-10,2.68
+          l7.32,7.32
+          l2.68,-10
+        Z`} />
+      )
+    }
+    let theta = Math.atan2(-props.endY + props.y, props.endX - props.x) * (180 / Math.PI);
+    if (theta < 0) theta += 360;
+    return (
+      <g>
+        <path
+          d={`
           M${props.x},${props.y}
           L${props.endX},${props.endY}
+        Z`} />
+        <polygon
+          strokeWidth={0.13}
+          points={`
+            0,0
+            ${-LINE_ARROW_UNIT},${-LINE_ARROW_UNIT * Math.tan(LINE_ARROW_ANGLE)}
+            ${-LINE_ARROW_UNIT},${LINE_ARROW_UNIT * Math.tan(LINE_ARROW_ANGLE)}
+          `} transform={`
+            translate(${props.endX}, ${props.endY})
+            rotate(${-theta} 0 0)
+          `}
+        />
+      </g>
+    );
+  }
+
+  static getDoubleLine(props) {
+    if (props.toolbar) {
+      return (
+        <path
+          style={{
+            fill: '#000000'
+          }}
+          d={`
+          M0,100
+          l10,-2.68
+          l-7.32,-7.32
+          l-2.68,10
+          Z
+          m5,-5
+          l90,-90
+          m5,-5
+          l-10,2.68
+          l7.32,7.32
+          l2.68,-10
+        Z`} />
+      )
+    }
+    let theta = Math.atan2(-props.endY + props.y, props.endX - props.x) * (180 / Math.PI);
+    if (theta < 0) theta += 360;
+    return (
+      <g>
+        <path
+          d={`
+          M${props.x},${props.y}
+          L${props.endX},${props.endY}
+        Z`} />
+        <polygon points={`
+          0,0
+          ${LINE_ARROW_UNIT},${-LINE_ARROW_UNIT * Math.tan(LINE_ARROW_ANGLE)}
+          ${LINE_ARROW_UNIT},${LINE_ARROW_UNIT * Math.tan(LINE_ARROW_ANGLE)}
+        `} transform={`
+          translate(${props.x}, ${props.y})
+          rotate(${-theta} 0 0)
         `} />
+        <polygon points={`
+          0,0
+          ${-LINE_ARROW_UNIT},${-LINE_ARROW_UNIT * Math.tan(LINE_ARROW_ANGLE)}
+          ${-LINE_ARROW_UNIT},${LINE_ARROW_UNIT * Math.tan(LINE_ARROW_ANGLE)}
+        `} transform={`
+          translate(${props.endX}, ${props.endY})
+          rotate(${-theta} 0 0)
+        `} />
+      </g>
     );
   }
 
@@ -261,11 +356,13 @@ class Shapes {
       case Shapes.TYPES.DOUBLE_ARROW: return Shapes.getDoubleArrow(props.toolbar);
       case Shapes.TYPES.FOUR_ARROW: return Shapes.getFourArrow();
       case Shapes.TYPES.LINE: return Shapes.getLine(props);
+      case Shapes.TYPES.ARROW_LINE: return Shapes.getArrowLine(props);
+      case Shapes.TYPES.DOUBLE_LINE: return Shapes.getDoubleLine(props);
       default: return null;
     }
   }
 
-  static getDefaultDimensions(type, props={}) {
+  static getDefaultDimensions(type, props = {}) {
     type = parseInt(type);
     let dimensions = [0, 0];
     switch (type) {
@@ -286,6 +383,8 @@ class Shapes {
         dimensions = [8, 8];
         break;
       case Shapes.TYPES.LINE:
+      case Shapes.TYPES.ARROW_LINE:
+      case Shapes.TYPES.DOUBLE_LINE:
         dimensions = [10, 0];
         break;
       default: break;

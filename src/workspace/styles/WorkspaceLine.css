@@ -17,7 +17,8 @@
   pointer-events: all;
 }
 
-.line-node > svg > path {
+.line-node > svg > path,
+.line-node > svg > g {
   stroke-width: 0.15;
   pointer-events: auto;
 }

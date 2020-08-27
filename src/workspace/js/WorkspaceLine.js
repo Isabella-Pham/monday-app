@@ -1,7 +1,7 @@
 import React from 'react';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
+import { faCut, faCopy, faEdit, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 
 import Shapes from '../../assets/shapes';
 import Constants from '../../constants/constants';
@@ -52,6 +52,7 @@ class WorkspaceLine extends React.Component {
       this.moveToBack,
       this.moveToFront,
       this.colorChange,
+      this.flipLine
     ];
 
     for (let func of bindFunctions) {
@@ -237,10 +238,14 @@ class WorkspaceLine extends React.Component {
           x: adjustedCord.x,
           y: adjustedCord.y,
         };
-        this.props.updateSelf(
-          this.props.index,
-          updateCoord
-        );
+        let newDx = Math.abs(adjustedCord.x - this.props.attributes[this.state.resizing.isEnd ? 'x' : 'endX']);
+        let newDy = Math.abs(adjustedCord.y - this.props.attributes[this.state.resizing.isEnd ? 'y' : 'endY']);
+        if (newDx >= 1 || newDy >= 1) {
+          this.props.updateSelf(
+            this.props.index,
+            updateCoord
+          );
+        }
       }
     }
   }
@@ -293,6 +298,15 @@ class WorkspaceLine extends React.Component {
     this.props.onContextChange(this.props.index, "color")
   }
 
+  flipLine() {
+    this.props.updateSelf(this.props.index, {
+      x: this.props.attributes.endX,
+      y: this.props.attributes.endY,
+      endX: this.props.attributes.x,
+      endY: this.props.attributes.y
+    });
+  }
+
   render() {
     let vBox = Constants.WORKSPACE_SETTINGS.getVerticalBoxes();
     let hBox = Constants.WORKSPACE_SETTINGS.getHorizontalBoxes();
@@ -315,43 +329,43 @@ class WorkspaceLine extends React.Component {
               left: offset.x,
               width: gridPixels.width,
               height: gridPixels.height,
+              fill: this.props.attributes.fillColor,
               stroke: this.props.attributes.fillColor
             }}>
             <svg
               ref={node => this.node = node}
               viewBox={`0 0 ${vBox} ${hBox}`}>
-                {
+              {
                 this.state.isSelected ? <path
-                style={{
-                  strokeWidth: 0.3,
-                  stroke: "#4a98fd",
-                  strokeDasharray: 0.25,
-                }}
-                d={`
+                  style={{
+                    strokeWidth: 0.3,
+                    stroke: "#4a98fd",
+                    strokeDasharray: 0.25,
+                  }}
+                  d={`
                   M${renderProps.x},${renderProps.y}
                   L${renderProps.endX},${renderProps.endY}
                 `} /> : null
               }
-              { Shapes.renderShape(this.props.attributes.type, renderProps) }
-              { this.state.isSelected ? [
+              {Shapes.renderShape(this.props.attributes.type, renderProps)}
+              {this.state.isSelected ? [
                 <circle
-                className="startCircle"
-                key="startCircle"
-                style={{
-                  stroke: "#bedafd",
-                  fill: "#bedafd",
-                  strokeWidth: 0.1,
-                }} cx={renderProps.x} cy={renderProps.y} r={0.25}></circle>,
-                <circle 
-                className="endCircle"
-                key="endCircle"
-                style={{
-                  stroke: "#bedafd",
-                  fill: "#bedafd",
-                  strokeWidth: 0.1,
-                }} cx={renderProps.endX} cy={renderProps.endY} r={0.25}></circle>
-              ] : null }
-              {/* Draw two circles for dragging and extending. One for end coord one for start */}
+                  className="startCircle"
+                  key="startCircle"
+                  style={{
+                    stroke: "#bedafd",
+                    fill: "#bedafd",
+                    strokeWidth: 0.1,
+                  }} cx={renderProps.x} cy={renderProps.y} r={0.25}></circle>,
+                <circle
+                  className="endCircle"
+                  key="endCircle"
+                  style={{
+                    stroke: "#bedafd",
+                    fill: "#bedafd",
+                    strokeWidth: 0.1,
+                  }} cx={renderProps.endX} cy={renderProps.endY} r={0.25}></circle>
+              ] : null}
             </svg>
           </div>
         </ContextMenuTrigger>
@@ -380,10 +394,6 @@ class WorkspaceLine extends React.Component {
               <FontAwesomeIcon icon={faClone} style={{ paddingRight: 10 }} />
               Duplicate
             </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
-              <FontAwesomeIcon icon={faTextHeight} style={{ paddingRight: 10 }} />
-              Text
-            </MenuItem>
           </SubMenu>
           <SubMenu
             title={
@@ -410,9 +420,9 @@ class WorkspaceLine extends React.Component {
               </div>
             }
             hoverDelay={100}>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+            <MenuItem className="react-contextmenu-item" onClick={this.flipLine}>
               <FontAwesomeIcon icon={faUndo} style={{ paddingRight: 10 }} />
-              Rotate
+              Flip
             </MenuItem>
             <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
               <FontAwesomeIcon icon={faPalette} style={{ paddingRight: 10 }} />

@@ -146,14 +146,14 @@ class Constants {
     closeY -= closeY % dimension;
     let offset = Constants.WORKSPACE_SETTINGS.getOffset();
     return {
-      x: Constants.roundFloat(closeX + (offset.x % dimension), ROUND_DECIMALS),
-      y: Constants.roundFloat(closeY + (offset.y % dimension), ROUND_DECIMALS)
+      x: Constants.roundFloat(closeX + (offset.x % dimension)),
+      y: Constants.roundFloat(closeY + (offset.y % dimension))
     };
   }
 
   static getGridCoord(mouseCoord, length, gridOffset, strictCursor=true) {
     let coord = ((mouseCoord - (Constants.cursorCentered && strictCursor ? length/2 : 0)) - gridOffset) / Constants.ZOOM_SETTINGS;
-    return Constants.roundFloat(coord, ROUND_DECIMALS);
+    return Constants.roundFloat(coord);
   }
 
   static setGridOffset(x, y) {
@@ -227,7 +227,8 @@ class Constants {
     return side * (q / 100)
   }
 
-  static roundFloat(num, decimals) {
+  static roundFloat(num, decimals=0) {
+    if (!decimals) decimals = ROUND_DECIMALS;
     return Number(Math.round(num+'e'+decimals)+'e-'+decimals);
   }
 }
