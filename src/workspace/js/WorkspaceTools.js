@@ -2,8 +2,8 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearchMinus, faSearchPlus, faBorderAll } from '@fortawesome/free-solid-svg-icons';
 
-import Constants from '../constants/constants';
-import './WorkspaceTools.css';
+import Constants from '../../constants/constants';
+import '../styles/WorkspaceTools.css';
 
 
 class WorkplaceTools extends React.Component {

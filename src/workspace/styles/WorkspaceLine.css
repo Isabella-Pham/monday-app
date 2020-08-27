@@ -1,0 +1,27 @@
+.line-node {
+  position: absolute !important;
+  display: block !important;
+  cursor: pointer !important;
+  background-color: transparent !important;
+  pointer-events: none;
+}
+
+.line-node > svg {
+  position: absolute;
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.line-node.selected {
+  pointer-events: all;
+}
+
+.line-node > svg > path {
+  stroke-width: 0.15;
+  pointer-events: auto;
+}
+
+.line-node > svg > circle {
+  pointer-events: auto;
+}

@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 import ToolbarNode from './ToolbarNode';
-import Shapes from '../assets/Shapes';
-import "./Toolbar.css";
+import Shapes from '../../assets/shapes';
+import "../styles/Toolbar.css";
 
 // fills in left to right, top to bottom
 const TOOLBAR_ORDER = [
@@ -20,6 +20,7 @@ const TOOLBAR_ORDER = [
   Shapes.TYPES.RIGHT_ARROW,
   Shapes.TYPES.DOUBLE_ARROW,
   Shapes.TYPES.FOUR_ARROW,
+  Shapes.TYPES.LINE
 ];
 const COL_COUNT = 3;
 

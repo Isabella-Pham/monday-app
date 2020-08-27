@@ -1,4 +1,4 @@
-const cursorCentered = false;
+const CURSOR_CENTERED = true;
 const ROUND_DECIMALS = 4;
 const MIN_MULTIPLIER = 0.5;
 const MAX_MULTIPLIER = 4;
@@ -51,6 +51,13 @@ class WorkspaceSettings {
   setVerticalBoxes(boxes) {
     this.verticalBoxes = boxes;
   }
+
+  getWorkspacePixels() {
+    return {
+      width: this.horizontalBoxes * this.getZoom(),
+      height: this.verticalBoxes * this.getZoom()
+    };
+  }
   
   setOffset(x, y) {
     this.offsetX = x;
@@ -102,7 +109,7 @@ class Constants {
   static WORKSPACE_SETTINGS = new WorkspaceSettings();
 
   static get cursorCentered() {
-    return cursorCentered;
+    return CURSOR_CENTERED;
   }
 
   static get gridEnabled() {
@@ -144,8 +151,8 @@ class Constants {
     };
   }
 
-  static getGridCoord(mouseCoord, length, gridOffset) {
-    let coord = ((mouseCoord - (Constants.cursorCentered ? length / 2 : 0)) - gridOffset) / Constants.ZOOM_SETTINGS;
+  static getGridCoord(mouseCoord, length, gridOffset, strictCursor=true) {
+    let coord = ((mouseCoord - (Constants.cursorCentered && strictCursor ? length/2 : 0)) - gridOffset) / Constants.ZOOM_SETTINGS;
     return Constants.roundFloat(coord, ROUND_DECIMALS);
   }
 
@@ -176,6 +183,29 @@ class Constants {
     else if (yCord + height > Constants.WORKSPACE_SETTINGS.verticalBoxes) {
       yCord = Constants.WORKSPACE_SETTINGS.verticalBoxes - height;
     }
+    return {
+      x: xCord,
+      y: yCord
+    };
+  }
+
+  static getAdjustedLine(xCord, yCord, deltaX, deltaY) {
+    let leftToRight = deltaX >= 0;
+    if (xCord < 0 || xCord+deltaX < 0) {
+      xCord = leftToRight ? 0 : Math.abs(deltaX);
+    }
+    else if (xCord + deltaX > Constants.WORKSPACE_SETTINGS.horizontalBoxes || xCord > Constants.WORKSPACE_SETTINGS.horizontalBoxes) {
+      xCord = Constants.WORKSPACE_SETTINGS.horizontalBoxes - (leftToRight ? deltaX : 0);
+    }
+
+    let topToBottom = deltaY >= 0;
+    if (yCord < 0 || yCord+deltaY < 0) {
+      yCord = topToBottom ? 0 : Math.abs(deltaY);
+    }
+    else if (yCord + deltaY > Constants.WORKSPACE_SETTINGS.verticalBoxes || yCord > Constants.WORKSPACE_SETTINGS.verticalBoxes) {
+      yCord = Constants.WORKSPACE_SETTINGS.verticalBoxes - (topToBottom ? deltaY : 0);
+    }
+
     return {
       x: xCord,
       y: yCord

@@ -14,11 +14,13 @@
 }
 
 .work-node:not(.selected):hover {
-  outline: 2px dashed #bedafd;
+  outline-style: dashed;
+  outline-color:#bedafd;
 }
 
 .work-node.selected {
-  outline: 2px dashed #4a98fd;
+  outline-style: dashed;
+  outline-color:#4a98fd;
   pointer-events: all;
 }
 

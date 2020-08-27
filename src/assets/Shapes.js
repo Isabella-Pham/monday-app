@@ -25,6 +25,10 @@ class Shapes {
     return TYPES;
   }
 
+  static isLine(type) {
+    return type === TYPES.LINE;
+  }
+
   static getRect(fitInSquare) {
     // 100x50 rectangle
     return (
@@ -73,7 +77,7 @@ class Shapes {
     let start = fitInSquare ? '10,20' : '0,10';
     let len = fitInSquare ? '60' : '80';
     return (
-    <path d={`
+      <path d={`
     M${start}
     a10,10 0 0 1 10,-10 
     l${len},0 
@@ -83,7 +87,7 @@ class Shapes {
     l-${len},0
     a10,10 0 0 1 -10,-10
     Z`}></path>
-      );
+    );
   }
 
   static getCircle() {
@@ -215,64 +219,74 @@ class Shapes {
     )
   }
 
-  static renderShape(type, fitInSquare = true) {
+  static getLine(props) {
+    if (props.toolbar) {
+      return (
+        <path
+          style={{
+            fill: '#000000'
+          }}
+          d={`
+          M12.5,87.5
+          l70,-70
+          l-5,-5
+          l10,0
+          l0,10
+          l-5,-5
+        `} />
+      )
+    }
+    return (
+      <path
+        d={`
+          M${props.x},${props.y}
+          L${props.endX},${props.endY}
+        `} />
+    );
+  }
+
+  static renderShape(type, props = { toolbar: true }) {
     type = parseInt(type);
     switch (type) {
-      case Shapes.TYPES.RECT: return Shapes.getRect(fitInSquare);
-      case Shapes.TYPES.ROUND_RECT: return Shapes.getRoundedRect(fitInSquare);
+      case Shapes.TYPES.RECT: return Shapes.getRect(props.toolbar);
+      case Shapes.TYPES.ROUND_RECT: return Shapes.getRoundedRect(props.toolbar);
       case Shapes.TYPES.CIRCLE: return Shapes.getCircle();
-      case Shapes.TYPES.ELLIPSE: return Shapes.getEllipse(fitInSquare);
+      case Shapes.TYPES.ELLIPSE: return Shapes.getEllipse(props.toolbar);
       case Shapes.TYPES.DIAMOND: return Shapes.getDiamond();
       case Shapes.TYPES.ROUNDED_DIAMOND: return Shapes.getRoundedDiamond();
-      case Shapes.TYPES.SQUARE: return Shapes.getSquare(fitInSquare);
-      case Shapes.TYPES.ROUNDED_SQUARE: return Shapes.getRoundedSquare(fitInSquare);
-      case Shapes.TYPES.LEFT_ARROW: return Shapes.getLeftArrow(fitInSquare);
-      case Shapes.TYPES.RIGHT_ARROW: return Shapes.getRightArrow(fitInSquare);
-      case Shapes.TYPES.DOUBLE_ARROW: return Shapes.getDoubleArrow(fitInSquare);
+      case Shapes.TYPES.SQUARE: return Shapes.getSquare(props.toolbar);
+      case Shapes.TYPES.ROUNDED_SQUARE: return Shapes.getRoundedSquare(props.toolbar);
+      case Shapes.TYPES.LEFT_ARROW: return Shapes.getLeftArrow(props.toolbar);
+      case Shapes.TYPES.RIGHT_ARROW: return Shapes.getRightArrow(props.toolbar);
+      case Shapes.TYPES.DOUBLE_ARROW: return Shapes.getDoubleArrow(props.toolbar);
       case Shapes.TYPES.FOUR_ARROW: return Shapes.getFourArrow();
+      case Shapes.TYPES.LINE: return Shapes.getLine(props);
       default: return null;
     }
   }
 
-  static getDefaultDimensions(type) {
+  static getDefaultDimensions(type, props={}) {
     type = parseInt(type);
     let dimensions = [0, 0];
     switch (type) {
       case Shapes.TYPES.RECT:
-        dimensions = [8, 4];
-        break;
       case Shapes.TYPES.ROUND_RECT:
-        dimensions = [8, 4];
-        break;
-      case Shapes.TYPES.CIRCLE:
-        dimensions = [8, 8];
-        break;
+      case Shapes.TYPES.LEFT_ARROW:
+      case Shapes.TYPES.RIGHT_ARROW:
+      case Shapes.TYPES.DOUBLE_ARROW:
       case Shapes.TYPES.ELLIPSE:
         dimensions = [8, 4];
         break;
       case Shapes.TYPES.DIAMOND:
-        dimensions = [8, 8];
-        break;
+      case Shapes.TYPES.CIRCLE:
       case Shapes.TYPES.SQUARE:
-        dimensions = [8, 8];
-        break;
       case Shapes.TYPES.ROUNDED_SQUARE:
-        dimensions = [8, 8];
-        break;
       case Shapes.TYPES.ROUNDED_DIAMOND:
-        dimensions = [8, 8];
-        break;
-      case Shapes.TYPES.LEFT_ARROW:
-        dimensions = [8, 4];
-        break;
-      case Shapes.TYPES.RIGHT_ARROW:
-        dimensions = [8, 4];
-        break;
-      case Shapes.TYPES.DOUBLE_ARROW:
-        dimensions = [8, 4];
-        break;
       case Shapes.TYPES.FOUR_ARROW:
         dimensions = [8, 8];
+        break;
+      case Shapes.TYPES.LINE:
+        dimensions = [10, 0];
         break;
       default: break;
     }

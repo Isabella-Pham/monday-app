@@ -1,7 +1,7 @@
 import React from 'react';
 
-import Shapes from '../assets/Shapes';
-import "./ToolbarNode.css";
+import Shapes from '../../assets/shapes';
+import "../styles/ToolbarNode.css";
 
 class ToolbarNode extends React.Component {
   static onMouseDown;

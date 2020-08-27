@@ -20,7 +20,7 @@
 }
 
 .toolbar-node > svg > path {
-  fill: transparent;
+  fill: white;
   stroke-width: 1px;
   stroke: black;
 }

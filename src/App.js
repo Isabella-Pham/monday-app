@@ -1,11 +1,12 @@
 import React from "react";
 
-import Workspace from './workspace/Workspace';
-import WorkspaceNode from './workspace/WorkspaceNode';
-import Toolbar from './toolbar/Toolbar';
-import ToolbarNode from './toolbar/ToolbarNode';
-import Shapes from './assets/Shapes';
-import TransitionNode from './toolbar/TransitionNode';
+import Workspace from './workspace/js/Workspace';
+import WorkspaceNode from './workspace/js/WorkspaceNode';
+import WorkspaceLine from "./workspace/js/WorkspaceLine";
+import Toolbar from './toolbar/js/Toolbar';
+import ToolbarNode from './toolbar/js/ToolbarNode';
+import TransitionNode from './toolbar/js/TransitionNode';
+import Shapes from './assets/shapes';
 import Constants from './constants/constants';
 import "./App.css";
 
@@ -90,7 +91,10 @@ class App extends React.Component {
           let nodeType = this.state.transitionNode.type;
           let dimensions = Shapes.getDefaultDimensions(nodeType);
           if (Constants.coordIsValid(xCoord, yCoord, dimensions.width, dimensions.height)) {
-            this._workspace.current.addNode(WorkspaceNode.getDefault(xCoord, yCoord, nodeType));
+            let nodeAttrs = Shapes.isLine(nodeType) ?
+            WorkspaceLine.getDefault(xCoord, yCoord, nodeType) :
+            WorkspaceNode.getDefault(xCoord, yCoord, nodeType);
+            this._workspace.current.addNode(nodeAttrs);
           }
           else {
             console.log('Out of grid');

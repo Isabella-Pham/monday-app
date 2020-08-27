@@ -6,44 +6,38 @@ import { faClipboard, faEdit } from '@fortawesome/free-solid-svg-icons';
 
 import WorkspaceNode from './WorkspaceNode';
 import WorkspaceTools from './WorkspaceTools';
-import Constants from '../constants/constants';
-import './Workspace.css';
-import './react-contextmenu.css';
+import Constants from '../../constants/constants';
+import Shapes from '../../assets/shapes';
+import '../styles/Workspace.css';
+import '../styles/react-contextmenu.css';
 
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import Button from '@material-ui/core/Button';
 import SketchPicker from 'react-color';
-import './node-modals/NodeColorModal.css';
+import '../styles/material-ui.css';
+import WorkspaceLine from './WorkspaceLine';
 
 class Workspace extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-        nodes: [],
-        scrolling: {
-          enabled: false,
-          xDis: 0,
-          yDis: 0
-        },
-        horizontalBoxCount: Constants.WORKSPACE_SETTINGS.horizontalBoxes,
-        verticalBoxCount: Constants.WORKSPACE_SETTINGS.verticalBoxes,
-        colorModalShow: false,
-        color: '#ffffff',
-        newColor: '#ffffff',
-        contextIndex: -1
+      nodes: [],
+      colorModalShow: false,
+      color: '#ffffff',
+      newColor: '#ffffff',
+      contextIndex: -1,
+      copiedNode: undefined
     };
 
     let bindFunctions = [
       this.addNode,
-      this.drawGrid,
+      this.drawWorkspace,
       this.deleteNode,
       this.duplicateNode,
       this.shiftNode,
-      this.startScroll,
-      this.endScroll,
       this.updateNode,
       this.incZoom,
       this.decZoom,
@@ -54,51 +48,28 @@ class Workspace extends React.Component {
       this.changeColor,
       this.dummyMethod,
       this.pasteNode,
-      this.resizeNode,
     ];
-    
+
     for (let func of bindFunctions) {
       this[func.name] = this[func.name].bind(this);
     }
   }
 
   componentDidMount() {
-    this.drawGrid();
-    window.addEventListener('resize', this.drawGrid, false);
+    this.drawWorkspace();
+    window.addEventListener('resize', this.drawWorkspace, false);
     window.addEventListener('resize', this.forceUpdate, false);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.drawGrid, false);
+    window.removeEventListener('resize', this.drawWorkspace, false);
     window.removeEventListener('resize', this.forceUpdate, false);
-  }
-
-  startScroll(xDis, yDis) {
-    this.setState({
-      scrolling: {
-        ...this.state.scrolling,
-        enabled: true,
-        xDis: xDis,
-        yDis: yDis
-      }
-    });
-  }
-
-  endScroll() {
-    this.setState({
-      scrolling: {
-        ...this.state.scrolling,
-        enabled: false,
-        xDis: 0,
-        yDis: 0
-      }
-    });
   }
 
   incZoom() {
     if (Constants.WORKSPACE_SETTINGS.canInc()) {
       Constants.WORKSPACE_SETTINGS.incZoom();
-      this.drawGrid();
+      this.drawWorkspace();
       this.forceUpdate();
     }
   }
@@ -106,16 +77,16 @@ class Workspace extends React.Component {
   decZoom() {
     if (Constants.WORKSPACE_SETTINGS.canDec()) {
       Constants.WORKSPACE_SETTINGS.decZoom()
-      this.drawGrid();
+      this.drawWorkspace();
       this.forceUpdate();
     }
   }
 
-  drawGrid() {
-    let gridDimension = Constants.ZOOM_SETTINGS;
-    let gridWidth = this.state.horizontalBoxCount * gridDimension;
-    let gridHeight = this.state.verticalBoxCount * gridDimension;
-  
+  drawWorkspace() {
+    let gridPixels = Constants.WORKSPACE_SETTINGS.getWorkspacePixels();
+    let gridWidth = gridPixels.width;
+    let gridHeight = gridPixels.height;
+
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
 
@@ -138,48 +109,49 @@ class Workspace extends React.Component {
 
     gridSvg.style('transform', `translate(-${translateX}, -${translateY})`)
 
-    let offsetX = widthTooSmall ? 0 : parseFloat(windowWidth-gridWidth)/2;
-    let offsetY = heightTooSmall ? 0 : parseFloat(windowHeight-gridHeight)/2;
+    let offsetX = widthTooSmall ? 0 : parseFloat(windowWidth - gridWidth) / 2;
+    let offsetY = heightTooSmall ? 0 : parseFloat(windowHeight - gridHeight) / 2;
     Constants.setGridOffset(offsetX, offsetY);
 
     if (Constants.gridEnabled) {
-      gridSvg.selectAll('line')
-      .data(d3.range(this.state.horizontalBoxCount+1))
-      .enter()
-      .append('line')
-      .attr('class', 'grid-line')
-      .attr('x1', (d, i) => gridDimension * i)
-      .attr('y1', 0)
-      .attr('x2', (d, i) => gridDimension * i)
-      .attr('y2', gridHeight)
-      .attr('stroke', '#000000')
-      .attr('stroke-width', '0.5')
-      .exit()
-      .data(d3.range(this.state.verticalBoxCount+1))
-      .enter()
-      .append('line')
-      .attr('class', 'grid-line')
-      .attr('x1', 0)
-      .attr('y1', (d, i) => gridDimension * i)
-      .attr('x2', gridWidth)
-      .attr('y2', (d, i) => gridDimension * i)
-      .attr('stroke', '#000000')
-      .attr('stroke-width', '0.5');
+      gridSvg.append('g')
+        .attr('class', 'grid-lines')
+        .selectAll('line')
+        .data(d3.range(Constants.WORKSPACE_SETTINGS.getHorizontalBoxes() + 1))
+        .enter()
+        .append('line')
+        .attr('class', 'grid-line')
+        .attr('x1', (d, i) => i)
+        .attr('y1', 0)
+        .attr('x2', (d, i) => i)
+        .attr('y2', gridHeight)
+        .attr('stroke', '#000000')
+        .attr('stroke-width', '0.05')
+        .exit()
+        .data(d3.range(Constants.WORKSPACE_SETTINGS.getVerticalBoxes() + 1))
+        .enter()
+        .append('line')
+        .attr('class', 'grid-line')
+        .attr('x1', 0)
+        .attr('y1', (d, i) => i)
+        .attr('x2', gridWidth)
+        .attr('y2', (d, i) => i)
+        .attr('stroke', '#000000')
+        .attr('stroke-width', '0.05');
     }
 
     this.forceUpdate();
   }
 
   removeGrid() {
-    d3.select('.grid').selectAll('.grid-line').remove();
+    d3.select('.grid').select('.grid-lines').remove();
   }
 
   addNode(attributes) {
     attributes.key = Constants.getUniqueReactKey();
-    console.log(attributes);
     let newNodes = this.state.nodes.concat(attributes);
     this.setState({
-        nodes: newNodes
+      nodes: newNodes
     });
   }
 
@@ -193,7 +165,7 @@ class Workspace extends React.Component {
     this.addNode(attributes);
   }
 
-  shiftNode(index, moveToFront=true) {
+  shiftNode(index, moveToFront = true) {
     let newNodes = this.state.nodes.slice();
     if (moveToFront) {
       newNodes.push(newNodes.splice(index, 1)[0]);
@@ -202,21 +174,25 @@ class Workspace extends React.Component {
       newNodes.unshift(newNodes.splice(index, 1)[0]);
     }
     this.setState({
-        nodes: newNodes
+      nodes: newNodes
     });
   }
 
   deleteNode(index) {
-    this.setState({nodes: this.state.nodes.filter((v, i) => {
-      return i !== index;
-    })});
+    this.setState({
+      nodes: this.state.nodes.filter((v, i) => {
+        return i !== index;
+      })
+    });
   }
 
-  updateNode(index, x, y) {
+  updateNode(index, props) {
     let newNodes = this.state.nodes.slice();
-    newNodes[index].x = x;
-    newNodes[index].y = y;
-    this.setState({nodes: newNodes});
+    newNodes[index] = {
+      ...newNodes[index],
+      ...props
+    };
+    this.setState({ nodes: newNodes });
   }
 
   getGraphJson() {
@@ -224,24 +200,26 @@ class Workspace extends React.Component {
       nodes: this.state.nodes.slice(),
       settings: {
         zoom: Constants.ZOOM_SETTINGS,
-        verticalBoxCount: this.state.verticalBoxCount,
-        horizontalBoxCount: this.state.horizontalBoxCount
+        verticalBoxCount: Constants.WORKSPACE_SETTINGS.getVerticalBoxes(),
+        horizontalBoxCount: Constants.WORKSPACE_SETTINGS.getHorizontalBoxes()
       }
     };
   }
 
   toggleGrid() {
     if (Constants.gridToggle()) {
-      this.drawGrid();
-      window.addEventListener('resize', this.drawGrid);
+      this.drawWorkspace();
+      window.addEventListener('resize', this.drawWorkspace);
     } else {
       this.removeGrid();
-      window.removeEventListener('resize', this.drawGrid);
+      window.removeEventListener('resize', this.drawWorkspace);
     }
   }
 
   storeCopiedNode(index) {
-    window.copiedNode = Object.assign({}, this.state.nodes[index]);
+    this.setState({
+      copiedNode: Object.assign({}, this.state.nodes[index])
+    });
   }
 
   dummyMethod() {
@@ -249,10 +227,11 @@ class Workspace extends React.Component {
   }
 
   pasteNode(e) {
-    let copiedNode = Object.assign({}, window.copiedNode);
+    let copiedNode = Object.assign({}, this.state.copiedNode);
     if (copiedNode !== undefined) {
-      let width = copiedNode.width * Constants.ZOOM_SETTINGS;
-      let height = copiedNode.height * Constants.ZOOM_SETTINGS;
+      let gridDimensions = Shapes.getDefaultDimensions(copiedNode.type);
+      let width = gridDimensions.width * copiedNode.multiplier * Constants.ZOOM_SETTINGS;
+      let height = gridDimensions.height* copiedNode.multiplier * Constants.ZOOM_SETTINGS;
       let offset = Constants.getGridOffset();
       let xCoord, yCoord;
 
@@ -262,7 +241,7 @@ class Workspace extends React.Component {
         yCoord = Constants.getGridCoord(closestCoord.y, height, offset.y);
       }
       else {
-        xCoord = Constants.getGridCoord(e.pageX, width, offset.x)
+        xCoord = Constants.getGridCoord(e.pageX, width, offset.x);
         yCoord = Constants.getGridCoord(e.pageY, height, offset.y);
       }
 
@@ -279,7 +258,7 @@ class Workspace extends React.Component {
   }
 
   contextChange(index, action) {
-    switch(action) {
+    switch (action) {
       case "color":
         this.setState({ colorModalShow: true, contextIndex: index });
         break;
@@ -290,36 +269,31 @@ class Workspace extends React.Component {
 
   changeColor() {
     this.setState({ colorModalShow: false, color: this.state.newColor, newColor: "#FFFFFF" }, () => {
-      console.log(this.state.color);
-      let newNodes = this.state.nodes.slice();
-      newNodes[this.state.contextIndex].fillColor = this.state.color;
-      this.setState({ nodes: newNodes });  
-    }); 
-  }
-
-  resizeNode(index, multiplier) {
-    let newNodes = this.state.nodes.slice();
-    newNodes[index].multiplier = multiplier;
-    this.setState({ nodes: newNodes });
+      this.updateNode(this.state.contextIndex, {
+        fillColor: this.state.color
+      })
+    });
   }
 
   render() {
     return (
       <div className="workspace">
-          <WorkspaceTools
-            incZoom={this.incZoom}
-            decZoom={this.decZoom}
-            toggleGrid={this.toggleGrid}/>
-          <ContextMenuTrigger id="gridContextMenu" holdToDisplay={-1}>
-          <svg className="grid"></svg>
+        <WorkspaceTools
+          incZoom={this.incZoom}
+          decZoom={this.decZoom}
+          toggleGrid={this.toggleGrid} />
+        <ContextMenuTrigger id="gridContextMenu" holdToDisplay={-1}>
+          <svg className="grid" viewBox={`0 0 ${Constants.WORKSPACE_SETTINGS.getHorizontalBoxes()} ${Constants.WORKSPACE_SETTINGS.getVerticalBoxes()}`}>
+          
+          </svg>
         </ContextMenuTrigger>
         <ContextMenu id="gridContextMenu" className="react-contextmenu">
-          <MenuItem disabled={window.copiedNode === undefined} className="react-contextmenu-item" onClick={this.pasteNode}>
-              <FontAwesomeIcon icon={faClipboard} style={{paddingRight: 10}}/>
+          <MenuItem disabled={this.state.copiedNode === undefined} className="react-contextmenu-item" onClick={this.pasteNode}>
+            <FontAwesomeIcon icon={faClipboard} style={{ paddingRight: 10 }} />
               Paste
           </MenuItem>
           <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
-              <FontAwesomeIcon icon={faEdit} style={{paddingRight: 10}}/>
+            <FontAwesomeIcon icon={faEdit} style={{ paddingRight: 10 }} />
               Edit Grid
           </MenuItem>
         </ContextMenu>
@@ -339,7 +313,7 @@ class Workspace extends React.Component {
           <Fade in={this.state.colorModalShow}>
             <div className="paper">
               <p id="transition-modal-title">Select Color</p>
-              <SketchPicker color={this.state.newColor} onChange={(color) => this.setState({ newColor: color.hex })} disableAlpha={true} className="sketch"/>
+              <SketchPicker color={this.state.newColor} onChange={(color) => this.setState({ newColor: color.hex })} disableAlpha={true} className="sketch" />
               <span className="buttons">
                 <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ colorModalShow: false })} className="done">
                   CANCEL
@@ -351,23 +325,33 @@ class Workspace extends React.Component {
             </div>
           </Fade>
         </Modal>
-          {this.state.nodes.map((item, i) =>
-            <WorkspaceNode
-              startScroll={this.startScroll}
-              endScroll={this.endScroll}
-              updateSelf={this.updateNode}
-              onDelete={this.deleteNode}
-              onDuplicate={this.duplicateNode}
-              onShift={this.shiftNode}
-              onContextChange={this.contextChange}
-              onResize={this.resizeNode}
-              copySelf={this.storeCopiedNode}
-              index={i}
-              menuId={item.key}
-              key={item.key}
-              attributes={item}
-            />
-          )}
+        {this.state.nodes.map((item, i) =>
+          Shapes.isLine(item.type) ? 
+          <WorkspaceLine
+            updateSelf={this.updateNode}
+            onDelete={this.deleteNode}
+            onDuplicate={this.duplicateNode}
+            onShift={this.shiftNode}
+            onContextChange={this.contextChange}
+            copySelf={this.storeCopiedNode}
+            index={i}
+            menuId={item.key}
+            key={item.key}
+            attributes={item}
+          /> :
+          <WorkspaceNode
+            updateSelf={this.updateNode}
+            onDelete={this.deleteNode}
+            onDuplicate={this.duplicateNode}
+            onShift={this.shiftNode}
+            onContextChange={this.contextChange}
+            copySelf={this.storeCopiedNode}
+            index={i}
+            menuId={item.key}
+            key={item.key}
+            attributes={item}
+          />
+        )}
       </div>
     );
   }

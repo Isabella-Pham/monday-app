@@ -4,11 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 import { Resizable } from 'react-resizable';
 
-import Shapes from '../assets/Shapes';
-import Constants from '../constants/constants';
-import './WorkspaceNode.css';
-import './react-contextmenu.css';
-import '../../node_modules/react-resizable/css/styles.css';
+import Shapes from '../../assets/shapes';
+import Constants from '../../constants/constants';
+import '../styles/WorkspaceNode.css';
+import '../styles/react-contextmenu.css';
+import '../styles/react-resizable.css';
 
 class WorkspaceNode extends React.Component {
   constructor(props) {
@@ -16,15 +16,12 @@ class WorkspaceNode extends React.Component {
 
     this.state = {
       isSelected: true,
-      offset: {
-        x: -1,
-        y: -1
-      },
-      isMoving: false,
-      scrolling: {
-        enabled: false,
-        xDis: 0,
-        yDis: 0
+      moving: {
+        isMoving: false,
+        offset: {
+          x: -1,
+          y: -1
+        }
       },
       isResizing: false
     }
@@ -58,7 +55,7 @@ class WorkspaceNode extends React.Component {
       multiplier: 1,
       fillColor: '#FFFFFF',
       borderColor: '#000000'
-    }
+    };
   }
 
   componentDidMount() {
@@ -75,16 +72,26 @@ class WorkspaceNode extends React.Component {
     document.removeEventListener('keydown', this.deleteSelf, false);
   }
 
+  getPosition() {
+    let offset = Constants.getGridOffset();
+    return {
+      x: this.props.attributes.x * Constants.ZOOM_SETTINGS + offset.x,
+      y: this.props.attributes.y * Constants.ZOOM_SETTINGS + offset.y
+    };
+  }
+
   handleClick(e) {
     if (this.node.contains(e.target)) {
       let position = this.getPosition();
       this.setState({
         isSelected: true,
-        offset: {
-          x: e.pageX - position.x,
-          y: e.pageY - position.y
-        },
-        isMoving: true
+        moving: {
+          offset: {
+            x: e.pageX - position.x,
+            y: e.pageY - position.y
+          },
+          isMoving: true
+        }
       });
     } else {
       if (!this.state.isResizing) {
@@ -109,27 +116,18 @@ class WorkspaceNode extends React.Component {
     };
   }
 
-  getPosition() {
-    let offset = Constants.getGridOffset();
-    
-    return {
-      x: this.props.attributes.x * Constants.ZOOM_SETTINGS + offset.x,
-      y: this.props.attributes.y * Constants.ZOOM_SETTINGS + offset.y
-    };
-  }
-
   moveNode(e) {
-    if (this.state.isSelected && this.state.isMoving) {
+    if (this.state.isSelected && this.state.moving.isMoving) {
       let position = {};
       if (Constants.gridEnabled) {
         position = Constants.getClosestPosition(
-          e.pageX - this.state.offset.x,
-          e.pageY - this.state.offset.y
+          e.pageX - this.state.moving.offset.x,
+          e.pageY - this.state.moving.offset.y
         );
       } else {
         position = {
-          x: e.pageX - this.state.offset.x,
-          y: e.pageY - this.state.offset.y,
+          x: e.pageX - this.state.moving.offset.x,
+          y: e.pageY - this.state.moving.offset.y,
         }
       }
       let offset = Constants.getGridOffset();
@@ -137,12 +135,14 @@ class WorkspaceNode extends React.Component {
       let xCord = Constants.getGridCoord(
         position.x,
         realDimensions.width,
-        offset.x
+        offset.x,
+        false
       );
       let yCord = Constants.getGridCoord(
         position.y,
         realDimensions.height,
-        offset.y
+        offset.y,
+        false
       );
       let gridDimensions = this.getGridDimensions();
       let adjustedCord = Constants.getAdjustedCoord(
@@ -153,17 +153,21 @@ class WorkspaceNode extends React.Component {
       )
       this.props.updateSelf(
         this.props.index,
-        adjustedCord.x,
-        adjustedCord.y
+        {
+          x: adjustedCord.x,
+          y: adjustedCord.y
+        }
       );
     }
   }
 
   placeNode() {
     this.setState({
-      isMoving: false
+      moving: {
+        ...this.state.moving,
+        isMoving: false
+      }
     });
-    this.props.endScroll();
   }
 
   deleteSelf(e) {
@@ -218,13 +222,18 @@ class WorkspaceNode extends React.Component {
     let isOutsideGridHeight = (this.props.attributes.y + (newMultiplier * defaultDimensions.height)) > Constants.WORKSPACE_SETTINGS.getVerticalBoxes();
   
     if (!(isOutsideGridWidth || isOutsideGridHeight)) {
-      this.props.onResize(this.props.index, newMultiplier);
+      this.props.updateSelf(this.props.index, {
+        multiplier: newMultiplier
+      });
     }
   }
 
   render() {
     let dimensions = this.getRealDimensions();
     let position = this.getPosition();
+    let renderProps = {
+      toolbar: false
+    };
     return (
       <div>
         <ContextMenuTrigger id={this.props.menuId} holdToDisplay={-1}>
@@ -246,12 +255,13 @@ class WorkspaceNode extends React.Component {
                 width: dimensions.width,
                 height: dimensions.height,
                 fill: this.props.attributes.fillColor,
-                stroke: this.props.attributes.borderColor
+                stroke: this.props.attributes.borderColor,
+                outlineWidth: Math.max(dimensions.width * 0.01, Constants.ZOOM_SETTINGS * 0.1)
               }}>
               <svg 
               ref={node => this.node = node}
-              viewBox="0 0 100 100">
-                { Shapes.renderShape(this.props.attributes.type, false) }
+              viewBox={`0 0 100 100`}>
+                { Shapes.renderShape(this.props.attributes.type, renderProps) }
               </svg>
             </div>
           </Resizable>
