@@ -12,6 +12,35 @@ class mondayClient {
         this.api_key = process.env.REACT_APP_MONDAY_TOKEN;
         this.setAllGraphs();
         this.sleep(5000);
+
+        //connect to the server
+        var WebSocketClient = require('websocket').client;
+        var client = new WebSocketClient();
+        var hostname = 'ws://localhost:8080/';
+        client.on('connectFailed', function (error) {
+            console.log('Connect Error: ' + error.toString());
+        });
+
+        client.on('connect', function (connection) {
+            console.log('WebSocket Client Connected');
+            connection.on('error', function (error) {
+                console.log("Connection Error: " + error.toString());
+            });
+            connection.on('close', function () {
+                console.log('echo-protocol Connection Closed');
+            });
+            connection.on('message', function (message) {
+                if (message.type === 'utf8') {
+                    console.log("Received: '" + message.utf8Data + "'");
+                }
+            });
+        });
+        //connect to server
+        client.connect(hostname, 'echo-protocol');
+    }
+
+    notifyServer(notification, params){
+        this.client.send({ "notification": notification, "params": params });
     }
 
     //used to delay the executation of code by a specified number of milliseconds
@@ -58,6 +87,7 @@ class mondayClient {
             const graphListString = graphList.toString();
             this.monday.storage.instance.setItem("all_graphs", graphListString);                
             this.monday.storage.instance.setItem(graphName, "null");
+            this.notifyServer("delete", { "graphName": graphName });
             return true; 
         });
         return success;
@@ -86,6 +116,7 @@ class mondayClient {
                 }
                 const graphJSONString = JSON.stringify(graphJSON);
                 this.monday.storage.instance.setItem(graphName, graphJSONString);
+                this.notifyServer("save", { "graphName": graphName });
                 return true;            
             }
         });
@@ -99,6 +130,14 @@ class mondayClient {
             return graph;
         });
         return JSON.parse(graphJSON);
+    }
+
+    async renameGraph(oldName, newName){
+        graphJSON = this.getGraph(oldName);
+        this.saveGraph(newName, graphJSON);
+        this.sleep(5000);
+        this.deleteGraph(oldName);
+        this.notifyServer("rename", { "oldName": oldName, "newName": newName });
     }
 
     //checks if there is a graph by the name of graphName
