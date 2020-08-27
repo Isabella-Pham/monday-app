@@ -55,10 +55,6 @@ class App extends React.Component {
     });
   }
 
-  transitionBeyondToolbar(x, y) {
-    return x - (Constants.cursorCentered ? (this.state.transitionNode.width / 2) : 0) > Constants.viewportToPixels('20vw');
-  }
-
   hideTransitionNode(e) {
     if (this.state.transitionNode.inTransition) {
       const pageX = e.pageX;
@@ -71,32 +67,28 @@ class App extends React.Component {
           inTransition: false
         }
       }), () => {
-        if (this.transitionBeyondToolbar(clientX, clientY)) {
-          let offset = Constants.getGridOffset();
-          let width = this.state.transitionNode.width;
-          let height = this.state.transitionNode.height;
-          let xCoord, yCoord;
+        let offset = Constants.getGridOffset();
+        let width = this.state.transitionNode.width;
+        let height = this.state.transitionNode.height;
+        let xCoord, yCoord;
 
-          if (Constants.gridEnabled) {
-            let closestCoord = Constants.getClosestPosition(pageX, pageY);
-            xCoord = Constants.getGridCoord(closestCoord.x, width, offset.x);
-            yCoord = Constants.getGridCoord(closestCoord.y, height, offset.y);
-          }
-          else {
-            xCoord = Constants.getGridCoord(pageX, width, offset.x)
-            yCoord = Constants.getGridCoord(pageY, height, offset.y);
-          }
+        if (Constants.gridEnabled) {
+          let closestCoord = Constants.getClosestPosition(pageX, pageY);
+          xCoord = Constants.getGridCoord(closestCoord.x, width, offset.x);
+          yCoord = Constants.getGridCoord(closestCoord.y, height, offset.y);
+        }
+        else {
+          xCoord = Constants.getGridCoord(pageX, width, offset.x)
+          yCoord = Constants.getGridCoord(pageY, height, offset.y);
+        }
 
-          let nodeType = this.state.transitionNode.type;
-          let dimensions = Shapes.getDefaultDimensions(nodeType);
-          if (Constants.coordIsValid(xCoord, yCoord, dimensions.width, dimensions.height)) {
-            this._workspace.current.addNode(WorkspaceNode.getDefault(xCoord, yCoord, nodeType));
-          }
-          else {
-            console.log('Out of grid');
-          }
-        } else {
-          console.log("INSIDE TOOLBAR");
+        let nodeType = this.state.transitionNode.type;
+        let dimensions = Shapes.getDefaultDimensions(nodeType);
+        if (Constants.coordIsValid(xCoord, yCoord, dimensions.width, dimensions.height)) {
+          this._workspace.current.addNode(WorkspaceNode.getDefault(xCoord, yCoord, nodeType));
+        }
+        else {
+          console.log('Out of grid');
         }
       });
     }

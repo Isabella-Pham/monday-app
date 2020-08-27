@@ -1,10 +1,13 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsAltH, faImage, faFont } from '@fortawesome/free-solid-svg-icons';
+import { faCircle } from '@fortawesome/free-regular-svg-icons';
+import { ContextMenu, ContextMenuTrigger, MenuItem } from "react-contextmenu";
 
 import ToolbarNode from './ToolbarNode';
 import Shapes from '../assets/Shapes';
 import "./Toolbar.css";
+import "./toolbar-contextmenu.css";
 
 // fills in left to right, top to bottom
 const TOOLBAR_ORDER = [
@@ -46,21 +49,29 @@ class Toolbar extends React.Component {
 
   render() {
     return (
-      <div className={'toolbar' + (this.state.hidden ? ' hidden' : '')}>
-        <div className="nodes">
-          {
-            this.cols.map((types, i) => (
-              <div key={i} className="node-col" style={{ order: i+1 }}>
-                { types.map((type, typeIndex) => <ToolbarNode key={typeIndex} type={type} />) }
-              </div>
-           ))
-          }
-        </div>
-        <FontAwesomeIcon
-          icon={this.state.hidden ? faChevronRight : faChevronLeft}
-          onClick={this.hide}
-          size="lg"
-          className="toolbar-toggle" />
+      <div className='toolbar'>
+        <ContextMenuTrigger id="shapes-menu" holdToDisplay={0}>
+          <FontAwesomeIcon icon={faCircle} className="toolbar-icon"/>
+        </ContextMenuTrigger>
+        <FontAwesomeIcon icon={faArrowsAltH} className="toolbar-icon"/>
+        <FontAwesomeIcon icon={faFont} className="toolbar-icon"/>
+        <FontAwesomeIcon icon={faImage} className="toolbar-icon"/>
+
+        <ContextMenu id="shapes-menu" className="toolbar-contextmenu">
+            <div className="nodes">
+            {
+              this.cols.map((types, i) => (
+                <div key={i} className="node-col" style={{ order: i + 1 }}>
+                  { types.map((type, typeIndex) => (
+                  <MenuItem className="toolbar-context-menu-item">
+                    <ToolbarNode key={typeIndex} type={type} />
+                  </MenuItem>)
+                  )}
+                </div>
+              ))
+            }
+            </div>
+        </ContextMenu>
       </div>
     );
   }
