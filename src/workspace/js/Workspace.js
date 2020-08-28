@@ -381,8 +381,7 @@ class Workspace extends React.Component {
       case "color":
         this.setState({ colorModalShow: true, contextIndex: index, newColor: this.state.nodes[index].fillColor }, () => {
           if (!Shapes.isLine(this.state.nodes[index].type) && this.state.nodes[index].type !== Shapes.TYPES.TEXT_BOX) {
-            console.log("HERE");
-            this.setState({ contextIsNode: true })
+            this.setState({ contextIsNode: true, newBorder: this.state.nodes[index].borderColor })
           }
         });
         break;
