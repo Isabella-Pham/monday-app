@@ -48,13 +48,15 @@ class WorkspaceNode extends React.Component {
   }
 
   static getDefault(x, y, type) {
+    let gridDimensions = Shapes.getDefaultDimensions(type);
     return {
       x: x,
       y: y,
       type: type,
       multiplier: 1,
       fillColor: '#FFFFFF',
-      borderColor: '#000000'
+      borderColor: '#000000',
+      defaultDimensions: gridDimensions
     };
   }
 
@@ -101,10 +103,9 @@ class WorkspaceNode extends React.Component {
   }
 
   getGridDimensions() {
-    let gridDimensions = Shapes.getDefaultDimensions(this.props.attributes.type);
     return {
-      width: gridDimensions.width * this.props.attributes.multiplier,
-      height: gridDimensions.height * this.props.attributes.multiplier,
+      width: this.props.attributes.defaultDimensions.width * this.props.attributes.multiplier,
+      height: this.props.attributes.defaultDimensions.height * this.props.attributes.multiplier,
     }
   }
 
@@ -206,7 +207,7 @@ class WorkspaceNode extends React.Component {
   }
 
   resize(e, {size}) {
-    let defaultDimensions = Shapes.getDefaultDimensions(this.props.attributes.type);
+    let defaultDimensions = this.props.attributes.defaultDimensions;
     let newMultiplier = parseFloat(size.width) / (defaultDimensions.width * Constants.ZOOM_SETTINGS);
     let isTooSmall = newMultiplier < Constants.MIN_MULTIPLIER;
     let isTooLarge = newMultiplier > Constants.MAX_MULTIPLIER;
