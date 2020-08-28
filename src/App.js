@@ -9,6 +9,7 @@ import TransitionNode from './toolbar/js/TransitionNode';
 import Shapes from './assets/shapes';
 import Constants from './constants/constants';
 import "./App.css";
+import WorkspaceText from "./workspace/js/WorkspaceText";
 
 class App extends React.Component {
   constructor(props) {
@@ -84,9 +85,14 @@ class App extends React.Component {
         let nodeType = this.state.transitionNode.type;
         let dimensions = Shapes.getDefaultDimensions(nodeType);
         if (Constants.coordIsValid(xCoord, yCoord, dimensions.width, dimensions.height)) {
-          let nodeAttrs = Shapes.isLine(nodeType) ?
-          WorkspaceLine.getDefault(xCoord, yCoord, nodeType) :
-          WorkspaceNode.getDefault(xCoord, yCoord, nodeType);
+          let nodeAttrs = {}
+          if (Shapes.isLine(nodeType)) {
+            nodeAttrs = WorkspaceLine.getDefault(xCoord, yCoord, nodeType)
+          } else if (nodeType === Shapes.TYPES.TEXT_BOX) {
+            nodeAttrs = WorkspaceText.getDefault(xCoord, yCoord, nodeType)
+          } else {
+            nodeAttrs = WorkspaceNode.getDefault(xCoord, yCoord, nodeType)
+          }
           this._workspace.current.addNode(nodeAttrs);
         }
         else {
@@ -122,7 +128,7 @@ class App extends React.Component {
     ToolbarNode.onMouseDown = this.showTransitionNode;
     return(
       <div className="App non-drag" onMouseMove={this.updateTransitionNode} onMouseUp={this.hideTransitionNode}>
-        <Toolbar/>
+        <Toolbar onTransition={this.showTransitionNode}/>
         <Workspace ref={this._workspace}/>
         {this.state.transitionNode.inTransition ? 
           <TransitionNode

@@ -1,0 +1,43 @@
+.work-text {
+  position: absolute !important;
+  display: block !important;
+  cursor: pointer !important;
+  background-color: transparent !important;
+  pointer-events: none;
+}
+
+.work-text > svg {
+  position: absolute;
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.work-text:not(.selected):hover {
+  outline-style: dashed;
+  outline-color:#bedafd;
+}
+
+.work-text.selected {
+  outline-style: dashed;
+  outline-color:#4a98fd;
+  pointer-events: all;
+}
+
+.work-text > svg > path, 
+.work-text > svg > g {
+  stroke-width: 1px;
+  pointer-events: auto;
+}
+
+.work-text > svg > text {
+  
+}
+
+.resize-active {
+  display: block !important;
+}
+
+.resize-inactive > span {
+  display: none !important;
+}
