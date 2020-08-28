@@ -30,8 +30,14 @@ class mondayClient {
                 console.log('echo-protocol Connection Closed');
             });
             connection.on('message', function (message) {
-                if (message.type === 'utf8') {
-                    console.log("Received: '" + message.utf8Data + "'");
+                messageJSON = JSON.parse(message);
+                var operation = messageJSON["notification"];
+                if (operation.toString().localeCompare("save") == 0) {
+                    //call get graph and display new graph
+                } else if (operation.toString().localeCompare("delete") == 0) {
+                    //undisplay the graph
+                } else if (operation.toString().localeCompare("rename") == 0) {
+                    //call get graph under the new graph name
                 }
             });
         });
@@ -129,6 +135,7 @@ class mondayClient {
             const graph = (res["data"]["value"]);
             return graph;
         });
+        this.notifyServer("load", { "graphName": graphName });
         return JSON.parse(graphJSON);
     }
 
