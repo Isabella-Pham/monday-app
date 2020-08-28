@@ -14,7 +14,7 @@ class mondayClient {
         this.sleep(5000);
 
         //connect to the server
-        var WebSocketClient = require('websocket').client;
+        /*var WebSocketClient = require('websocket').client;
         var client = new WebSocketClient();
         var hostname = 'ws://localhost:8080/';
         client.on('connectFailed', function (error) {
@@ -30,7 +30,7 @@ class mondayClient {
                 console.log('echo-protocol Connection Closed');
             });
             connection.on('message', function (message) {
-                messageJSON = JSON.parse(message);
+               const  messageJSON = JSON.parse(message);
                 var operation = messageJSON["notification"];
                 if (operation.toString().localeCompare("save") == 0) {
                     //call get graph and display new graph
@@ -42,7 +42,7 @@ class mondayClient {
             });
         });
         //connect to server
-        client.connect(hostname, 'echo-protocol');
+        client.connect(hostname, 'echo-protocol');*/
     }
 
     notifyServer(notification, params){
@@ -61,6 +61,47 @@ class mondayClient {
             return res;
         });
         return teammates;
+    }
+
+    async getAllTasks() {
+        const tasks = await this.monday.api("{items {name, id, updated_at, subscribers {name, id}}}").then(res => {
+            return res["data"]["items"];
+        });
+        return tasks;
+    }
+
+    async createTask(taskName, user_id) {
+        const boardID = await this.monday.api("{boards{id}}").then(res => {
+            return res["data"]["boards"][0]["id"];
+        });
+        const taskID = await this.monday.api(`
+            mutation{
+                create_item(
+                    board_id: ${boardID},
+                    item_name: "${taskName}"
+                ) {
+                    id
+                }
+            }
+        `).then(res => {
+            return res["data"]["create_item"]["id"];
+        });
+        const notif = await this.monday.api(`
+              mutation {
+                create_notification(
+                  text: "You have been assigned the following task: ${taskName}",
+                  user_id: ${user_id},
+                  target_id: ${taskID},
+                  target_type: Project,
+                  internal: true
+                ) { 
+                  id 
+                }
+              }
+            `).then(res => {
+                return res["data"]["create_notification"]["id"];
+            });
+        return notif;
     }
 
     //returns an array containing all graphs saved 
@@ -140,7 +181,7 @@ class mondayClient {
     }
 
     async renameGraph(oldName, newName){
-        graphJSON = this.getGraph(oldName);
+        const graphJSON = this.getGraph(oldName);
         this.saveGraph(newName, graphJSON);
         this.sleep(5000);
         this.deleteGraph(oldName);
@@ -150,7 +191,7 @@ class mondayClient {
     //checks if there is a graph by the name of graphName
     async containsGraph(graphName) {
         const contains = await this.monday.storage.instance.getItem(graphName).then(res => {
-            if (!res["data"]["success"] || res["data"] == null){
+            if (res["data"] == null || !res["data"]["success"]){
                 return false;
             } else {
                 return true;
