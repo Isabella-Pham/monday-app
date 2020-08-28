@@ -53,6 +53,18 @@
   padding-right: 10px;
 }
 
+.grid-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 80px;
+  padding-right: 80px;
+}
+
+.grid-fields {
+  display: flex;
+  justify-content: space-between;
+}
+
 .buttons > button {
   font-family: inherit;
 }

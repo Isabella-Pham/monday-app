@@ -28,9 +28,15 @@ class Workspace extends React.Component {
     this.state = {
       nodes: [],
       colorModalShow: false,
+      gridModalShow: false,
+      validWidth: false,
+      validHeight: false,
+      gridButtonIsDisabled: true,
       textModalShow: false,
       newColor: '#ffffff',
       newText: '',
+      newWidth: -1,
+      newHeight: -1,
       contextIndex: -1,
       copiedNode: undefined
     };
@@ -52,12 +58,17 @@ class Workspace extends React.Component {
       this.changeText,
       this.dummyMethod,
       this.pasteNode,
-      this.handleTextChange
+      this.handleTextChange,
+      this.handleGridChange,
+      this.changeGrid
     ];
 
     for (let func of bindFunctions) {
       this[func.name] = this[func.name].bind(this);
     }
+
+    this.widthInput = React.createRef();
+    this.heightInput = React.createRef();
   }
 
   componentDidMount() {
@@ -333,11 +344,15 @@ class Workspace extends React.Component {
   contextChange(index, action) {
     switch (action) {
       case "color":
-        this.setState({ colorModalShow: true, contextIndex: index });
+        this.setState({ colorModalShow: true, contextIndex: index, newColor: this.state.nodes[index].fillColor });
         break;
       case "text":
-        this.setState({ textModalShow: true, contextIndex: index });
-        break;  
+        this.setState({ textModalShow: true, contextIndex: index, newText: this.state.nodes[index].text });
+        break;
+      case "grid":
+        this.setState({ 
+          gridModalShow: true, 
+        })
       default:
         break;
     }
@@ -363,6 +378,64 @@ class Workspace extends React.Component {
     });
   }
 
+  gridDimensionsValid() {
+    return this.state.newWidth >= Constants.MIN_GRID && this.state.newWidth <= Constants.MAX_GRID && this.state.newHeight >= Constants.MIN_GRID && this.state.newHeight <= Constants.MAX_GRID
+  }
+
+  handleGridChange(e) {
+    let intVal = Constants.getInteger(e.target.value)
+    console.log(intVal);
+
+    console.log(e.target)
+
+    if (!isNaN(intVal)) {
+      if (this.widthInput.current.contains(e.target)) {
+        this.setState({ newWidth: intVal }, () => {
+            this.setState({ gridButtonIsDisabled: !this.gridDimensionsValid() })
+        })
+      } else if (this.heightInput.current.contains(e.target)) {
+        this.setState({ newHeight: intVal }, () => {
+          this.setState({ gridButtonIsDisabled: !this.gridDimensionsValid() })
+        })
+      }
+    } else {
+      this.setState({ gridButtonIsDisabled: true })
+    }
+
+    console.log(this.state.newWidth, this.state.newHeight)
+  }
+
+  changeGrid() {
+    if (!this.gridDimensionsValid()) {
+      return;
+    }
+
+    let newWidth = this.state.newWidth;
+    let newHeight = this.state.newHeight;
+
+    let newNodes = this.state.nodes.filter(attributes => {
+      if (Shapes.isLine(attributes.type)) {
+        let startIncluded = attributes.x <= newWidth && attributes.y <= newHeight;
+        let endIncluded = attributes.endX <= newWidth && attributes.endY <= newHeight;
+        return startIncluded && endIncluded;
+      }
+      else if (attributes.type === Shapes.TYPES.TEXTBOX) {
+        return attributes.x + attributes.width <= newWidth && attributes.y + attributes.height <= newHeight;
+      }
+      else {
+        let nodeDimensions = Shapes.getDefaultDimensions(attributes.type);
+        let width = nodeDimensions.width * attributes.multiplier;
+        let height = nodeDimensions.height * attributes.multiplier;
+        return attributes.x + width <= newWidth && attributes.y + height <= newHeight;
+      }
+    });
+
+    Constants.WORKSPACE_SETTINGS.setHorizontalBoxes(this.state.newWidth);
+    Constants.WORKSPACE_SETTINGS.setVerticalBoxes(this.state.newHeight);
+    this.setState({ nodes: newNodes, gridModalShow: false });
+    this.drawWorkspace();
+  }
+
   render() {
     return (
       <div className="workspace">
@@ -380,7 +453,7 @@ class Workspace extends React.Component {
             <FontAwesomeIcon icon={faClipboard} style={{ paddingRight: 10 }} />
               Paste
           </MenuItem>
-          <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
+          <MenuItem className="react-contextmenu-item" onClick={() => this.contextChange(-1, "grid")}>
             <FontAwesomeIcon icon={faEdit} style={{ paddingRight: 10 }} />
               Edit Grid
           </MenuItem>
@@ -429,12 +502,44 @@ class Workspace extends React.Component {
           <Fade in={this.state.textModalShow}>
             <div className="paper">
               <p id="transition-modal-title">Edit Text</p>
-              <TextField id="outlined-basic" label="Enter Text" variant="outlined" multiline={true} onChange={this.handleTextChange} style={{ paddingBottom: 20 }}/>
+              <TextField id="outlined-basic" label="Enter Text" value={this.state.newText} variant="outlined" multiline={true} onChange={this.handleTextChange} style={{ paddingBottom: 20 }}/>
               <span className="text-buttons">
                 <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ textModalShow: false })} className="done">
                   Cancel
                 </Button>
                 <Button variant="outlined" size="medium" color="primary" onClick={this.changeText} className="done">
+                  Submit
+                </Button>
+              </span>
+            </div>
+          </Fade>
+        </Modal>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className="modal"
+          open={this.state.gridModalShow}
+          onClose={() => this.setState({ gridModalShow: false })}
+          closeAfterTransition
+          disableEnforceFocus={true}
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
+          }}
+        >
+          <Fade in={this.state.gridModalShow}>
+            <div className="paper">
+              <p id="transition-modal-title">Enter Grid Dimensions (10-1000 Boxes)</p>
+              <p style={{fontSize: 14}}>Nodes outside the new grid will be removed</p>
+              <span className="grid-fields">
+                <TextField ref={this.widthInput} id="outlined-basic" label="Width" variant="outlined" multiline={false} onChange={this.handleGridChange} style={{ paddingBottom: 20, paddingRight: 60 }}/>
+                <TextField ref={this.heightInput} id="outlined-basic" label="Height" variant="outlined" multiline={false} onChange={this.handleGridChange} style={{ paddingBottom: 20 }}/>
+              </span>
+              <span className="grid-buttons">
+                <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ gridModalShow: false })} className="done">
+                  Cancel
+                </Button>
+                <Button variant="outlined" size="medium" color="primary" disabled={this.state.gridButtonIsDisabled} onClick={this.changeGrid} className="done">
                   Submit
                 </Button>
               </span>
