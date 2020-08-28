@@ -4,10 +4,6 @@ import Constants from '../../constants/constants'
 import '../styles/TransitionNode.css';
 
 class TransitionNode extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-    
     render() {
         return(
             <div className='transition-node' style={{

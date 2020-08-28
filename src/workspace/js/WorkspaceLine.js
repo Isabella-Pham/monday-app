@@ -1,7 +1,7 @@
 import React from 'react';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faCopy, faEdit, faTrashAlt, faFileAlt, faVectorSquare, faUndo, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
+import { faCut, faCopy, faEdit, faTrashAlt, faFileAlt, faUndo, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 
 import Shapes from '../../assets/shapes';
 import Constants from '../../constants/constants';
@@ -321,7 +321,7 @@ class WorkspaceLine extends React.Component {
     };
     return (
       <div>
-        <ContextMenuTrigger id={this.props.menuId} holdToDisplay={-1}>
+        <ContextMenuTrigger id={this.props.attributes.key} holdToDisplay={-1}>
           <div
             className={'line-node' + (this.state.isSelected ? ' selected' : '')}
             style={{
@@ -369,7 +369,7 @@ class WorkspaceLine extends React.Component {
             </svg>
           </div>
         </ContextMenuTrigger>
-        <ContextMenu id={this.props.menuId} className="react-contextmenu">
+        <ContextMenu id={this.props.attributes.key} className="react-contextmenu">
           <MenuItem className="react-contextmenu-item" onClick={() => { this.props.onDelete(this.props.index) }}>
             <FontAwesomeIcon icon={faTrashAlt} style={{ paddingRight: 10 }} />
               Delete

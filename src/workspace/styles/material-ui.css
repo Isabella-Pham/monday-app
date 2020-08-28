@@ -58,8 +58,6 @@
 .color-buttons-2 {
   display: flex;
   justify-content: space-around;
-  /* padding-left: 10%;
-  padding-right: 10%; */
 }
 
 .text-buttons {
@@ -76,9 +74,17 @@
   padding-right: 80px;
 }
 
-.grid-fields {
+.grid-fields,
+.image-fields {
   display: flex;
   justify-content: space-between;
+}
+
+.image-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 200px;
+  padding-right: 200px;
 }
 
 .buttons > button {

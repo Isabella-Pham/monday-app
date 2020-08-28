@@ -2,6 +2,8 @@ import React from "react";
 
 import Workspace from './workspace/js/Workspace';
 import WorkspaceNode from './workspace/js/WorkspaceNode';
+import WorkspaceText from "./workspace/js/WorkspaceText";
+import WorkspaceImage from "./workspace/js/WorkspaceImage";
 import WorkspaceLine from "./workspace/js/WorkspaceLine";
 import Toolbar from './toolbar/js/Toolbar';
 import ToolbarNode from './toolbar/js/ToolbarNode';
@@ -9,7 +11,6 @@ import TransitionNode from './toolbar/js/TransitionNode';
 import Shapes from './assets/shapes';
 import Constants from './constants/constants';
 import "./App.css";
-import WorkspaceText from "./workspace/js/WorkspaceText";
 
 class App extends React.Component {
   constructor(props) {
@@ -90,7 +91,9 @@ class App extends React.Component {
             nodeAttrs = WorkspaceLine.getDefault(xCoord, yCoord, nodeType)
           } else if (nodeType === Shapes.TYPES.TEXT_BOX) {
             nodeAttrs = WorkspaceText.getDefault(xCoord, yCoord, nodeType)
-          } else {
+          } else if (nodeType === Shapes.TYPES.IMAGE) {
+            nodeAttrs = WorkspaceImage.getDefault(xCoord, yCoord, nodeType)
+          }else {
             nodeAttrs = WorkspaceNode.getDefault(xCoord, yCoord, nodeType)
           }
           this._workspace.current.addNode(nodeAttrs);

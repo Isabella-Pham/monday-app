@@ -6,10 +6,6 @@ import "../styles/ToolbarNode.css";
 class ToolbarNode extends React.Component {
   static onMouseDown;
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <div data-type={this.props.type} className="toolbar-node" onMouseDown={ToolbarNode.onMouseDown}>

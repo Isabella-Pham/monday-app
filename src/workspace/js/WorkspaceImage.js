@@ -1,16 +1,15 @@
 import React from 'react';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faCopy, faEdit, faTrashAlt, faFileAlt, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
+import { faLink, faCut, faCopy, faEdit, faTrashAlt, faFileAlt, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 import { Resizable } from 'react-resizable';
 
-import Shapes from '../../assets/shapes';
 import Constants from '../../constants/constants';
-import '../styles/WorkspaceNode.css';
+import '../styles/WorkspaceImage.css';
 import '../styles/react-contextmenu.css';
 import '../styles/react-resizable.css';
 
-class WorkspaceNode extends React.Component {
+class WorkspaceImage extends React.Component {
   constructor(props) {
     super(props);
 
@@ -38,34 +37,25 @@ class WorkspaceNode extends React.Component {
       this.cutNode,
       this.moveToBack,
       this.moveToFront,
-      this.colorChange,
       this.resize,
+      this.imageChange
     ];
 
     for (let func of bindFunctions) {
       this[func.name] = this[func.name].bind(this);
     }
-
-    let viewDimension = 100;
-    if (this.props.attributes.defaultDimensions.width < this.props.attributes.defaultDimensions.height) {
-      viewDimension /= 2;
-    }
-    this.viewbox = `0 0 ${viewDimension} ${viewDimension}`;
-    this.renderedShape = Shapes.renderShape(this.props.attributes.type, {
-      toolbar: false
-    });
   }
 
   static getDefault(x, y, type) {
-    let gridDimensions = Shapes.getDefaultDimensions(type);
     return {
       x: x,
       y: y,
       type: type,
       multiplier: 1,
-      fillColor: '#FFFFFF',
-      borderColor: '#000000',
-      defaultDimensions: gridDimensions
+      srcWidth: 200,
+      srcHeight: 200,
+      imageUrl: Constants.NOT_FOUND_IMAGE,
+      isOriginal: true
     };
   }
 
@@ -74,6 +64,10 @@ class WorkspaceNode extends React.Component {
     document.addEventListener('mouseup', this.placeNode, false);
     document.addEventListener('mousemove', this.moveNode, false);
     document.addEventListener('keydown', this.deleteSelf, false);
+
+    if (this.props.attributes.isOriginal) {
+      this.imageChange();
+    }
   }
 
   componentWillUnmount() {
@@ -111,11 +105,26 @@ class WorkspaceNode extends React.Component {
     }
   }
 
-  getGridDimensions() {
+  static getDefaultDimensions(srcWidth, srcHeight) {
     return {
-      width: this.props.attributes.defaultDimensions.width * this.props.attributes.multiplier,
-      height: this.props.attributes.defaultDimensions.height * this.props.attributes.multiplier,
+      width: srcWidth / window.screen.width * 100,
+      height: srcHeight / window.screen.width * 100
     }
+  }
+
+  getDefaultDimensions() {
+    return WorkspaceImage.getDefaultDimensions(
+      this.props.attributes.srcWidth,
+      this.props.attributes.srcHeight
+    );
+  }
+
+  getGridDimensions() {
+    let dimensions = this.getDefaultDimensions();
+    return {
+      width: dimensions.width * this.props.attributes.multiplier,
+      height: dimensions.height * this.props.attributes.multiplier,
+    };
   }
 
   getRealDimensions() {
@@ -211,12 +220,12 @@ class WorkspaceNode extends React.Component {
     console.log("Dummy method");
   }
 
-  colorChange() {
-    this.props.onContextChange(this.props.index, "color")
+  imageChange() {
+      this.props.onContextChange(this.props.index, "image");
   }
 
   resize(e, {size}) {
-    let defaultDimensions = this.props.attributes.defaultDimensions;
+    let defaultDimensions = this.getDefaultDimensions();
     let newMultiplier = parseFloat(size.width) / (defaultDimensions.width * Constants.ZOOM_SETTINGS);
     let isTooSmall = newMultiplier < Constants.MIN_MULTIPLIER;
 
@@ -251,21 +260,21 @@ class WorkspaceNode extends React.Component {
             onResizeStop={() => this.setState({ isResizing: false })}
           >
             <div
-              className={'work-node' + (this.state.isResizing ? ' resizing' : '') + (this.state.isSelected ? ' selected' : '')}
+              className={'image-node' + (this.state.isResizing ? ' resizing' : '') + (this.state.isSelected ? ' selected' : '')}
               style={{
                 top: position.y,
                 left: position.x,
                 width: dimensions.width,
-                height: dimensions.height,
-                fill: this.props.attributes.fillColor,
-                stroke: this.props.attributes.borderColor,
-                outlineWidth: Math.max(dimensions.width * 0.01, Constants.ZOOM_SETTINGS * 0.1)
+                height: dimensions.height
               }}>
-              <svg 
-              ref={node => this.node = node}
-              viewBox={this.viewbox}>
-                { this.renderedShape }
-              </svg>
+              <img
+                draggable={false}
+                ref={node => this.node = node}
+                alt="Could not load"
+                width={dimensions.width}
+                height={dimensions.height}
+                src={this.props.attributes.imageUrl}
+              />
             </div>
           </Resizable>
         </ContextMenuTrigger>
@@ -294,9 +303,9 @@ class WorkspaceNode extends React.Component {
               <FontAwesomeIcon icon={faClone} style={{paddingRight: 10}}/>
               Duplicate
             </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
-              <FontAwesomeIcon icon={faPalette} style={{paddingRight: 10}}/>
-              Color
+            <MenuItem className="react-contextmenu-item" onClick={this.imageChange}>
+              <FontAwesomeIcon icon={faLink} style={{paddingRight: 10}}/>
+              URL
             </MenuItem>
           </SubMenu>
           <SubMenu 
@@ -322,4 +331,4 @@ class WorkspaceNode extends React.Component {
   }
 }
 
-export default WorkspaceNode;
+export default WorkspaceImage;

@@ -1,0 +1,38 @@
+.image-node {
+  position: absolute !important;
+  display: block !important;
+  cursor: pointer !important;
+  background-color: transparent !important;
+  pointer-events: none;
+}
+
+.image-node > svg {
+  position: absolute;
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.image-node:not(.selected):hover {
+  outline-style: dashed;
+  outline-color:#bedafd;
+}
+
+.image-node.selected {
+  outline-style: dashed;
+  outline-color:#4a98fd;
+  pointer-events: all;
+}
+
+.image-node > img {
+  stroke-width: 1px;
+  pointer-events: auto;
+}
+
+.resize-active {
+  display: block !important;
+}
+
+.resize-inactive > span {
+  display: none !important;
+}

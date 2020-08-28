@@ -505,6 +505,7 @@ class Shapes {
       case Shapes.TYPES.FOUR_DIAG_ARROW:
       case Shapes.TYPES.POST_IT:
       case Shapes.TYPES.UPRIGHT_CYLINDER:
+      case Shapes.TYPES.IMAGE:
         dimensions = [8, 8];
         break;
       case Shapes.TYPES.LINE:

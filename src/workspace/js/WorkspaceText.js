@@ -269,7 +269,7 @@ class WorkspaceText extends React.Component {
         let position = this.getPosition();
         return (
             <div>
-                <ContextMenuTrigger id={this.props.menuId} holdToDisplay={-1}>
+                <ContextMenuTrigger id={this.props.attributes.key} holdToDisplay={-1}>
                     <Resizable
                         className={'resize-' + (this.state.isSelected ? 'active' : 'inactive')}
                         width={dimensions.width}
@@ -301,7 +301,7 @@ class WorkspaceText extends React.Component {
                         </div>
                     </Resizable>
                 </ContextMenuTrigger>
-                <ContextMenu id={this.props.menuId} className="react-contextmenu">
+                <ContextMenu id={this.props.attributes.key} className="react-contextmenu">
                     <MenuItem className="react-contextmenu-item" onClick={() => { this.props.onDelete(this.props.index) }}>
                         <FontAwesomeIcon icon={faTrashAlt} style={{ paddingRight: 10 }} />
                 Delete

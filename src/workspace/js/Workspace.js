@@ -7,6 +7,7 @@ import { faClipboard, faEdit } from '@fortawesome/free-solid-svg-icons';
 import WorkspaceNode from './WorkspaceNode';
 import WorkspaceLine from './WorkspaceLine';
 import WorkspaceText from './WorkspaceText';
+import WorkspaceImage from './WorkspaceImage';
 import WorkspaceTools from './WorkspaceTools';
 import Constants from '../../constants/constants';
 import Shapes from '../../assets/shapes';
@@ -27,20 +28,31 @@ class Workspace extends React.Component {
 
     this.state = {
       nodes: [],
+      copiedNode: undefined,
+      contextIndex: -1,
+      
+      // for changing color
       colorModalShow: false,
+      newColor: '#ffffff',
+      newBorder: "#ffffff",
+      contextIsNode: false,
+
+      // for changing grid
       gridModalShow: false,
+      newWidth: -1,
+      newHeight: -1,
       validWidth: false,
       validHeight: false,
       gridButtonIsDisabled: true,
+
+      // for changing text
       textModalShow: false,
-      newColor: '#ffffff',
-      newBorder: "#ffffff",
       newText: '',
-      newWidth: -1,
-      newHeight: -1,
-      contextIndex: -1,
-      copiedNode: undefined,
-      contextIsNode: false
+
+      // for changing image
+      imageModalShow: false,
+      imageButtonDisabled: true,
+      newImageUrl: ''
     };
 
     let bindFunctions = [
@@ -62,7 +74,9 @@ class Workspace extends React.Component {
       this.pasteNode,
       this.handleTextChange,
       this.handleGridChange,
-      this.changeGrid
+      this.changeGrid,
+      this.handleImageChange,
+      this.changeImage
     ];
 
     for (let func of bindFunctions) {
@@ -71,6 +85,15 @@ class Workspace extends React.Component {
 
     this.widthInput = React.createRef();
     this.heightInput = React.createRef();
+
+    this.nodeComponentProps = {
+      updateSelf: this.updateNode,
+      onDelete: this.deleteNode,
+      onDuplicate: this.duplicateNode,
+      onShift: this.shiftNode,
+      onContextChange: this.contextChange,
+      copySelf: this.storeCopiedNode
+    };
   }
 
   componentDidMount() {
@@ -345,6 +368,36 @@ class Workspace extends React.Component {
           ...copiedNode,
           ...adjustedCord
         }
+      }
+      else if (copiedNode.type === Shapes.TYPES.IMAGE) {
+        let defaultDimensions = WorkspaceImage.getDefaultDimensions(
+          copiedNode.srcWidth,
+          copiedNode.srcHeight
+        );
+        width = defaultDimensions.width * Constants.ZOOM_SETTINGS;
+        height = defaultDimensions.height * Constants.ZOOM_SETTINGS;
+
+        if (Constants.gridEnabled) {
+          let closestCoord = Constants.getClosestPosition(e.pageX, e.pageY);
+          xCoord = Constants.getGridCoord(closestCoord.x, width, offset.x);
+          yCoord = Constants.getGridCoord(closestCoord.y, height, offset.y);
+        }
+        else {
+          xCoord = Constants.getGridCoord(e.pageX, width, offset.x);
+          yCoord = Constants.getGridCoord(e.pageY, height, offset.y);
+        }
+
+        let adjustedCord = Constants.getAdjustedCoord(
+          xCoord,
+          yCoord,
+          defaultDimensions.width,
+          defaultDimensions.height
+        );
+        copiedNode = {
+          ...copiedNode,
+          ...adjustedCord,
+          isOriginal: false
+        }
       } 
       else {
         let gridDimensions = Shapes.getDefaultDimensions(copiedNode.type);
@@ -364,8 +417,8 @@ class Workspace extends React.Component {
         let adjustedCord = Constants.getAdjustedCoord(
           xCoord,
           yCoord,
-          copiedNode.width,
-          copiedNode.height
+          gridDimensions.width * copiedNode.multiplier,
+          gridDimensions.height * copiedNode.multiplier
         );
         copiedNode = {
           ...copiedNode,
@@ -379,22 +432,35 @@ class Workspace extends React.Component {
   contextChange(index, action) {
     switch (action) {
       case "color":
-        this.setState({ colorModalShow: true, contextIndex: index, newColor: this.state.nodes[index].fillColor }, () => {
+        this.setState({
+          colorModalShow: true,
+          contextIndex: index,
+          newColor: this.state.nodes[index].fillColor
+        }, () => {
           if (!Shapes.isLine(this.state.nodes[index].type) && this.state.nodes[index].type !== Shapes.TYPES.TEXT_BOX) {
             this.setState({ contextIsNode: true, newBorder: this.state.nodes[index].borderColor })
           }
         });
         break;
       case "text":
-        this.setState({ textModalShow: true, contextIndex: index, newText: this.state.nodes[index].text });
+        this.setState({
+          textModalShow: true, 
+          contextIndex: index,
+          newText: this.state.nodes[index].text
+        });
         break;
       case "grid":
         this.setState({ 
-          gridModalShow: true, 
+          gridModalShow: true
         });
         break;
-      default:
+      case "image":
+        this.setState({
+          imageModalShow: true,
+          contextIndex: index
+        });
         break;
+      default: break;
     }
   }
 
@@ -433,9 +499,6 @@ class Workspace extends React.Component {
 
   handleGridChange(e) {
     let intVal = Constants.getInteger(e.target.value)
-    console.log(intVal);
-
-    console.log(e.target)
 
     if (!isNaN(intVal)) {
       if (this.widthInput.current.contains(e.target)) {
@@ -450,8 +513,6 @@ class Workspace extends React.Component {
     } else {
       this.setState({ gridButtonIsDisabled: true })
     }
-
-    console.log(this.state.newWidth, this.state.newHeight)
   }
 
   changeGrid() {
@@ -485,6 +546,33 @@ class Workspace extends React.Component {
     this.drawWorkspace();
   }
 
+  handleImageChange(e) {
+    let imageUrl = e.target.value.trim();
+    this.setState({
+      imageButtonDisabled: !Constants.isUrl(imageUrl),
+      newImageUrl: imageUrl
+    });
+  }
+
+  changeImage() {
+    Constants.getImageSourceDimensions(this.state.newImageUrl, (url, w, h) => {
+      let validImage = w > 0 && h > 0;
+      if (validImage) {
+        this.setState({ imageModalShow: false }, () => {
+          this.updateNode(this.state.contextIndex, {
+            imageUrl: this.state.newImageUrl,
+            srcWidth: w,
+            srcHeight: h,
+            multiplier: 1
+          });
+        });
+      }
+      else {
+        alert('Could not load image!');
+      }
+    });
+  }
+
   render() {
     return (
       <div className="workspace">
@@ -492,6 +580,8 @@ class Workspace extends React.Component {
           incZoom={this.incZoom}
           decZoom={this.decZoom}
           toggleGrid={this.toggleGrid} />
+
+        {/* Render context menu for grid */}
         <ContextMenuTrigger id="gridContextMenu" holdToDisplay={-1}>
           <svg className="grid" viewBox={`0 0 ${Constants.WORKSPACE_SETTINGS.getHorizontalBoxes()} ${Constants.WORKSPACE_SETTINGS.getVerticalBoxes()}`}>
 
@@ -507,6 +597,9 @@ class Workspace extends React.Component {
               Edit Grid
           </MenuItem>
         </ContextMenu>
+        
+        {/* Render pop-up modals */}
+        {/* Color modal*/}
         <Modal
           aria-labelledby="transition-modal-title"
           aria-describedby="transition-modal-description"
@@ -547,6 +640,7 @@ class Workspace extends React.Component {
             </div>
           </Fade>
         </Modal>
+        {/* Text modal*/}
         <Modal
           aria-labelledby="transition-modal-title"
           aria-describedby="transition-modal-description"
@@ -575,6 +669,7 @@ class Workspace extends React.Component {
             </div>
           </Fade>
         </Modal>
+        {/* Grid modal*/}
         <Modal
           aria-labelledby="transition-modal-title"
           aria-describedby="transition-modal-description"
@@ -607,48 +702,58 @@ class Workspace extends React.Component {
             </div>
           </Fade>
         </Modal>
+        {/* Image modal*/}
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className="modal"
+          open={this.state.imageModalShow}
+          onClose={() => this.setState({ imageModalShow: false })}
+          closeAfterTransition
+          disableEnforceFocus={true}
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
+          }}
+        >
+          <Fade in={this.state.imageModalShow}>
+            <div className="paper" style={{
+              width: '700px'
+            }}>
+              <p id="transition-modal-title">Enter Image URL</p>
+              <span className="image-fields">
+                <TextField id="outlined-basic" fullWidth={true} variant="outlined" multiline={false} onChange={this.handleImageChange} style={{ paddingBottom: 20 }}/>
+              </span>
+              <span className="image-buttons">
+                <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ imageModalShow: false })} className="done">
+                  Cancel
+                </Button>
+                <Button variant="outlined" size="medium" color="primary" disabled={this.state.imageButtonDisabled} onClick={this.changeImage} className="done">
+                  Submit
+                </Button>
+              </span>
+            </div>
+          </Fade>
+        </Modal>
+        
+        {/* Render nodes */}
         {this.state.nodes.map((attributes, i) => {
+          let componentProps = {
+            ...this.nodeComponentProps,
+            index: i,
+            key: attributes.key,
+            attributes: attributes
+          };
           if (Shapes.isLine(attributes.type)) {
-            return <WorkspaceLine
-              updateSelf={this.updateNode}
-              onDelete={this.deleteNode}
-              onDuplicate={this.duplicateNode}
-              onShift={this.shiftNode}
-              onContextChange={this.contextChange}
-              copySelf={this.storeCopiedNode}
-              index={i}
-              menuId={attributes.key}
-              key={attributes.key}
-              attributes={attributes}
-            />
+            return <WorkspaceLine {...componentProps} />
           } else if (attributes.type === Shapes.TYPES.TEXT_BOX) {
-            return <WorkspaceText
-              updateSelf={this.updateNode}
-              onDelete={this.deleteNode}
-              onDuplicate={this.duplicateNode}
-              onShift={this.shiftNode}
-              onContextChange={this.contextChange}
-              copySelf={this.storeCopiedNode}
-              index={i}
-              menuId={attributes.key}
-              key={attributes.key}
-              attributes={attributes}
-            />
+            return <WorkspaceText {...componentProps} />
+          } else if (attributes.type === Shapes.TYPES.IMAGE) {
+            return <WorkspaceImage {...componentProps} />
           } else {
-            return <WorkspaceNode
-              updateSelf={this.updateNode}
-              onDelete={this.deleteNode}
-              onDuplicate={this.duplicateNode}
-              onShift={this.shiftNode}
-              onContextChange={this.contextChange}
-              copySelf={this.storeCopiedNode}
-              index={i}
-              menuId={attributes.key}
-              key={attributes.key}
-              attributes={attributes}
-            />
+            return <WorkspaceNode {...componentProps} />
           }
-      })}
+        })}
       </div>
     );
   }
