@@ -2,5 +2,5 @@
     position: absolute;
     outline: 2px dashed black;
     cursor: grabbing;
-    z-index: 2;
+    z-index: 1000;
 }

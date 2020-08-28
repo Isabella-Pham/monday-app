@@ -71,7 +71,7 @@ class Toolbar extends React.Component {
         <ContextMenuTrigger id="lines-menu" holdToDisplay={0}>
           <FontAwesomeIcon icon={faArrowsAltH} className="toolbar-icon"/>
         </ContextMenuTrigger>
-        <FontAwesomeIcon icon={faFont} className="toolbar-icon"/>
+        <FontAwesomeIcon icon={faFont} className="toolbar-icon" data-type={Shapes.TYPES.TEXT_BOX} onMouseDown={this.props.onTransition}/>
         <FontAwesomeIcon icon={faImage} className="toolbar-icon"/>
 
         <ContextMenu id="shapes-menu" className="toolbar-contextmenu">

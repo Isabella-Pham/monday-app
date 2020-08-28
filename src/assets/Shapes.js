@@ -9,8 +9,8 @@ const TYPES = Object.freeze({
   ELLIPSE: 2,
   DIAMOND: 3,
   POST_IT: 4,
-  UPRIGHT_CYCLINDER: 5,
-  TEXTBOX: 6,
+  UPRIGHT_CYLINDER: 5,
+  TEXT_BOX: 6,
   IMAGE: 7,
   CIRCLE: 8,
   SQUARE: 9,
@@ -340,6 +340,49 @@ class Shapes {
     );
   }
 
+  static getTextBox(props) {
+    if (props.toolbar) {
+      return null;
+    }
+
+    console.log(props.width);
+
+    return (
+      <g>
+        {/* <path d={`
+              M0,0
+              l1000,0
+              l0,750
+              l-1000,0
+              Z`}></path> */}
+        <text 
+          x={0} 
+          y="50%"
+          id={props.key}
+          style={{
+            stroke: props.textColor,
+            fill: props.textColor,
+            strokeWidth: 0.25,
+            inlineSize: 10 + "px",
+            fontSize: "14px",
+            fontFamily: "Roboto",
+            textOverflow: "ellipsis"
+          }}
+        >{props.text}</text>
+        {/* <script type="application/ecmascript">
+          let width = {props.width}; 
+          let height = {props.height};
+          let textBox = document.getElementById("{props.key}");
+          let bb = textBox.getBBox();
+          let widthTransform = width / bb.width;
+          let heightTransform = height / bb.height;
+          {"let value = widthTransform < heightTransform ? widthTransform : heightTransform;"}
+          textBox.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
+        </script> */}
+      </g>
+    )
+  }
+
   static renderShape(type, props = { toolbar: true }) {
     type = parseInt(type);
     switch (type) {
@@ -358,6 +401,7 @@ class Shapes {
       case Shapes.TYPES.LINE: return Shapes.getLine(props);
       case Shapes.TYPES.ARROW_LINE: return Shapes.getArrowLine(props);
       case Shapes.TYPES.DOUBLE_LINE: return Shapes.getDoubleLine(props);
+      case Shapes.TYPES.TEXT_BOX: return Shapes.getTextBox(props);
       default: return null;
     }
   }
@@ -386,6 +430,9 @@ class Shapes {
       case Shapes.TYPES.ARROW_LINE:
       case Shapes.TYPES.DOUBLE_LINE:
         dimensions = [10, 0];
+        break;
+      case Shapes.TYPES.TEXT_BOX:
+        dimensions = [8, 6];
         break;
       default: break;
     }

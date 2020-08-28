@@ -292,10 +292,6 @@ class WorkspaceNode extends React.Component {
               <FontAwesomeIcon icon={faClone} style={{paddingRight: 10}}/>
               Duplicate
             </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.dummyMethod}>
-              <FontAwesomeIcon icon={faTextHeight} style={{paddingRight: 10}}/>
-              Text
-            </MenuItem>
             <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
               <FontAwesomeIcon icon={faPalette} style={{paddingRight: 10}}/>
               Color

@@ -39,11 +39,18 @@
     -o-user-select: none !important;
 }
 
-.buttons {
+.color-buttons {
     display: flex;
     justify-content: space-between;
     padding-left: 25px;
-    padding-right: 25px
+    padding-right: 25px;
+}
+
+.text-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .buttons > button {

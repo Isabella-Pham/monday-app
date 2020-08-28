@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClipboard, faEdit } from '@fortawesome/free-solid-svg-icons';
 
 import WorkspaceNode from './WorkspaceNode';
+import WorkspaceLine from './WorkspaceLine';
+import WorkspaceText from './WorkspaceText';
 import WorkspaceTools from './WorkspaceTools';
 import Constants from '../../constants/constants';
 import Shapes from '../../assets/shapes';
@@ -15,9 +17,9 @@ import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 import SketchPicker from 'react-color';
 import '../styles/material-ui.css';
-import WorkspaceLine from './WorkspaceLine';
 
 class Workspace extends React.Component {
   constructor(props) {
@@ -26,8 +28,9 @@ class Workspace extends React.Component {
     this.state = {
       nodes: [],
       colorModalShow: false,
-      color: '#ffffff',
+      textModalShow: false,
       newColor: '#ffffff',
+      newText: '',
       contextIndex: -1,
       copiedNode: undefined
     };
@@ -46,9 +49,10 @@ class Workspace extends React.Component {
       this.storeCopiedNode,
       this.contextChange,
       this.changeColor,
+      this.changeText,
       this.dummyMethod,
       this.pasteNode,
-      this.changeDimensions
+      this.handleTextChange
     ];
 
     for (let func of bindFunctions) {
@@ -206,7 +210,6 @@ class Workspace extends React.Component {
     }
 
     let newNodes = this.state.nodes.filter(attributes => {
-      console.log(attributes);
       if (Shapes.isLine(attributes.type)) {
         let startIncluded = attributes.x <= newWidth && attributes.y <= newHeight;
         let endIncluded = attributes.endX <= newWidth && attributes.endY <= newHeight;
@@ -232,7 +235,6 @@ class Workspace extends React.Component {
   changeDimensions(e) {
     let width = parseInt(prompt('New width'));
     let height = parseInt(prompt('New height'));
-    console.log(width, height);
     this.updateDimensions(width, height);
   }
 
@@ -306,6 +308,31 @@ class Workspace extends React.Component {
           endY: adjustedCord.y + height
         };
       }
+      else if (copiedNode.type === Shapes.TYPES.TEXT_BOX) {
+        width = copiedNode.width * Constants.ZOOM_SETTINGS;
+        height = copiedNode.height * Constants.ZOOM_SETTINGS;
+
+        if (Constants.gridEnabled) {
+          let closestCoord = Constants.getClosestPosition(e.pageX, e.pageY);
+          xCoord = Constants.getGridCoord(closestCoord.x, width, offset.x);
+          yCoord = Constants.getGridCoord(closestCoord.y, height, offset.y);
+        }
+        else {
+          xCoord = Constants.getGridCoord(e.pageX, width, offset.x);
+          yCoord = Constants.getGridCoord(e.pageY, height, offset.y);
+        }
+
+        let adjustedCord = Constants.getAdjustedCoord(
+          xCoord,
+          yCoord,
+          copiedNode.width,
+          copiedNode.height
+        );
+        copiedNode = {
+          ...copiedNode,
+          ...adjustedCord
+        }
+      } 
       else {
         let gridDimensions = Shapes.getDefaultDimensions(copiedNode.type);
         width = gridDimensions.width * copiedNode.multiplier * Constants.ZOOM_SETTINGS;
@@ -341,15 +368,30 @@ class Workspace extends React.Component {
       case "color":
         this.setState({ colorModalShow: true, contextIndex: index });
         break;
+      case "text":
+        this.setState({ textModalShow: true, contextIndex: index });
+        break;  
       default:
         break;
     }
   }
 
   changeColor() {
-    this.setState({ colorModalShow: false, color: this.state.newColor, newColor: "#FFFFFF" }, () => {
+    this.setState({ colorModalShow: false }, () => {
       this.updateNode(this.state.contextIndex, {
-        fillColor: this.state.color
+        fillColor: this.state.newColor
+      })
+    });
+  }
+
+  handleTextChange(e) {
+    this.setState({ newText: e.target.value })
+  }
+
+  changeText() {
+    this.setState({ textModalShow: false }, () => {
+      this.updateNode(this.state.contextIndex, {
+        text: this.state.newText.trim()
       })
     });
   }
@@ -393,7 +435,7 @@ class Workspace extends React.Component {
             <div className="paper">
               <p id="transition-modal-title">Select Color</p>
               <SketchPicker color={this.state.newColor} onChange={(color) => this.setState({ newColor: color.hex })} disableAlpha={true} className="sketch" />
-              <span className="buttons">
+              <span className="color-buttons">
                 <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ colorModalShow: false })} className="done">
                   Cancel
                 </Button>
@@ -404,9 +446,37 @@ class Workspace extends React.Component {
             </div>
           </Fade>
         </Modal>
-        {this.state.nodes.map((item, i) =>
-          Shapes.isLine(item.type) ?
-            <WorkspaceLine
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className="modal"
+          open={this.state.textModalShow}
+          onClose={() => this.setState({ textModalShow: false })}
+          closeAfterTransition
+          disableEnforceFocus={true}
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
+          }}
+        >
+          <Fade in={this.state.textModalShow}>
+            <div className="paper">
+              <p id="transition-modal-title">Edit Text</p>
+              <TextField id="outlined-basic" label="Enter Text" variant="outlined" multiline={true} onChange={this.handleTextChange} style={{ paddingBottom: 20 }}/>
+              <span className="text-buttons">
+                <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ textModalShow: false })} className="done">
+                  Cancel
+                </Button>
+                <Button variant="outlined" size="medium" color="primary" onClick={this.changeText} className="done">
+                  Submit
+                </Button>
+              </span>
+            </div>
+          </Fade>
+        </Modal>
+        {this.state.nodes.map((attributes, i) => {
+          if (Shapes.isLine(attributes.type)) {
+            return <WorkspaceLine
               updateSelf={this.updateNode}
               onDelete={this.deleteNode}
               onDuplicate={this.duplicateNode}
@@ -414,23 +484,38 @@ class Workspace extends React.Component {
               onContextChange={this.contextChange}
               copySelf={this.storeCopiedNode}
               index={i}
-              menuId={item.key}
-              key={item.key}
-              attributes={item}
-            /> :
-            <WorkspaceNode
-              updateSelf={this.updateNode}
-              onDelete={this.deleteNode}
-              onDuplicate={this.duplicateNode}
-              onShift={this.shiftNode}
-              onContextChange={this.contextChange}
-              copySelf={this.storeCopiedNode}
-              index={i}
-              menuId={item.key}
-              key={item.key}
-              attributes={item}
+              menuId={attributes.key}
+              key={attributes.key}
+              attributes={attributes}
             />
-        )}
+          } else if (attributes.type === Shapes.TYPES.TEXT_BOX) {
+            return <WorkspaceText
+              updateSelf={this.updateNode}
+              onDelete={this.deleteNode}
+              onDuplicate={this.duplicateNode}
+              onShift={this.shiftNode}
+              onContextChange={this.contextChange}
+              copySelf={this.storeCopiedNode}
+              index={i}
+              menuId={attributes.key}
+              key={attributes.key}
+              attributes={attributes}
+            />
+          } else {
+            return <WorkspaceNode
+              updateSelf={this.updateNode}
+              onDelete={this.deleteNode}
+              onDuplicate={this.duplicateNode}
+              onShift={this.shiftNode}
+              onContextChange={this.contextChange}
+              copySelf={this.storeCopiedNode}
+              index={i}
+              menuId={attributes.key}
+              key={attributes.key}
+              attributes={attributes}
+            />
+          }
+      })}
       </div>
     );
   }
