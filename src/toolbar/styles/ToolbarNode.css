@@ -15,7 +15,8 @@
   overflow: visible;
 }
 
-.toolbar-node > svg > path {
+.toolbar-node > svg > path,
+.toolbar-node > svg > g > path {
   fill: white;
   stroke-width: 4px;
   stroke: black;

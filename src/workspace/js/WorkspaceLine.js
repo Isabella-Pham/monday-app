@@ -347,7 +347,7 @@ class WorkspaceLine extends React.Component {
                   L${renderProps.endX},${renderProps.endY}
                 `} /> : null
               }
-              {Shapes.renderShape(this.props.attributes.type, renderProps)}
+              { Shapes.renderShape(this.props.attributes.type, renderProps) }
               {this.state.isSelected ? [
                 <circle
                   className="startCircle"
@@ -394,6 +394,14 @@ class WorkspaceLine extends React.Component {
               <FontAwesomeIcon icon={faClone} style={{ paddingRight: 10 }} />
               Duplicate
             </MenuItem>
+            <MenuItem className="react-contextmenu-item" onClick={this.flipLine}>
+              <FontAwesomeIcon icon={faUndo} style={{ paddingRight: 10 }} />
+              Flip
+            </MenuItem>
+            <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
+              <FontAwesomeIcon icon={faPalette} style={{ paddingRight: 10 }} />
+              Color
+            </MenuItem>
           </SubMenu>
           <SubMenu
             title={
@@ -410,23 +418,6 @@ class WorkspaceLine extends React.Component {
             <MenuItem className="react-contextmenu-item" onClick={this.moveToBack}>
               <FontAwesomeIcon icon={faSortAmountDownAlt} style={{ paddingRight: 10 }} />
               Send To Back
-            </MenuItem>
-          </SubMenu>
-          <SubMenu
-            title={
-              <div style={{ display: "inline" }}>
-                <FontAwesomeIcon icon={faVectorSquare} style={{ paddingRight: 10 }} />
-                <span>Styling</span>
-              </div>
-            }
-            hoverDelay={100}>
-            <MenuItem className="react-contextmenu-item" onClick={this.flipLine}>
-              <FontAwesomeIcon icon={faUndo} style={{ paddingRight: 10 }} />
-              Flip
-            </MenuItem>
-            <MenuItem className="react-contextmenu-item" onClick={this.colorChange}>
-              <FontAwesomeIcon icon={faPalette} style={{ paddingRight: 10 }} />
-              Change Color
             </MenuItem>
           </SubMenu>
         </ContextMenu>

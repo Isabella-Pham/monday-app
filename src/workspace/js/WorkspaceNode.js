@@ -45,16 +45,27 @@ class WorkspaceNode extends React.Component {
     for (let func of bindFunctions) {
       this[func.name] = this[func.name].bind(this);
     }
+
+    let viewDimension = 100;
+    if (this.props.attributes.defaultDimensions.width < this.props.attributes.defaultDimensions.height) {
+      viewDimension /= 2;
+    }
+    this.viewbox = `0 0 ${viewDimension} ${viewDimension}`;
+    this.renderedShape = Shapes.renderShape(this.props.attributes.type, {
+      toolbar: false
+    });
   }
 
   static getDefault(x, y, type) {
+    let gridDimensions = Shapes.getDefaultDimensions(type);
     return {
       x: x,
       y: y,
       type: type,
       multiplier: 1,
       fillColor: '#FFFFFF',
-      borderColor: '#000000'
+      borderColor: '#000000',
+      defaultDimensions: gridDimensions
     };
   }
 
@@ -101,10 +112,9 @@ class WorkspaceNode extends React.Component {
   }
 
   getGridDimensions() {
-    let gridDimensions = Shapes.getDefaultDimensions(this.props.attributes.type);
     return {
-      width: gridDimensions.width * this.props.attributes.multiplier,
-      height: gridDimensions.height * this.props.attributes.multiplier,
+      width: this.props.attributes.defaultDimensions.width * this.props.attributes.multiplier,
+      height: this.props.attributes.defaultDimensions.height * this.props.attributes.multiplier,
     }
   }
 
@@ -206,7 +216,7 @@ class WorkspaceNode extends React.Component {
   }
 
   resize(e, {size}) {
-    let defaultDimensions = Shapes.getDefaultDimensions(this.props.attributes.type);
+    let defaultDimensions = this.props.attributes.defaultDimensions;
     let newMultiplier = parseFloat(size.width) / (defaultDimensions.width * Constants.ZOOM_SETTINGS);
     let isTooSmall = newMultiplier < Constants.MIN_MULTIPLIER;
     let isTooLarge = newMultiplier > Constants.MAX_MULTIPLIER;
@@ -231,9 +241,6 @@ class WorkspaceNode extends React.Component {
   render() {
     let dimensions = this.getRealDimensions();
     let position = this.getPosition();
-    let renderProps = {
-      toolbar: false
-    };
     return (
       <div>
         <ContextMenuTrigger id={this.props.menuId} holdToDisplay={-1}>
@@ -260,8 +267,8 @@ class WorkspaceNode extends React.Component {
               }}>
               <svg 
               ref={node => this.node = node}
-              viewBox={`0 0 100 100`}>
-                { Shapes.renderShape(this.props.attributes.type, renderProps) }
+              viewBox={this.viewbox}>
+                { this.renderedShape }
               </svg>
             </div>
           </Resizable>

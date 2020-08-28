@@ -24,7 +24,8 @@
   pointer-events: all;
 }
 
-.work-node > svg > path {
+.work-node > svg > path,
+.work-node > svg > g >path {
   stroke-width: 1px;
   pointer-events: auto;
 }

@@ -217,6 +217,40 @@ class Workspace extends React.Component {
     });
   }
 
+  updateDimensions(newWidth, newHeight) {
+    if (!newWidth || !newHeight || newWidth <= 0 || newHeight <= 0) {
+      return;
+    }
+
+    let newNodes = this.state.nodes.filter(attributes => {
+      if (Shapes.isLine(attributes.type)) {
+        let startIncluded = attributes.x <= newWidth && attributes.y <= newHeight;
+        let endIncluded = attributes.endX <= newWidth && attributes.endY <= newHeight;
+        return startIncluded && endIncluded;
+      }
+      else if (attributes.type === Shapes.TYPES.TEXTBOX) {
+        return attributes.x + attributes.width <= newWidth && attributes.y + attributes.height <= newHeight;
+      }
+      else {
+        let nodeDimensions = Shapes.getDefaultDimensions(attributes.type);
+        let width = nodeDimensions.width * attributes.multiplier;
+        let height = nodeDimensions.height * attributes.multiplier;
+        return attributes.x + width <= newWidth && attributes.y + height <= newHeight;
+      }
+    });
+
+    Constants.WORKSPACE_SETTINGS.setHorizontalBoxes(newWidth);
+    Constants.WORKSPACE_SETTINGS.setVerticalBoxes(newHeight);
+    this.setState({ nodes: newNodes });
+    this.drawWorkspace();
+  }
+
+  changeDimensions(e) {
+    let width = parseInt(prompt('New width'));
+    let height = parseInt(prompt('New height'));
+    this.updateDimensions(width, height);
+  }
+
   updateNode(index, props) {
     let newNodes = this.state.nodes.slice();
     newNodes[index] = {
@@ -230,9 +264,8 @@ class Workspace extends React.Component {
     return {
       nodes: this.state.nodes.slice(),
       settings: {
-        zoom: Constants.ZOOM_SETTINGS,
-        verticalBoxCount: Constants.WORKSPACE_SETTINGS.getVerticalBoxes(),
-        horizontalBoxCount: Constants.WORKSPACE_SETTINGS.getHorizontalBoxes()
+        width: Constants.WORKSPACE_SETTINGS.getVerticalBoxes(),
+        height: Constants.WORKSPACE_SETTINGS.getHorizontalBoxes()
       }
     };
   }
@@ -359,7 +392,7 @@ class Workspace extends React.Component {
       case "grid":
         this.setState({ 
           gridModalShow: true, 
-        })
+        });
         break;
       default:
         break;
