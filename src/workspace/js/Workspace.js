@@ -34,11 +34,13 @@ class Workspace extends React.Component {
       gridButtonIsDisabled: true,
       textModalShow: false,
       newColor: '#ffffff',
+      newBorder: "#ffffff",
       newText: '',
       newWidth: -1,
       newHeight: -1,
       contextIndex: -1,
-      copiedNode: undefined
+      copiedNode: undefined,
+      contextIsNode: false
     };
 
     let bindFunctions = [
@@ -344,7 +346,12 @@ class Workspace extends React.Component {
   contextChange(index, action) {
     switch (action) {
       case "color":
-        this.setState({ colorModalShow: true, contextIndex: index, newColor: this.state.nodes[index].fillColor });
+        this.setState({ colorModalShow: true, contextIndex: index, newColor: this.state.nodes[index].fillColor }, () => {
+          if (!Shapes.isLine(this.state.nodes[index].type) && this.state.nodes[index].type !== Shapes.TYPES.TEXT_BOX) {
+            console.log("HERE");
+            this.setState({ contextIsNode: true })
+          }
+        });
         break;
       case "text":
         this.setState({ textModalShow: true, contextIndex: index, newText: this.state.nodes[index].text });
@@ -353,17 +360,27 @@ class Workspace extends React.Component {
         this.setState({ 
           gridModalShow: true, 
         })
+        break;
       default:
         break;
     }
   }
 
   changeColor() {
-    this.setState({ colorModalShow: false }, () => {
-      this.updateNode(this.state.contextIndex, {
-        fillColor: this.state.newColor
-      })
-    });
+    if (this.state.contextIsNode) {
+      this.setState({ colorModalShow: false, contextIsNode: false}, () => {
+        this.updateNode(this.state.contextIndex, {
+          fillColor: this.state.newColor,
+          borderColor: this.state.newBorder
+        })
+      });
+    } else {
+      this.setState({ colorModalShow: false, contextIsNode: false}, () => {
+        this.updateNode(this.state.contextIndex, {
+          fillColor: this.state.newColor
+        })
+      });
+    }
   }
 
   handleTextChange(e) {
@@ -463,7 +480,7 @@ class Workspace extends React.Component {
           aria-describedby="transition-modal-description"
           className="modal"
           open={this.state.colorModalShow}
-          onClose={() => this.setState({ colorModalShow: false })}
+          onClose={() => this.setState({ colorModalShow: false, contextIsNode: false })}
           closeAfterTransition
           disableEnforceFocus={true}
           BackdropComponent={Backdrop}
@@ -473,10 +490,22 @@ class Workspace extends React.Component {
         >
           <Fade in={this.state.colorModalShow}>
             <div className="paper">
-              <p id="transition-modal-title">Select Color</p>
-              <SketchPicker color={this.state.newColor} onChange={(color) => this.setState({ newColor: color.hex })} disableAlpha={true} className="sketch" />
-              <span className="color-buttons">
-                <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ colorModalShow: false })} className="done">
+              <p id="transition-modal-title"><b>Select Color</b></p>
+              <div style={this.state.contextIsNode ? { display: "flex" } : { display: "block" }}>
+                <div className="sketch">
+                  {this.state.contextIsNode ? <p>Fill</p> : null}
+                  <SketchPicker color={this.state.newColor} onChange={(color) => this.setState({ newColor: color.hex })} disableAlpha={true} className="picker" />
+                </div>
+                {this.state.contextIsNode ? 
+                <div className="sketch">
+                  <p>Border</p>
+                  <SketchPicker color={this.state.newBorder} onChange={(color) => this.setState({ newBorder: color.hex })} disableAlpha={true} className="picker" />
+                </div>
+                : null
+                }
+              </div>
+              <span className={this.state.contextIsNode ? "color-buttons-2" : "color-buttons"}>
+                <Button variant="outlined" size="medium" color="primary" onClick={() => this.setState({ colorModalShow: false, contextIsNode: false })} className="done">
                   Cancel
                 </Button>
                 <Button variant="outlined" size="medium" color="primary" onClick={this.changeColor} className="done">
