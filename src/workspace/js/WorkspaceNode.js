@@ -1,7 +1,7 @@
 import React from 'react';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faCopy, faEdit, faTextHeight, faTrashAlt, faFileAlt, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
+import { faCut, faCopy, faEdit, faTrashAlt, faFileAlt, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 import { Resizable } from 'react-resizable';
 
 import Shapes from '../../assets/shapes';
@@ -45,6 +45,15 @@ class WorkspaceNode extends React.Component {
     for (let func of bindFunctions) {
       this[func.name] = this[func.name].bind(this);
     }
+
+    let viewDimension = 100;
+    if (this.props.attributes.defaultDimensions.width < this.props.attributes.defaultDimensions.height) {
+      viewDimension /= 2;
+    }
+    this.viewbox = `0 0 ${viewDimension} ${viewDimension}`;
+    this.renderedShape = Shapes.renderShape(this.props.attributes.type, {
+      toolbar: false
+    });
   }
 
   static getDefault(x, y, type) {
@@ -232,9 +241,6 @@ class WorkspaceNode extends React.Component {
   render() {
     let dimensions = this.getRealDimensions();
     let position = this.getPosition();
-    let renderProps = {
-      toolbar: false
-    };
     return (
       <div>
         <ContextMenuTrigger id={this.props.menuId} holdToDisplay={-1}>
@@ -261,8 +267,8 @@ class WorkspaceNode extends React.Component {
               }}>
               <svg 
               ref={node => this.node = node}
-              viewBox={`0 0 100 100`}>
-                { Shapes.renderShape(this.props.attributes.type, renderProps) }
+              viewBox={this.viewbox}>
+                { this.renderedShape }
               </svg>
             </div>
           </Resizable>

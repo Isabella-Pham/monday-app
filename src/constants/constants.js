@@ -2,6 +2,8 @@ const CURSOR_CENTERED = true;
 const ROUND_DECIMALS = 4;
 const MIN_MULTIPLIER = 0.5;
 const MAX_MULTIPLIER = 4;
+const MIN_GRID = 10;
+const MAX_GRID = 1000;
 
 let gridEnabled = true;
 
@@ -138,6 +140,14 @@ class Constants {
     return Constants.WORKSPACE_SETTINGS.getDefaultZoom();
   }
 
+  static get MIN_GRID() {
+    return MIN_GRID;
+  }
+
+  static get MAX_GRID() {
+    return MAX_GRID;
+  }
+
   static getClosestPosition(x, y) {
     let dimension = Constants.ZOOM_SETTINGS;
     let closeX = x + dimension / 2;
@@ -187,6 +197,15 @@ class Constants {
       x: xCord,
       y: yCord
     };
+  }
+
+  static getInteger(x) {
+    if (typeof x !== "number" && typeof x !== "string" || x === "") {
+        return NaN;
+    } else {
+        x = Number(x);
+        return x === Math.floor(x) ? x : NaN;
+    }
   }
 
   static getAdjustedLine(xCord, yCord, deltaX, deltaY) {
