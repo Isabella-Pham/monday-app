@@ -9,3 +9,26 @@
   background-color: #ffffff;
   position: absolute;
 }
+
+#graph-name {
+  margin-left: 50%;
+  margin-top: 1%;
+  padding: 20px 20px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  min-width: 30%;
+  max-width: 70%;
+  max-height: 2%;
+  display: block;
+  position: fixed;
+  z-index: 95;
+  font-family: inherit;
+  font-size: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  background-color: white;
+  transform: translateX(-50%);
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,.4);
+}

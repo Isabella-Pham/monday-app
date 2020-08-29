@@ -1,5 +1,7 @@
 import React from "react";
 
+import getSocketClient from './socketClient';
+
 import Workspace from './workspace/js/Workspace';
 import WorkspaceNode from './workspace/js/WorkspaceNode';
 import WorkspaceText from "./workspace/js/WorkspaceText";
@@ -30,6 +32,7 @@ class App extends React.Component {
     };
 
     this._workspace = React.createRef();
+    this.socket = getSocketClient(3001);
 
     this.showTransitionNode = this.showTransitionNode.bind(this);
     this.hideTransitionNode = this.hideTransitionNode.bind(this);
@@ -37,7 +40,14 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    
+    this.socket.on('connect', function() {
+      this.socket.send(JSON.stringify({
+        notification: 'lets goooo',
+        params: {
+
+        }
+      }))
+    }.bind(this))
   }
   
   showTransitionNode(e) {

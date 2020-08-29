@@ -1,9 +1,10 @@
 import React from 'react';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faCopy, faEdit, faTrashAlt, faFileAlt, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
+import { faCut, faCopy, faEdit, faTrashAlt, faFileAlt, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone, faTasks } from '@fortawesome/free-solid-svg-icons';
 import { Resizable } from 'react-resizable';
 
+import TaskPopup from './TaskPopup';
 import Shapes from '../../assets/shapes';
 import Constants from '../../constants/constants';
 import '../styles/WorkspaceNode.css';
@@ -40,6 +41,8 @@ class WorkspaceNode extends React.Component {
       this.moveToFront,
       this.colorChange,
       this.resize,
+      this.showPopup,
+      this.updateTasks
     ];
 
     for (let func of bindFunctions) {
@@ -54,6 +57,8 @@ class WorkspaceNode extends React.Component {
     this.renderedShape = Shapes.renderShape(this.props.attributes.type, {
       toolbar: false
     });
+
+    this.taskPopup = React.createRef();
   }
 
   static getDefault(x, y, type) {
@@ -65,7 +70,8 @@ class WorkspaceNode extends React.Component {
       multiplier: 1,
       fillColor: '#FFFFFF',
       borderColor: '#000000',
-      defaultDimensions: gridDimensions
+      defaultDimensions: gridDimensions,
+      tasks: []
     };
   }
 
@@ -234,6 +240,14 @@ class WorkspaceNode extends React.Component {
     }
   }
 
+  showPopup() {
+    this.taskPopup.current.displaySelf();
+  }
+
+  updateTasks(newTasks) {
+    this.props.updateSelf(this.props.index, { tasks: newTasks });
+  }
+
   render() {
     let dimensions = this.getRealDimensions();
     let position = this.getPosition();
@@ -316,7 +330,12 @@ class WorkspaceNode extends React.Component {
               Send To Back
             </MenuItem>
           </SubMenu>
+          <MenuItem className="react-contextmenu-item" onClick={this.showPopup}>
+              <FontAwesomeIcon icon={faTasks} style={{paddingRight: 10}}/>
+              Tasks
+          </MenuItem>
         </ContextMenu>
+        <TaskPopup ref={this.taskPopup} updateTasks={this.updateTasks} tasks={this.props.attributes.tasks}/>
       </div>
     );
   }
