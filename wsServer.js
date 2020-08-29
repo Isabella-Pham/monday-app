@@ -1,32 +1,18 @@
-var WebSocketServer = require('websocket').server;
-var http = require('http');
+const PORT = process.env.SOCK_PORT || 3001;
+var wsServer = require('socket.io')();
 var graphViewers = {};
 var clients = [];
 
-var server = http.createServer(function (request, response) {
-    console.log((new Date()) + ' Received request for ' + request.url);
-    response.writeHead(404);
-    response.end();
-});
-server.listen(8080, function () {
-    console.log((new Date()) + ' Server is listening on port 8080');
-});
-
-wsServer = new WebSocketServer({
-    httpServer: server,
-    // You should not use autoAcceptConnections for production
-    // applications, as it defeats all standard cross-origin protection
-    // facilities built into the protocol and the browser.  You should
-    // *always* verify the connection's origin and decide whether or not
-    // to accept it.
-    autoAcceptConnections: false
-});
-
 function sendToAllClients(message, toExclude) {
-    for (var i = 0; i < clients.lengthl i++) {
+    for (var i = 0; i < clients.length; i++) {
         if (clients[i], toString().localCompare(toExclude) == 0) continue;
         clients[i].send(message);
     }
+}
+
+function originIsAllowed(origin) {
+  // put logic here to detect whether the specified origin is allowed.
+  return true;
 }
 
 wsServer.on('connection', function (ws) {
@@ -36,7 +22,8 @@ wsServer.on('connection', function (ws) {
     clients.push(ws);
 
     ws.on('message', function (message) {
-        messageJSON = JSON.parse(message);
+      try {
+        var messageJSON = JSON.parse(message);
         var operation = messageJSON["notification"];
         var params = messageJSON["params"];
         if (operation.toString().localeCompare("save") == 0) {
@@ -54,16 +41,22 @@ wsServer.on('connection', function (ws) {
             }
             viewers.push(id);
             graphViewers["graphName"] = viewers;
-
+        } else {
+          console.log(messageJSON);
         }
+      } catch(e) {
+        console.log(new Date() + ' Error: '+e.message)
+      }
     });
     ws.on('close', function (reasonCode, description) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
 });
 
+wsServer.listen(PORT, {
+  secure: true
+});
 
-function originIsAllowed(origin) {
-    // put logic here to detect whether the specified origin is allowed.
-    return true;
-}
+wsServer.httpServer.on('listening', () => {
+  console.log(`Socket open on port ${PORT}`)
+});
