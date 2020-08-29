@@ -62,7 +62,6 @@ wsServer.on('connection', function (ws) {
     });
 });
 
-
 function originIsAllowed(origin) {
     // put logic here to detect whether the specified origin is allowed.
     return true;
