@@ -559,12 +559,27 @@ class Workspace extends React.Component {
       let validImage = w > 0 && h > 0;
       if (validImage) {
         this.setState({ imageModalShow: false }, () => {
-          this.updateNode(this.state.contextIndex, {
-            imageUrl: this.state.newImageUrl,
-            srcWidth: w,
-            srcHeight: h,
-            multiplier: 1
-          });
+          let defaultDimensions = WorkspaceImage.getDefaultDimensions(w, h);
+          if (defaultDimensions.width > Constants.WORKSPACE_SETTINGS.getHorizontalBoxes() || 
+            defaultDimensions.height > Constants.WORKSPACE_SETTINGS.getVerticalBoxes()) {
+            alert(`Image is too big for grid. Please expand grid to at least ${defaultDimensions.width} x ${defaultDimensions.height}`);
+          }
+          else {
+            let adjustedCord = Constants.getAdjustedCoord(
+              this.state.nodes[this.state.contextIndex].x,
+              this.state.nodes[this.state.contextIndex].y,
+              defaultDimensions.width,
+              defaultDimensions.height
+            );
+            this.updateNode(this.state.contextIndex, {
+              imageUrl: this.state.newImageUrl,
+              srcWidth: w,
+              srcHeight: h,
+              multiplier: 1,
+              x: adjustedCord.x,
+              y: adjustedCord.y
+            });
+          }
         });
       }
       else {
@@ -576,6 +591,7 @@ class Workspace extends React.Component {
   render() {
     return (
       <div className="workspace">
+        <span contentEditable="true" id="graph-name" placeholder="Graph Name"></span>
         <WorkspaceTools
           incZoom={this.incZoom}
           decZoom={this.decZoom}

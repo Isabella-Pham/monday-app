@@ -9,40 +9,8 @@ import mondaySdk from "monday-sdk-js";
 class mondayClient {
     constructor() {
         this.monday = mondaySdk();
-        this.api_key = process.env.REACT_APP_MONDAY_TOKEN;
         this.setAllGraphs();
         this.sleep(5000);
-
-        //connect to the server
-        /*var WebSocketClient = require('websocket').client;
-        var client = new WebSocketClient();
-        var hostname = 'ws://localhost:8080/';
-        client.on('connectFailed', function (error) {
-            console.log('Connect Error: ' + error.toString());
-        });
-
-        client.on('connect', function (connection) {
-            console.log('WebSocket Client Connected');
-            connection.on('error', function (error) {
-                console.log("Connection Error: " + error.toString());
-            });
-            connection.on('close', function () {
-                console.log('echo-protocol Connection Closed');
-            });
-            connection.on('message', function (message) {
-               const  messageJSON = JSON.parse(message);
-                var operation = messageJSON["notification"];
-                if (operation.toString().localeCompare("save") == 0) {
-                    //call get graph and display new graph
-                } else if (operation.toString().localeCompare("delete") == 0) {
-                    //undisplay the graph
-                } else if (operation.toString().localeCompare("rename") == 0) {
-                    //call get graph under the new graph name
-                }
-            });
-        });
-        //connect to server
-        client.connect(hostname, 'echo-protocol');*/
     }
 
     notifyServer(notification, params){
