@@ -35,14 +35,14 @@
   padding-left: 5%;
   padding-right: 5%;
   height: 10%;
-  bottom: 2%;
+  bottom: 5%;
   left: 0;
   position: absolute !important;
 }
 
 .option-group {
   height: 50%;
-  margin-bottom: 2%;
+  margin-bottom: 5%;
 }
 
 .option-group:last-of-type {

@@ -1,3 +1,5 @@
+import { mondayClient } from "../mondayClient";
+
 const CURSOR_CENTERED = true;
 const ROUND_DECIMALS = 4;
 const MIN_MULTIPLIER = 0.25;
@@ -110,6 +112,15 @@ class WorkspaceSettings {
 
 class Constants {
   static WORKSPACE_SETTINGS = new WorkspaceSettings();
+  static MONDAY_CLIENT = null;
+
+  static get mondayClient() {
+    return Constants.MONDAY_CLIENT;
+  }
+
+  static setMondayClient(client) {
+    Constants.MONDAY_CLIENT = client;
+  }
 
   static get cursorCentered() {
     return CURSOR_CENTERED;

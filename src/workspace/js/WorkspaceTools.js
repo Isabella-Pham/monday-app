@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearchMinus, faSearchPlus, faBorderAll, faSave, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
+import { faSearchMinus, faSearchPlus, faBorderAll, faSave, faFolderOpen, faFolder } from '@fortawesome/free-solid-svg-icons';
 
 import Constants from '../../constants/constants';
 import '../styles/WorkspaceTools.css';
@@ -57,7 +57,7 @@ class WorkplaceTools extends React.Component {
         </button>
         <button className="grid-button folder" onClick={this.toggleFileSystem}>
           <FontAwesomeIcon
-            icon={faFolderOpen}
+            icon={this.state.fileSystemOpen ? faFolderOpen : faFolder}
             size="lg" />
         </button>
         <FileSystem open={this.state.fileSystemOpen} graphs={[{name: "Sprint Plan September 2020"}, {name: "Product Diagram 1"}, {name: "Distribution"}]}/>

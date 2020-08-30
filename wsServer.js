@@ -52,11 +52,3 @@ wsServer.on('connection', function (ws) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
 });
-
-wsServer.listen(PORT, {
-  secure: true
-});
-
-wsServer.httpServer.on('listening', () => {
-  console.log(`Socket open on port ${PORT}`)
-});

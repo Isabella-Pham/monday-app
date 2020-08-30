@@ -34,8 +34,6 @@ class App extends React.Component {
 
     this._workspace = React.createRef();
     this.socket = getSocketClient(3001);
-    this.client = new mondayClient();
-
     this.showTransitionNode = this.showTransitionNode.bind(this);
     this.hideTransitionNode = this.hideTransitionNode.bind(this);
     this.updateTransitionNode = this.updateTransitionNode.bind(this);
@@ -49,7 +47,9 @@ class App extends React.Component {
 
         },
       }))
-    }.bind(this))
+    }.bind(this));
+
+    Constants.setMondayClient(new mondayClient());
   }
   
   showTransitionNode(e) {
