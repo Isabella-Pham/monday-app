@@ -60,7 +60,7 @@ class WorkplaceTools extends React.Component {
             icon={faFolderOpen}
             size="lg" />
         </button>
-        <FileSystem open={this.state.fileSystemOpen}/>
+        <FileSystem open={this.state.fileSystemOpen} graphs={[{name: "Sprint Plan September 2020"}, {name: "Product Diagram 1"}, {name: "Distribution"}]}/>
       </div>
     );
   }
