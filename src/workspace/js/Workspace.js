@@ -289,7 +289,8 @@ class Workspace extends React.Component {
       settings: {
         width: Constants.WORKSPACE_SETTINGS.getVerticalBoxes(),
         height: Constants.WORKSPACE_SETTINGS.getHorizontalBoxes()
-      }
+      },
+      name: document.getElementById('graph-name').value
     };
   }
 
@@ -591,7 +592,7 @@ class Workspace extends React.Component {
   render() {
     return (
       <div className="workspace">
-        <span contentEditable="true" id="graph-name" placeholder="Graph Name"></span>
+        <input id="graph-name" placeholder="Graph Name"></input>
         <WorkspaceTools
           incZoom={this.incZoom}
           decZoom={this.decZoom}

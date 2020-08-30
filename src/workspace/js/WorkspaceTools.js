@@ -1,19 +1,22 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearchMinus, faSearchPlus, faBorderAll } from '@fortawesome/free-solid-svg-icons';
+import { faSearchMinus, faSearchPlus, faBorderAll, faSave, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
 
 import Constants from '../../constants/constants';
 import '../styles/WorkspaceTools.css';
+import FileSystem from './FileSystem';
 
 
 class WorkplaceTools extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      enabled: true
+      enabled: true,
+      fileSystemOpen: false
     }
 
     this.updateEnabled = this.updateEnabled.bind(this);
+    this.toggleFileSystem = this.toggleFileSystem.bind(this);
   }
 
   updateEnabled() {
@@ -21,6 +24,12 @@ class WorkplaceTools extends React.Component {
     this.setState({
       enabled: !this.state.enabled
     });
+  }
+
+  toggleFileSystem() {
+    this.setState({
+      fileSystemOpen: !this.state.fileSystemOpen
+    })
   }
 
   render() {
@@ -40,8 +49,18 @@ class WorkplaceTools extends React.Component {
           <FontAwesomeIcon
             icon={faBorderAll}
             size="lg" />
-          {/* <span className="tooltip">{this.state.enabled ? "Disable" : "Enable"} Grid</span> */}
         </button>
+        <button className="grid-button save">
+          <FontAwesomeIcon
+            icon={faSave}
+            size="lg" />
+        </button>
+        <button className="grid-button folder" onClick={this.toggleFileSystem}>
+          <FontAwesomeIcon
+            icon={faFolderOpen}
+            size="lg" />
+        </button>
+        <FileSystem open={this.state.fileSystemOpen}/>
       </div>
     );
   }

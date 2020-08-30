@@ -1,12 +1,13 @@
 import React from 'react'
 import '../styles/TaskPopup.css'
 import Constants from '../../constants/constants';
-
 import Task from './Task';
+
 import Modal from '@material-ui/core/Modal';
-import Button from '@material-ui/core/Button';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 
 class TaskPopup extends React.Component {
   constructor(props) {
@@ -19,7 +20,8 @@ class TaskPopup extends React.Component {
     let bindFunctions = [
       this.displaySelf,
       this.createTask,
-      this.editTask
+      this.editTask,
+      this.deleteTask
     ];
 
     for (let func of bindFunctions) {
@@ -34,7 +36,7 @@ class TaskPopup extends React.Component {
   createTask() {
     let newTasks = this.props.tasks.concat({ 
       key: Constants.getUniqueReactKey(), 
-      title: '', 
+      title: 'New Task', 
       isCompleted: false, 
       people: [] 
     });
@@ -48,6 +50,14 @@ class TaskPopup extends React.Component {
       ...newTasks[index],
       ...props
     };
+
+    this.props.updateTasks(newTasks);
+  }
+
+  deleteTask(index) {
+    let newTasks = this.props.tasks.slice()
+    
+    newTasks.splice(index, 1);
 
     this.props.updateTasks(newTasks);
   }
@@ -70,12 +80,21 @@ class TaskPopup extends React.Component {
         >
           <Fade in={this.state.show}>
             <div className="taskPaper">
-              <p>Title</p>
-              <Button variant="outlined" size="medium" color="primary" onClick={this.createTask} style={{ marginBottom: 20 }}>
-                Add Task
-              </Button>
+              <div className='manage-header'>
+                <span className="header-title">Manage Tasks</span>
+                <span className='add-task'>
+                  <FontAwesomeIcon icon={faPlusCircle} size="2x" onClick={this.createTask}/>
+                </span>
+              </div>
               {this.props.tasks.map((item, i) => {
-                return <Task key={item.key} index={i} title={item.title} isCompleted={item.isCompleted} people={item.people} editTask={this.editTask}/>
+                return <Task key={item.key} 
+                             index={i} 
+                             title={item.title} 
+                             isCompleted={item.isCompleted} 
+                             people={item.people} 
+                             editTask={this.editTask}
+                             deleteTask={this.deleteTask}
+                        />
               })}
             </div>
           </Fade>

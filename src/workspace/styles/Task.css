@@ -1,0 +1,100 @@
+.task-actions {
+  width: 3%;
+  margin-right: 1%;
+  padding: 0;
+}
+
+.task-actions:first-of-type {
+  margin-left: -2%;
+}
+
+.people-actions {
+  width: 5%;
+  padding: 0;
+}
+
+.people-icon {
+  top: 50%;
+  position: absolute;
+  transform: translateY(-50%);
+  display: block;
+  right: 0%;
+  transition: none;
+}
+
+.people-icon.disabled {
+  color: lightgray;
+  pointer-events: none;
+}
+
+.people-icon.enabled {
+  color: rgb(25, 199, 25);
+  cursor: pointer;
+}
+
+.task-icon {
+  top: 50%;
+  position: absolute;
+  transform: translateY(-50%);
+  display: block;
+}
+
+.task-details > * {
+  position: relative;
+  display: block;
+}
+
+.task-details {
+  width: 100%;
+  height: fit-content;
+}
+
+.add-people {
+  min-width: 100%;
+  margin: auto;
+}
+
+.task-people {
+  min-width: 100%;
+  margin-top: 20px;
+}
+
+.task-person {
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  width: 89%;
+  height: 20px;
+  padding-top: 7.5px;
+  padding-bottom: 7.5px;
+  margin: auto;
+  margin-bottom: 10px;
+  margin-left: 7%
+}
+
+.task-person:last-of-type {
+  margin-bottom: 0px;
+}
+
+.person-name {
+  float: left;
+  margin-left: 20px;
+  width: 30%;
+  max-height: 100%;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-lines: 1;
+  white-space: nowrap;
+}
+
+.person-email {
+  margin-left: 2%;
+  float: left;
+  width: 60%;
+  text-align: left;
+}
+
+.person-remove {
+  color: red;
+  cursor: pointer;
+}

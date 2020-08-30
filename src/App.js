@@ -13,6 +13,7 @@ import TransitionNode from './toolbar/js/TransitionNode';
 import Shapes from './assets/shapes';
 import Constants from './constants/constants';
 import "./App.css";
+import { mondayClient } from "./mondayClient";
 
 class App extends React.Component {
   constructor(props) {
@@ -33,6 +34,7 @@ class App extends React.Component {
 
     this._workspace = React.createRef();
     this.socket = getSocketClient(3001);
+    this.client = new mondayClient();
 
     this.showTransitionNode = this.showTransitionNode.bind(this);
     this.hideTransitionNode = this.hideTransitionNode.bind(this);
@@ -45,7 +47,7 @@ class App extends React.Component {
         notification: 'lets goooo',
         params: {
 
-        }
+        },
       }))
     }.bind(this))
   }

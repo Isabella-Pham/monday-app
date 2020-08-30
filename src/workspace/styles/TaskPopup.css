@@ -3,12 +3,6 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 10%;
-  outline: 0;
-  user-select: none !important;
-  -moz-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -o-user-select: none;
   font-family: "Roboto", sans-serif;
 }
 
@@ -17,14 +11,32 @@
   text-align: center;
   background-color: #ffffff;
   border: 0px solid #fff;
+  outline: none;
   padding-left: 1%;
   padding-right: 1%;
   padding-bottom: 1%;
   border-radius: 5px;
   min-width: 900px;
-  user-select: none !important;
-  -moz-user-select: none !important;
-  -khtml-user-select: none !important;
-  -webkit-user-select: none !important;
-  -o-user-select: none !important;
+  max-height: 70%;
+  overflow-y: auto;
+}
+
+.manage-header {
+  width: 100%;
+  height: 70px;
+}
+
+.header-title {
+  display: inline-block;
+  position: relative;
+  margin-top: 2%;
+  font-size: 20px;
+}
+
+.add-task {
+  float: right;
+  position: relative;
+  margin-top: 2%;
+  cursor: pointer;
+  color: rgb(16, 170, 221)
 }

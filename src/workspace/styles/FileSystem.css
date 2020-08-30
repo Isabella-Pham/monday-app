@@ -1,0 +1,35 @@
+.file-system {
+  font-family: inherit;
+  width: 100%;
+  position: relative;
+  top: 20px;
+  height: 80vh;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px 0 rgba(0,0,0,.4);
+}
+
+.file-system.off {
+  display: none;
+}
+
+.file-system > * {
+  width: 100%;
+  position: relative;
+}
+
+.system-header {
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  letter-spacing: 1px;
+  font-size: 12pt;
+}
+
+.file-options {
+  align-content: center;
+}
+
+.file-buttons {
+  width: 40%
+}

@@ -1,14 +1,10 @@
 .settings {
   position: fixed;
   display: block;
-  top: 5px;
-  right: 0;
+  top: 1%;
+  right: 1%;
   background-color: transparent;
   z-index: 1000;
-}
-
-.setting > * {
-  display: inline-block;
 }
 
 .grid-button {
@@ -29,7 +25,7 @@
   background: lightgray;
 }
 .grid-button:last-of-type {
-  margin-left: 0;
+  margin-right: 0;
 }
 
 .grid-button.on {
@@ -51,35 +47,11 @@
   top: 0px;
 }
 
-.tooltip {
-  visibility: hidden;
-  width: 120px;
-  background-color: #555;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  position: absolute;
-  z-index: 1;
-  bottom: 125%;
-  left: 50%;
-  margin-left: -60px;
-  opacity: 0;
-  transition: opacity 0.3s;
+.grid-button.save {
+  background: rgb(123, 23, 236);
+  color: #fff
 }
 
-.grid-button .tooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: #555 transparent transparent transparent;
-}
-
-.grid-button:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
+.grid-button.folder {
+  background: rgb(241, 210, 33);
 }

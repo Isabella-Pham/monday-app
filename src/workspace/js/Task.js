@@ -1,20 +1,45 @@
 import React from 'react';
+import '../styles/Task.css'
 
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import TextField from '@material-ui/core/TextField';
+import { faPlusCircle, faTrash, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+import { withStyles } from '@material-ui/core/styles';
+import { green } from '@material-ui/core/colors';
+
+const GreenCheckbox = withStyles({
+  root: {
+    color: green[400],
+    '&$checked': {
+      color: green[600],
+    },
+  },
+  checked: {},
+})((props) => <Checkbox color="default" {...props} />);
 
 class Task extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      selectedPeople: []
+    }
+
     let bindFunctions = [
-      this.updateTitle
+      this.updateTitle,
+      this.updateIsCompleted,
+      this.deleteSelf,
+      this.addPeople,
+      this.removePerson
     ];
 
     for (let func of bindFunctions) {
@@ -23,7 +48,28 @@ class Task extends React.Component {
   }
 
   updateTitle(e) {
-    this.props.editTask(this.props.index, { title: e.target.value.trim() });
+    this.props.editTask(this.props.index, { title: e.target.value });
+  }
+
+  updateIsCompleted(e) {
+    this.props.editTask(this.props.index, { isCompleted: e.target.checked })
+  }
+
+  deleteSelf(e) {
+    e.stopPropagation();
+    this.props.deleteTask(this.props.index);
+  }
+
+  addPeople(e) {
+    this.props.editTask(this.props.index, { people: this.props.people.concat(this.state.selectedPeople) });
+    this.setState({ selectedPeople: [] });
+  }
+
+  removePerson(e) {
+    let people = this.props.people.slice();
+    people.splice(parseInt(e.target.closest('.task-person').getAttribute('data-index')), 1);
+
+    this.props.editTask(this.props.index, { people: people });
   }
 
   render() {
@@ -37,25 +83,107 @@ class Task extends React.Component {
         >
           <FormControlLabel
             aria-label="Acknowledge"
-            control={<Checkbox />}
+            control={
+            <GreenCheckbox 
+              checked={this.props.isCompleted}
+              onChange={this.updateIsCompleted}
+            />}
             onClick={(event) => event.stopPropagation()}
             onFocus={(event) => event.stopPropagation()}  
           />
+          <div className="task-actions">
+            <FontAwesomeIcon 
+              icon={faTrash} 
+              size="lg" 
+              className="task-icon"
+              style={{ color: '' }}
+              onClick={this.deleteSelf}
+              onFocus={(event) => event.stopPropagation()}    
+            />
+          </div>
           <TextField 
             fullWidth={true} 
-            variant="outlined" 
+            variant="outlined"
+            label="Task Description"
             multiline={false} 
             onChange={this.updateTitle}
             onClick={(event) => event.stopPropagation()} 
-            onFocus={(event) => event.stopPropagation()} 
+            onFocus={(event) => event.stopPropagation()}
             value={this.props.title}
           />
         </AccordionSummary>
         <AccordionDetails>
-          <Typography color="textPrimary">
-            The click event of the nested action will propagate up and expand the accordion unless
-            you explicitly stop it.
-          </Typography>
+        <div className='task-details'>
+          <div className='add-people'>
+            <Autocomplete
+              multiple={true}
+              options={[
+                {
+                  name: 'Goodfellas',
+                  email: 'robert.deniro@gmail.com',
+                  user_id: 'deezNuts'
+                }, 
+                {
+                  name: 'Good Will Hunting',
+                  email: 'matt.damon@gmail.com',
+                  user_id: 'deezBalls'
+                },
+                {
+                  name: 'The Godfather',
+                  email: 'matt.damon@gmail.com',
+                  user_id: 'f'
+                }
+              ]}
+              getOptionSelected={(option, value) => option.name === value.name}
+              getOptionLabel={(option) => option.name}
+              freeSolo={false}
+              fullWidth={true}
+              style={{ width: '89%', marginLeft: '7%' }}
+              onChange={(event, values) => this.setState({ selectedPeople: values })}
+              value={this.state.selectedPeople}
+              renderInput={(params) => <TextField {...params} 
+                label={`Add Task Member${this.state.selectedPeople.length === 1 ? '' : 's'}`}
+                variant="outlined" 
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <>
+                      <InputAdornment position="start">
+                        <AccountCircle />
+                      </InputAdornment>
+                      {params.InputProps.startAdornment}
+                    </>
+                  ),
+              }} />}
+            />
+            <div className="people-actions">
+              <FontAwesomeIcon 
+                icon={faPlusCircle} 
+                size="lg" 
+                className={"people-icon" + (this.state.selectedPeople.length > 0 ? ' enabled' : ' disabled')}
+                onClick={this.addPeople}
+                onFocus={(event) => event.stopPropagation()}    
+              />
+            </div>
+          </div>
+          <div className="task-people">
+            {this.props.people.map((item, i) => {
+              return (
+                <div className="task-person" key={item.user_id} data-index={i}>
+                  <span className="person-name">
+                    {item.name}
+                  </span>
+                  <span className="person-email">
+                    {item.email}
+                  </span>
+                  <span className="person-remove">
+                    <FontAwesomeIcon icon={faTimesCircle} size="lg" onClick={this.removePerson}/>
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
         </AccordionDetails>
       </Accordion>
     )

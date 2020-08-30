@@ -117,7 +117,7 @@ class mondayClient {
                 console.log("Invalid graph name, name must not contain any commmas");
                 return false;
             }
-            if (data["value"] == null || data["value"].toString().localeCompare("null") == 0) {
+            if (data["value"] == null || data["value"].toString().localeCompare("null") === 0) {
                 this.monday.storage.instance.setItem("all_graphs", graphName);
                 console.log("Adding ", graphName, " as first graph of graph list");
                 return true;
@@ -170,7 +170,7 @@ class mondayClient {
 
     async setAllGraphs() {
         const success = await this.containsGraph("all_graphs").then(res => {
-            if (res == false) {
+            if (res === false) {
                 this.monday.storage.instance.setItem("all_graphs", "null");
                 return true;
             } else {

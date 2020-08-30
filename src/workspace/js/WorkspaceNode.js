@@ -1,7 +1,7 @@
 import React from 'react';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from "react-contextmenu";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCut, faCopy, faEdit, faTrashAlt, faFileAlt, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone, faTasks } from '@fortawesome/free-solid-svg-icons';
+import { faCut, faCopy, faEdit, faTrashAlt, faFileAlt, faPalette, faSortAmountUpAlt, faSortAmountDownAlt, faClone } from '@fortawesome/free-solid-svg-icons';
 import { Resizable } from 'react-resizable';
 
 import TaskPopup from './TaskPopup';
@@ -246,6 +246,7 @@ class WorkspaceNode extends React.Component {
 
   updateTasks(newTasks) {
     this.props.updateSelf(this.props.index, { tasks: newTasks });
+    this.forceUpdate();
   }
 
   render() {
@@ -331,8 +332,8 @@ class WorkspaceNode extends React.Component {
             </MenuItem>
           </SubMenu>
           <MenuItem className="react-contextmenu-item" onClick={this.showPopup}>
-              <FontAwesomeIcon icon={faTasks} style={{paddingRight: 10}}/>
-              Tasks
+            <img src={Constants.MONDAY_LOGO} alt="Not found!" height='10px' style={{ paddingRight: '5px' }}/>
+            Tasks
           </MenuItem>
         </ContextMenu>
         <TaskPopup ref={this.taskPopup} updateTasks={this.updateTasks} tasks={this.props.attributes.tasks}/>
