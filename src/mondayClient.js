@@ -10,7 +10,38 @@ class mondayClient {
     constructor() {
         this.monday = mondaySdk();
         this.setAllGraphs();
-        this.sleep(5000);
+        this.sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+
+        //connect to the server
+        /*var WebSocketClient = require('websocket').client;
+        var client = new WebSocketClient();
+        var hostname = 'ws://localhost:8080/';
+        client.on('connectFailed', function (error) {
+            console.log('Connect Error: ' + error.toString());
+        });
+
+        client.on('connect', function (connection) {
+            console.log('WebSocket Client Connected');
+            connection.on('error', function (error) {
+                console.log("Connection Error: " + error.toString());
+            });
+            connection.on('close', function () {
+                console.log('echo-protocol Connection Closed');
+            });
+            connection.on('message', function (message) {
+               const  messageJSON = JSON.parse(message);
+                var operation = messageJSON["notification"];
+                if (operation.toString().localeCompare("save") == 0) {
+                    //call get graph and display new graph
+                } else if (operation.toString().localeCompare("delete") == 0) {
+                    //undisplay the graph
+                } else if (operation.toString().localeCompare("rename") == 0) {
+                    //call get graph under the new graph name
+                }
+            });
+        });
+        //connect to server
+        client.connect(hostname, 'echo-protocol');*/
     }
 
     notifyServer(notification, params){
@@ -18,15 +49,33 @@ class mondayClient {
     }
 
     //used to delay the executation of code by a specified number of milliseconds
-    sleep(delay) {
-        var start = new Date().getTime();
-        while (new Date().getTime() < start + delay);
-    }
+    /*sleep(milliseconds) {
+        //change to settimeout
+        setTimeout
+    }*/
 
     //returns JSON array containing each user on the team and their name, email, and url to their photo
     async getTeammates() {
-        const teammates = await this.monday.api("{users{name,email,photo_original}}").then(res => {
+        const teammates = await this.monday.api("{users{name,id,email,photo_original}}").then(res => {
             return res;
+        });
+        return teammates["data"]["users"];
+    }
+
+    //takes in the name of a user or their userID and returns all info about them. 
+    //Be wary of trying to get info using someone's name if two people have the same exact name.
+    async getUserInfo(name) {
+        const teammates = await this.getTeammates().then(res => {
+            console.log(res);
+            for (var i = 0; i < res.length; i++) {
+                var teammate = res[i];
+                if (teammate["name"].localeCompare(name) == 0) {
+                    return res[i];
+                } else if (teammate["id"] == name) {
+                    return res[i];
+                }
+            }
+            return "teammate does not exist";
         });
         return teammates;
     }
@@ -38,7 +87,7 @@ class mondayClient {
         return tasks;
     }
 
-    async createTask(taskName, user_id) {
+    async createTask(taskName, listOfUsers) {
         const boardID = await this.monday.api("{boards{id}}").then(res => {
             return res["data"]["boards"][0]["id"];
         });
@@ -54,7 +103,9 @@ class mondayClient {
         `).then(res => {
             return res["data"]["create_item"]["id"];
         });
-        const notif = await this.monday.api(`
+        for (var i = 0; i < listOfUsers.length; i++) {
+            var user_id = listOfUsers[i];
+            const notif = await this.monday.api(`
               mutation {
                 create_notification(
                   text: "You have been assigned the following task: ${taskName}",
@@ -66,10 +117,8 @@ class mondayClient {
                   id 
                 }
               }
-            `).then(res => {
-                return res["data"]["create_notification"]["id"];
-            });
-        return notif;
+            `)
+        }
     }
 
     //returns an array containing all graphs saved 
@@ -151,7 +200,7 @@ class mondayClient {
     async renameGraph(oldName, newName){
         const graphJSON = this.getGraph(oldName);
         this.saveGraph(newName, graphJSON);
-        this.sleep(5000);
+        await this.sleep(10000);
         this.deleteGraph(oldName);
         this.notifyServer("rename", { "oldName": oldName, "newName": newName });
     }
