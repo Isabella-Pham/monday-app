@@ -21,6 +21,7 @@ class mondayClient {
 
     async sendServerRequest(path, data) {
         data.teamName = this.team;
+        data.clientId = Constants.CLIENT_ID;
 
         const options = {
             method: 'POST',
@@ -119,10 +120,8 @@ class mondayClient {
     async getAllGraphs() {
         let response = await this.sendServerRequest('getAll', {});
         if (!response.error) {
-            console.log("NOT EMPTY", response.graphs);
             return response.graphs
         } else {
-            console.log("EMPTY");
             return [];
         }
     }

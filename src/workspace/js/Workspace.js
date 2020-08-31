@@ -82,6 +82,9 @@ class Workspace extends React.Component {
     this.loadGraph = this.loadGraph.bind(this);
     this.deleteGraph = this.deleteGraph.bind(this);
     this.newGraph = this.newGraph.bind(this);
+    this.resetGraph = this.resetGraph.bind(this);
+    this.updateCurrentGraph = this.updateCurrentGraph.bind(this);
+    this.updateAfterDeletion = this.updateAfterDeletion.bind(this);
     
     this.widthInput = React.createRef();
     this.heightInput = React.createRef();
@@ -292,6 +295,30 @@ class Workspace extends React.Component {
     };
   }
 
+  updateCurrentGraph(graph) {
+    if (this.state.storedGraphId !== graph.id) {
+      return false;
+    }
+
+    this.loadGraph(graph);
+
+    alert('The graph you are editing has been updated by another user.');
+
+    return true;
+  }
+
+  updateAfterDeletion(graphId) {
+    if (this.state.storedGraphId !== graphId) {
+      return false;
+    }
+
+    this.resetGraph();
+
+    alert('The graph you are editing on has been deleted by another user.');
+
+    return true;
+  }
+
   saveGraph() {
     let graph = this.getGraphJson();
 
@@ -302,7 +329,8 @@ class Workspace extends React.Component {
     if (this.state.storedGraphId === null) {
       Constants.MONDAY_CLIENT.createGraph(graph.name, graph.nodes, graph.width, graph.width).then((res) => {
         if (!res.error) {
-          this.setState({ storedGraphId: res.graphId });
+          window.graphs = res.graphs;
+          this.setState({ storedGraphId: res.graph.id });
           alert('Graph saved.')
         } else {
           alert(res.message);
@@ -311,6 +339,8 @@ class Workspace extends React.Component {
     } else {
       Constants.MONDAY_CLIENT.editGraph(this.state.storedGraphId, graph.name, graph.nodes, graph.width, graph.height).then((res) => {
         if (!res.error) {
+          window.graphs = res.graphs;
+          this.forceUpdate();
           alert('Graph saved.');
         } else {
           alert(res.message);
@@ -326,26 +356,36 @@ class Workspace extends React.Component {
     this.setState({ nodes: graph.nodes, storedGraphId: graph.id });
   }
 
+  resetGraph() {
+    Constants.WORKSPACE_SETTINGS.setHorizontalBoxes(100);
+    Constants.WORKSPACE_SETTINGS.setVerticalBoxes(100);
+    document.getElementById('graph-name').value = '';
+    this.setState({ nodes: [], storedGraphId: null });
+  }
+
   deleteGraph(graph) {
     Constants.MONDAY_CLIENT.deleteGraph(graph.id).then(function(res) {
       if (!res.error) {
         if (this.state.storedGraphId === graph.id) {
-          Constants.WORKSPACE_SETTINGS.setHorizontalBoxes(100);
-          Constants.WORKSPACE_SETTINGS.setVerticalBoxes(100);
-          document.getElementById('graph-name').value = '';
-          this.setState({ nodes: [], storedGraphId: null });      
+          this.resetGraph();
         }
         window.graphs = res.graphs;
+        this.forceUpdate();
         alert('Deleted graph successfully.')
       }
     }.bind(this));
-    // if (this.state.storedGraphId === graph.id) {
-      
-    // }
   }
 
   newGraph() {
-
+    Constants.MONDAY_CLIENT.createGraph('New Graph', [], 100, 100).then((res) => {
+      if (!res.error) {
+        window.graphs = res.graphs;
+        this.loadGraph(res.graph);
+        alert('New graph created.')
+      } else {
+        alert(res.message);
+      }
+    });
   }
 
   toggleGrid() {

@@ -17,6 +17,9 @@ class WorkplaceTools extends React.Component {
 
     this.updateEnabled = this.updateEnabled.bind(this);
     this.toggleFileSystem = this.toggleFileSystem.bind(this);
+    this.load = this.load.bind(this);
+    this.delete = this.delete.bind(this);
+    this.new = this.new.bind(this);
   }
 
   updateEnabled() {
@@ -30,6 +33,21 @@ class WorkplaceTools extends React.Component {
     this.setState({
       fileSystemOpen: !this.state.fileSystemOpen
     })
+  }
+
+  load(graph) {
+    this.setState({ fileSystemOpen: false })
+    this.props.load(graph);
+  }
+
+  delete(graph) {
+    this.setState({ fileSystemOpen: false })
+    this.props.delete(graph);
+  }
+
+  new() {
+    this.setState({ fileSystemOpen: false })
+    this.props.new();
   }
 
   render() {
@@ -61,7 +79,7 @@ class WorkplaceTools extends React.Component {
             icon={this.state.fileSystemOpen ? faFolderOpen : faFolder}
             size="lg" />
         </button>
-        <FileSystem open={this.state.fileSystemOpen} load={this.props.load} delete={this.props.delete} new={this.props.new}/>
+        <FileSystem open={this.state.fileSystemOpen} load={this.load} delete={this.delete} new={this.new}/>
       </div>
     );
   }

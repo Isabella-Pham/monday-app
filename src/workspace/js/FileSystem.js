@@ -30,12 +30,14 @@ class FileSystem extends React.Component {
   loadGraph() {
     if (this.state.selectedIndex >= 0) {
       this.props.load(window.graphs[this.state.selectedIndex]);
+      this.setState({ selectedIndex: -1 });
     }
   }
 
   deleteGraph() {
     if (this.state.selectedIndex >= 0) {
       this.props.delete(window.graphs[this.state.selectedIndex]);
+      this.setState({ selectedIndex: -1 });
     }
   }
 
@@ -76,7 +78,7 @@ class FileSystem extends React.Component {
             </Button>
           </div>
           <div className="option-group">
-            <Button variant="outlined" className="file-buttons new" style={{ borderColor: "#16a800", color: "#16a800" }} onclick={this.newGraph}>
+            <Button variant="outlined" className="file-buttons new" style={{ borderColor: "#16a800", color: "#16a800" }} onClick={this.newGraph}>
               New
             </Button>
           </div>

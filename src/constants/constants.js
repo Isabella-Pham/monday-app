@@ -112,6 +112,7 @@ class Constants {
   static WORKSPACE_SETTINGS = new WorkspaceSettings();
   static MONDAY_CLIENT = null;
   static SOCKET = null;
+  static CLIENT_ID = null;
 
   static get SOCKET() {
     return Constants.SOCKET;
@@ -119,6 +120,14 @@ class Constants {
 
   static setSocket(socket) {
     Constants.SOCKET = socket;
+  }
+
+  static get CLIENT_ID() {
+    return Constants.CLIENT_ID;
+  }
+
+  static setClientId(id) {
+    Constants.CLIENT_ID = id;
   }
 
   static get MONDAY_CLIENT() {

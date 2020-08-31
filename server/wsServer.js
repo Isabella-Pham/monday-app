@@ -5,38 +5,40 @@ var clients = [];
 
 function sendToAllClients(message, toExclude) {
     for (var i = 0; i < clients.length; i++) {
-        if (clients[i], toString().localCompare(toExclude) == 0) continue;
-        clients[i].send(message);
+        if (clients[i].id === toExclude) continue;
+        clients[i].socket.send(message);
     }
 }
 
-function originIsAllowed(origin) {
-  // put logic here to detect whether the specified origin is allowed.
-  return true;
-}
-
-module.exports = function(server) {
+module.exports.attachSocketServer = function(server) {
   var wsServer = socketIO(server);
-  wsServer.on('connection', function (ws) {
-    id = Math.random();
+  wsServer.on('connect', function (ws) {
+    const id = Math.random();
     console.log("connection is established: " + id);
-    clients[id] = ws;
-    clients.push(ws);
+    clients.push({
+      socket: ws,
+      id: id
+    });
+
+    ws.send(JSON.stringify({
+      message: 'init',
+      id: id
+    }));
 
     ws.on('message', function (message) {
       try {
         var messageJSON = JSON.parse(message);
-        var operation = messageJSON["notification"];
+        var operation = messageJSON["message"];
         var params = messageJSON["params"];
-        if (operation.toString().localeCompare("save") == 0) {
-            sendToAllClients("save", ws);
-        } else if (operation.toString().localeCompare("delete") == 0) {
+        if (operation.toString().localeCompare("save") === 0) {
+            sendToAllClients("save", id);
+        } else if (operation.toString().localeCompare("delete") === 0) {
             //undisplay the graph
-            sendToAllClients("delete", ws);
-        } else if (operation.toString().localeCompare("rename") == 0) {
+            sendToAllClients("delete", id);
+        } else if (operation.toString().localeCompare("rename") === 0) {
             //call get graph under the new graph name
-            sendToAllClients("rename", ws);
-        } else if (operation.toString().localeCompare("load") == 0) {
+            sendToAllClients("rename", id);
+        } else if (operation.toString().localeCompare("load") === 0) {
             viewers = [];
             if (!graphViewers[params["graphName"]]) {
                 viewers = graphViewers["graphName"];
@@ -47,11 +49,15 @@ module.exports = function(server) {
           console.log(messageJSON);
         }
       } catch(e) {
-        console.log(new Date() + ' Error: '+e.message)
+        console.log(new Date() + ' Error: ' + e.message)
       }
     });
     ws.on('close', function (reasonCode, description) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
   });
+}
+
+module.exports.sendMessageToClients = function(message, clientId) {
+  sendToAllClients(message, clientId);
 }

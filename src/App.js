@@ -1,6 +1,6 @@
 import React from "react";
 
-import getSocketClient from './socketClient';
+import setSocketClient from './socketClient';
 
 import Workspace from './workspace/js/Workspace';
 import WorkspaceNode from './workspace/js/WorkspaceNode';
@@ -39,15 +39,11 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    Constants.setSocket(getSocketClient());
-    Constants.SOCKET.send(JSON.stringify({
-      notification: "hello",
-      params: {}
-    }));
+    setSocketClient(this._workspace);
     Constants.setMondayClient(new mondayClient());
     Constants.MONDAY_CLIENT.getAllGraphs().then(function(res) {
       window.graphs = res;
-    }.bind(this));  
+    }.bind(this));
   }
   
   showTransitionNode(e) {
