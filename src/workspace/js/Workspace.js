@@ -54,7 +54,7 @@ class Workspace extends React.Component {
       imageButtonDisabled: true,
       newImageUrl: '',
 
-      currentGraphName: ''
+      storedGraphId: null
     };
 
     this.addNode = this.addNode.bind(this);
@@ -79,6 +79,9 @@ class Workspace extends React.Component {
     this.handleImageChange = this.handleImageChange.bind(this);
     this.changeImage = this.changeImage.bind(this);
     this.saveGraph = this.saveGraph.bind(this);
+    this.loadGraph = this.loadGraph.bind(this);
+    this.deleteGraph = this.deleteGraph.bind(this);
+    this.newGraph = this.newGraph.bind(this);
     
     this.widthInput = React.createRef();
     this.heightInput = React.createRef();
@@ -283,28 +286,66 @@ class Workspace extends React.Component {
   getGraphJson() {
     return {
       nodes: this.state.nodes.slice(),
-      settings: {
-        width: Constants.WORKSPACE_SETTINGS.getVerticalBoxes(),
-        height: Constants.WORKSPACE_SETTINGS.getHorizontalBoxes()
-      },
+      width: Constants.WORKSPACE_SETTINGS.getVerticalBoxes(),
+      height: Constants.WORKSPACE_SETTINGS.getHorizontalBoxes(),
       name: document.getElementById('graph-name').value.trim()
     };
   }
 
   saveGraph() {
     let graph = this.getGraphJson();
-    let renameNecessary = (graph.name !== this.state.currentGraphName && this.state.currentGraphName)
 
-    if (renameNecessary) {
-      console.log("RENAME NECESSARY", graph.name, this.state.currentGraphName)
+    if (graph.name === '') {
+      alert('Graph name must be non-empty.');
+      return;
     }
+    if (this.state.storedGraphId === null) {
+      Constants.MONDAY_CLIENT.createGraph(graph.name, graph.nodes, graph.width, graph.width).then((res) => {
+        if (!res.error) {
+          this.setState({ storedGraphId: res.graphId });
+          alert('Graph saved.')
+        } else {
+          alert(res.message);
+        }
+      })
+    } else {
+      Constants.MONDAY_CLIENT.editGraph(this.state.storedGraphId, graph.name, graph.nodes, graph.width, graph.height).then((res) => {
+        if (!res.error) {
+          alert('Graph saved.');
+        } else {
+          alert(res.message);
+        }
+      });
+    }
+  }
 
-    Constants.MONDAY_CLIENT.saveGraph(graph.name, graph).then(function(res) {
-      if (res.success) {
-        this.setState({ currentGraphName: graph.name });
+  loadGraph(graph) {
+    Constants.WORKSPACE_SETTINGS.setHorizontalBoxes(graph.width);
+    Constants.WORKSPACE_SETTINGS.setVerticalBoxes(graph.height);
+    document.getElementById('graph-name').value = graph.name;
+    this.setState({ nodes: graph.nodes, storedGraphId: graph.id });
+  }
+
+  deleteGraph(graph) {
+    Constants.MONDAY_CLIENT.deleteGraph(graph.id).then(function(res) {
+      if (!res.error) {
+        if (this.state.storedGraphId === graph.id) {
+          Constants.WORKSPACE_SETTINGS.setHorizontalBoxes(100);
+          Constants.WORKSPACE_SETTINGS.setVerticalBoxes(100);
+          document.getElementById('graph-name').value = '';
+          this.setState({ nodes: [], storedGraphId: null });      
+        }
+        window.graphs = res.graphs;
+        alert('Deleted graph successfully.')
       }
-      alert(res.message);
     }.bind(this));
+    // if (this.state.storedGraphId === graph.id) {
+      
+    // }
+  }
+
+  newGraph() {
+
   }
 
   toggleGrid() {
@@ -610,8 +651,10 @@ class Workspace extends React.Component {
           incZoom={this.incZoom}
           decZoom={this.decZoom}
           toggleGrid={this.toggleGrid} 
-          save={this.saveGraph}/>
-
+          save={this.saveGraph}
+          load={this.loadGraph}
+          delete={this.deleteGraph}
+          new={this.newGraph}/>
         {/* Render context menu for grid */}
         <ContextMenuTrigger id="gridContextMenu" holdToDisplay={-1}>
           <svg className="grid" viewBox={`0 0 ${Constants.WORKSPACE_SETTINGS.getHorizontalBoxes()} ${Constants.WORKSPACE_SETTINGS.getVerticalBoxes()}`}>

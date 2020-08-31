@@ -16,7 +16,7 @@ const server = createServer(app);
 attachSocketServer(server);
 
 mongoose.connect(
-  'mongodb+srv://'+ process.env.MONGO_DB_USER +':'+ process.env.MONGO_DB_PASS + "@cluster0.8meef.mongodb.net/test?retryWrites=true&w=majority'",
+  'mongodb+srv://'+ process.env.MONGO_DB_USER +':'+ process.env.MONGO_DB_PASS + "@cluster0.8meef.mongodb.net/test?retryWrites=true&w=majority",
   {
       auth: {
           user: process.env.MONGO_DB_USER,
@@ -27,8 +27,9 @@ mongoose.connect(
   function(err, client) {
       if (err) {
           console.log(err);
+      } else {
+        console.log('Connected to Mongo DB');
       }
-      console.log('Connected to Mongo DB');
   }
 );
 

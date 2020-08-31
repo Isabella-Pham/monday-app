@@ -29,7 +29,13 @@ class mondayClient {
             url: this.BASE_URL + path
         };
 
-        return await axios(options);
+        return await axios(options).then((res) => {
+            console.log("Axios response: ", res);
+            return res.data;
+        }).catch((err) => {
+            console.log("Axios error: ", err.response);
+            return err.response.data;
+        });
     }
 
     notifyServer(notification, params){
@@ -111,70 +117,82 @@ class mondayClient {
 
     //returns an array containing all graphs saved 
     async getAllGraphs() {
-        return await this.sendServerRequest('getAll', {});
+        let response = await this.sendServerRequest('getAll', {});
+        if (!response.error) {
+            console.log("NOT EMPTY", response.graphs);
+            return response.graphs
+        } else {
+            console.log("EMPTY");
+            return [];
+        }
     }
 
     //deletes all graphs saved
-    async deleteAllGraphs() {
-        const success = await this.monday.storage.instance.setItem("all_graphs", "null").then(res => {
-            return res["data"]["success"];
-        });
-        return success;
-    }
+    // async deleteAllGraphs() {
+    //     const success = await this.monday.storage.instance.setItem("all_graphs", "null").then(res => {
+    //         return res["data"]["success"];
+    //     });
+    //     return success;
+    // }
 
     //delete the graph by the name graphName
-    async deleteGraph(graphName) {
-        const success = await this.monday.storage.instance.getItem("all_graphs").then(res => {
-            console.log("Deleting graph ", graphName);
-            const data = res["data"];
-            var graphList = data["value"].split(",");
-            graphList.splice(graphList.indexOf(graphName), 1);
-            const graphListString = graphList.toString();
-            this.monday.storage.instance.setItem("all_graphs", graphListString);                
-            this.monday.storage.instance.setItem(graphName, "null");
-            this.notifyServer("delete", { "graphName": graphName });
-            return true; 
-        });
-        return success;
+    async deleteGraph(graphId) {
+        return await this.sendServerRequest('delete', {graphId: graphId});
+    }
+
+    async createGraph(graphName, nodes, width, height) {
+        return await this.sendServerRequest('create', {graphName: graphName, nodes: nodes, width: width, height: height})
+    }
+
+    async editGraph(graphId, graphName, nodes, width, height) {
+        let request = {
+            graphId: graphId,
+            graphName: graphName,
+            nodes: nodes,
+            width: width,
+            height: height
+        }
+
+        return await this.sendServerRequest('edit', request);
     }
 
     //returns true/false if a graph is successfully saved. Will save new graphs, if a graph already exists then graph will be updated
-    async saveGraph(graphName, graphJSON) {
-        const response = await this.monday.storage.instance.getItem("all_graphs").then(res => {
-            const data = res["data"];
-            var graphList = data["value"];
-            if (graphName.includes(",")) {
-                return { 
-                   message: "Invalid graph name, name must not contain any commas.",
-                   success: false
-                };
-            }
-            if (data["value"] == null || data["value"].toString().localeCompare("null") === 0) {
-                this.monday.storage.instance.setItem("all_graphs", graphName).then((res) => { console.log(res) });
-                return { 
-                    message: "Adding " + graphName + " as first graph of graph list.",
-                    success: true
-                 }; 
-            } else {
-                if (graphList.split(",").includes(graphName)) {
-                    console.log("Updating graph " + graphName);
-                } else {
-                    graphList = graphList + "," + graphName;
-                    console.log("Adding ", graphName, " to graph list");
-                    this.monday.storage.instance.setItem("all_graphs", graphList);
-                }
-                const graphJSONString = JSON.stringify(graphJSON);
-                this.monday.storage.instance.setItem(graphName, graphJSONString).then((res) => { console.log(res) });
-                this.notifyServer("save", { "graphName": graphName });
-                return { 
-                    message: "Graph saved.",
-                    success: true
-                 }; 
-            }
-        });
+    // async saveGraph(graphName, graphJSON) {
+    //     const response = await this.monday.storage.instance.getItem("all_graphs").then(res => {
+    //         const data = res["data"];
+    //         var graphList = data["value"];
+    //         if (graphName.includes(",")) {
+    //             return { 
+    //                message: "Invalid graph name, name must not contain any commas.",
+    //                success: false
+    //             };
+    //         }
+    //         if (data["value"] == null || data["value"].toString().localeCompare("null") === 0) {
+    //             this.monday.storage.instance.setItem("all_graphs", graphName).then((res) => { console.log(res) });
+    //             return { 
+    //                 message: "Adding " + graphName + " as first graph of graph list.",
+    //                 success: true
+    //              }; 
+    //         } else {
+    //             if (graphList.split(",").includes(graphName)) {
+    //                 console.log("Updating graph " + graphName);
+    //             } else {
+    //                 graphList = graphList + "," + graphName;
+    //                 console.log("Adding ", graphName, " to graph list");
+    //                 this.monday.storage.instance.setItem("all_graphs", graphList);
+    //             }
+    //             const graphJSONString = JSON.stringify(graphJSON);
+    //             this.monday.storage.instance.setItem(graphName, graphJSONString).then((res) => { console.log(res) });
+    //             this.notifyServer("save", { "graphName": graphName });
+    //             return { 
+    //                 message: "Graph saved.",
+    //                 success: true
+    //              }; 
+    //         }
+    //     });
         
-        return response;
-    }
+    //     return response;
+    // }
 
     //returns JSON data of graph
     async getGraph(graphName) {

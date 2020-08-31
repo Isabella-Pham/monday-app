@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const Team = require('./models/mondayTeam');
+const mongoose = require('mongoose');
 
 function getGraphId() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -17,6 +18,8 @@ function createNewGraph(req, res, next) {
     teamName,
     graphName,
     nodes,
+    width,
+    height
   } = req.body;
 
   if (!teamName || !graphName || !nodes) {
@@ -36,7 +39,9 @@ function createNewGraph(req, res, next) {
               graphs: [{
                 name: graphName,
                 nodes: nodes,
-                id: getGraphId()
+                id: getGraphId(),
+                width: width,
+                height: height
               }]
             });
 
@@ -63,13 +68,15 @@ function createNewGraph(req, res, next) {
                     graphs: {
                       name: graphName,
                       nodes: nodes,
-                      id: graphId
+                      id: graphId,
+                      width: width,
+                      height: height
                     }
                 }
               }
               team.update(updateOps)
                   .exec()
-                  .then(function(res) {
+                  .then(function(result) {
                       res.status(200).json({
                           error: false,
                           message: 'Added graph successfully',
@@ -124,10 +131,12 @@ function deleteGraph(req, res, next) {
             }
             team.update(updateOps)
                 .exec()
-                .then(function(res) {
+                .then(function(result) {
+                  console.log(team.graphs);
                     res.status(200).json({
                         error: false,
-                        message: 'Deleted graph successfully'
+                        message: 'Deleted graph successfully',
+                        graphs: team.graphs
                     });
                 })
                 .catch(function(err) {
@@ -151,10 +160,12 @@ function editGraph(req, res, next) {
     teamName,
     graphId,
     graphName,
-    nodes
+    nodes,
+    width,
+    height
   } = req.body;
 
-  if (!teamName || !graphId || (!graphName && !nodes)) {
+  if (!teamName || !graphId || !graphName || !nodes || !width || !height) {
       return res.status(500).json({
           error: true,
           message: 'Missing required fields'
@@ -176,20 +187,17 @@ function editGraph(req, res, next) {
             }
 
             let setOps = {
-              "$set": {}
-            }
-
-            if (graphName) {
-              setOps["$set"]["graphs.$.name"] = graphName
-            }
-
-            if (nodes) {
-              setOps["$set"]["graphs.$.nodes"] = nodes
+              "$set": {
+                "graphs.$.name": graphName,
+                "graphs.$.name": nodes,
+                "graphs.$.name": parseInt(width),
+                "graphs.$.name": parseInt(height),
+              }
             }
 
             team.update(updateOps, setOps)
                 .exec()
-                .then(function(res) {
+                .then(function(result) {
                     res.status(200).json({
                         error: false,
                         message: 'Updated graph successfully'

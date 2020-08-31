@@ -45,6 +45,9 @@ class App extends React.Component {
       params: {}
     }));
     Constants.setMondayClient(new mondayClient());
+    Constants.MONDAY_CLIENT.getAllGraphs().then(function(res) {
+      window.graphs = res;
+    }.bind(this));  
   }
   
   showTransitionNode(e) {

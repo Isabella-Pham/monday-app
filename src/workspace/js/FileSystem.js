@@ -28,15 +28,19 @@ class FileSystem extends React.Component {
   }
 
   loadGraph() {
-
+    if (this.state.selectedIndex >= 0) {
+      this.props.load(window.graphs[this.state.selectedIndex]);
+    }
   }
 
   deleteGraph() {
-
+    if (this.state.selectedIndex >= 0) {
+      this.props.delete(window.graphs[this.state.selectedIndex]);
+    }
   }
 
   newGraph() {
-    
+    this.props.new();
   }
 
   render() {
@@ -47,13 +51,13 @@ class FileSystem extends React.Component {
         </div>
         <div className="saved-graphs" onClick={this.handleSelection}>
           <ul className="graph-list">
-            {this.props.graphs.map((item, i) => {
+            {window.graphs ? window.graphs.map((item, i) => {
               return (
                 <li className={(this.state.selectedIndex === i) ? "selected" : ""} key={i} data-graph-index={i}>
-                  {item}
+                  {item.name}
                 </li>
               )
-            })}
+            }) : null }
           </ul>
         </div>
         <div className="file-options">
@@ -61,7 +65,7 @@ class FileSystem extends React.Component {
             <Button variant="outlined" className="file-buttons load" 
                     style={this.state.selectedIndex >= 0 ? {borderColor: "#007fff", color: "#007fff"} : {borderColor: "#878787", color: "#878787", opacity: 0.5}}
                     disabled={this.state.selectedIndex < 0}
-                    onclick={this.loadGraph}>
+                    onClick={this.loadGraph}>
               Load
             </Button>
             <Button variant="outlined" className="file-buttons load" 
