@@ -39,12 +39,12 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    Constants.setSocket(getSocketClient(3000));
+    Constants.setSocket(getSocketClient());
     Constants.SOCKET.send(JSON.stringify({
       notification: "hello",
       params: {}
     }));
-    Constants.setMondayClient(new mondayClient(3000));
+    Constants.setMondayClient(new mondayClient());
   }
   
   showTransitionNode(e) {

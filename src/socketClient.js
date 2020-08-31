@@ -1,7 +1,7 @@
 import io from "socket.io-client";
 
-export default function getSocketClient(port) {
-  let address = window.location.protocol + '//' + window.location.hostname + ':' + port;
+export default function getSocketClient() {
+  let address = window.location.protocol + '//' + window.location.host;
   let client = io(address);
   
   client.on('connect', function (connection) {

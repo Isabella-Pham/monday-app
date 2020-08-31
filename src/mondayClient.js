@@ -9,11 +9,11 @@ import axios from 'axios';
 */
 
 class mondayClient {
-    constructor(port) {
+    constructor() {
         this.monday = mondaySdk();
         // this.setAllGraphs();
         this.sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
-        this.BASE_URL = window.location.protocol + '//' + window.location.hostname + ':' + port + '/api/';
+        this.BASE_URL = window.location.protocol + '//' + window.location.host + '/api/';
         console.log(this.BASE_URL);
 
         this.team = "MondayWrkFlwApp";
