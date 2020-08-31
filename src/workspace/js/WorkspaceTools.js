@@ -12,11 +12,21 @@ class WorkplaceTools extends React.Component {
     super(props);
     this.state = {
       enabled: true,
-      fileSystemOpen: false
+      fileSystemOpen: false,
+      graphs: []
     }
 
     this.updateEnabled = this.updateEnabled.bind(this);
     this.toggleFileSystem = this.toggleFileSystem.bind(this);
+  }
+
+  componentDidMount() {
+    setTimeout(() => {
+      Constants.MONDAY_CLIENT.getAllGraphs().then(function(res) {
+        console.log(res);
+        this.setState({ graphs: res });
+      }.bind(this));  
+    }, 3000);
   }
 
   updateEnabled() {
@@ -61,7 +71,7 @@ class WorkplaceTools extends React.Component {
             icon={this.state.fileSystemOpen ? faFolderOpen : faFolder}
             size="lg" />
         </button>
-        <FileSystem open={this.state.fileSystemOpen} graphs={[{name: "Sprint Plan September 2020"}, {name: "Product Diagram 1"}, {name: "Distribution"}]}/>
+        <FileSystem open={this.state.fileSystemOpen} graphs={this.state.graphs}/>
       </div>
     );
   }

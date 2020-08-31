@@ -35,7 +35,7 @@ class FileSystem extends React.Component {
             {this.props.graphs.map((item, i) => {
               return (
                 <li className={(this.state.selectedIndex === i) ? "selected" : ""} key={i} data-graph-index={i}>
-                  {item.name}
+                  {item}
                 </li>
               )
             })}
