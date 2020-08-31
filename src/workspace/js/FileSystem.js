@@ -12,6 +12,9 @@ class FileSystem extends React.Component {
     }
 
     this.handleSelection = this.handleSelection.bind(this);
+    this.loadGraph = this.loadGraph.bind(this);
+    this.deleteGraph = this.deleteGraph.bind(this);
+    this.newGraph = this.newGraph.bind(this);
   }
 
   handleSelection(e) {
@@ -22,6 +25,18 @@ class FileSystem extends React.Component {
     } else {
       this.setState({ selectedIndex: -1 })
     }
+  }
+
+  loadGraph() {
+
+  }
+
+  deleteGraph() {
+
+  }
+
+  newGraph() {
+    
   }
 
   render() {
@@ -45,17 +60,19 @@ class FileSystem extends React.Component {
           <div className="option-group">
             <Button variant="outlined" className="file-buttons load" 
                     style={this.state.selectedIndex >= 0 ? {borderColor: "#007fff", color: "#007fff"} : {borderColor: "#878787", color: "#878787", opacity: 0.5}}
-                    disabled={this.state.selectedIndex < 0}>
+                    disabled={this.state.selectedIndex < 0}
+                    onclick={this.loadGraph}>
               Load
             </Button>
             <Button variant="outlined" className="file-buttons load" 
                     style={this.state.selectedIndex >= 0 ? {borderColor: "red", color: "red"} : {borderColor: "#878787", color: "#878787", opacity: 0.5}}
-                    disabled={this.state.selectedIndex < 0}>
+                    disabled={this.state.selectedIndex < 0}
+                    onClick={this.deleteGraph}>
               Delete
             </Button>
           </div>
           <div className="option-group">
-            <Button variant="outlined" className="file-buttons new" style={{ borderColor: "#16a800", color: "#16a800" }}>
+            <Button variant="outlined" className="file-buttons new" style={{ borderColor: "#16a800", color: "#16a800" }} onclick={this.newGraph}>
               New
             </Button>
           </div>

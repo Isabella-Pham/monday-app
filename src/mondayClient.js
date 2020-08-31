@@ -1,5 +1,6 @@
 import mondaySdk from "monday-sdk-js";
 import Constants from './constants/constants';
+import axios from 'axios';
 
 /*
  * To import write the following at the top of a file: import { mondayClient } from './mondayClient';
@@ -8,41 +9,27 @@ import Constants from './constants/constants';
 */
 
 class mondayClient {
-    constructor() {
+    constructor(port) {
         this.monday = mondaySdk();
-        this.setAllGraphs();
+        // this.setAllGraphs();
         this.sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+        this.BASE_URL = window.location.protocol + '//' + window.location.hostname + ':' + port + '/api/';
+        console.log(this.BASE_URL);
 
-        //connect to the server
-        /*var WebSocketClient = require('websocket').client;
-        var client = new WebSocketClient();
-        var hostname = 'ws://localhost:8080/';
-        client.on('connectFailed', function (error) {
-            console.log('Connect Error: ' + error.toString());
-        });
+        this.team = "MondayWrkFlwApp";
+    }
 
-        client.on('connect', function (connection) {
-            console.log('WebSocket Client Connected');
-            connection.on('error', function (error) {
-                console.log("Connection Error: " + error.toString());
-            });
-            connection.on('close', function () {
-                console.log('echo-protocol Connection Closed');
-            });
-            connection.on('message', function (message) {
-               const  messageJSON = JSON.parse(message);
-                var operation = messageJSON["notification"];
-                if (operation.toString().localeCompare("save") == 0) {
-                    //call get graph and display new graph
-                } else if (operation.toString().localeCompare("delete") == 0) {
-                    //undisplay the graph
-                } else if (operation.toString().localeCompare("rename") == 0) {
-                    //call get graph under the new graph name
-                }
-            });
-        });
-        //connect to server
-        client.connect(hostname, 'echo-protocol');*/
+    async sendServerRequest(path, data) {
+        data.teamName = this.team;
+
+        const options = {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            data: JSON.stringify(data),
+            url: this.BASE_URL + path
+        };
+
+        return await axios(options);
     }
 
     notifyServer(notification, params){
@@ -124,14 +111,7 @@ class mondayClient {
 
     //returns an array containing all graphs saved 
     async getAllGraphs() {
-        const allGraphs = await this.monday.storage.instance.getItem("all_graphs").then(res => {
-            var all = res["data"]["value"];
-            if (all != null) {
-                return all.split(",");
-            }
-            return [];
-        });
-        return allGraphs;
+        return await this.sendServerRequest('getAll', {});
     }
 
     //deletes all graphs saved
@@ -170,7 +150,7 @@ class mondayClient {
                 };
             }
             if (data["value"] == null || data["value"].toString().localeCompare("null") === 0) {
-                this.monday.storage.instance.setItem("all_graphs", graphName);
+                this.monday.storage.instance.setItem("all_graphs", graphName).then((res) => { console.log(res) });
                 return { 
                     message: "Adding " + graphName + " as first graph of graph list.",
                     success: true
@@ -184,7 +164,7 @@ class mondayClient {
                     this.monday.storage.instance.setItem("all_graphs", graphList);
                 }
                 const graphJSONString = JSON.stringify(graphJSON);
-                this.monday.storage.instance.setItem(graphName, graphJSONString);
+                this.monday.storage.instance.setItem(graphName, graphJSONString).then((res) => { console.log(res) });
                 this.notifyServer("save", { "graphName": graphName });
                 return { 
                     message: "Graph saved.",

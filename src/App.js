@@ -44,7 +44,7 @@ class App extends React.Component {
       notification: "hello",
       params: {}
     }));
-    Constants.setMondayClient(new mondayClient());
+    Constants.setMondayClient(new mondayClient(3000));
   }
   
   showTransitionNode(e) {
