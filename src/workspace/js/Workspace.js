@@ -52,7 +52,9 @@ class Workspace extends React.Component {
       // for changing image
       imageModalShow: false,
       imageButtonDisabled: true,
-      newImageUrl: ''
+      newImageUrl: '',
+
+      currentGraphName: ''
     };
 
     this.addNode = this.addNode.bind(this);
@@ -76,6 +78,7 @@ class Workspace extends React.Component {
     this.changeGrid = this.changeGrid.bind(this);
     this.handleImageChange = this.handleImageChange.bind(this);
     this.changeImage = this.changeImage.bind(this);
+    this.saveGraph = this.saveGraph.bind(this);
     
     this.widthInput = React.createRef();
     this.heightInput = React.createRef();
@@ -284,8 +287,24 @@ class Workspace extends React.Component {
         width: Constants.WORKSPACE_SETTINGS.getVerticalBoxes(),
         height: Constants.WORKSPACE_SETTINGS.getHorizontalBoxes()
       },
-      name: document.getElementById('graph-name').value
+      name: document.getElementById('graph-name').value.trim()
     };
+  }
+
+  saveGraph() {
+    let graph = this.getGraphJson();
+    let renameNecessary = (graph.name !== this.state.currentGraphName && this.state.currentGraphName)
+
+    if (renameNecessary) {
+      console.log("RENAME NECESSARY", graph.name, this.state.currentGraphName)
+    }
+
+    Constants.MONDAY_CLIENT.saveGraph(graph.name, graph).then(function(res) {
+      if (res.success) {
+        this.setState({ currentGraphName: graph.name });
+      }
+      alert(res.message);
+    }.bind(this));
   }
 
   toggleGrid() {
@@ -590,7 +609,8 @@ class Workspace extends React.Component {
         <WorkspaceTools
           incZoom={this.incZoom}
           decZoom={this.decZoom}
-          toggleGrid={this.toggleGrid} />
+          toggleGrid={this.toggleGrid} 
+          save={this.saveGraph}/>
 
         {/* Render context menu for grid */}
         <ContextMenuTrigger id="gridContextMenu" holdToDisplay={-1}>

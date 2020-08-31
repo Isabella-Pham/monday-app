@@ -1,4 +1,5 @@
 import mondaySdk from "monday-sdk-js";
+import Constants from './constants/constants';
 
 /*
  * To import write the following at the top of a file: import { mondayClient } from './mondayClient';
@@ -45,7 +46,7 @@ class mondayClient {
     }
 
     notifyServer(notification, params){
-        this.client.send({ "notification": notification, "params": params });
+        Constants.SOCKET.send({ "notification": notification, "params": params });
     }
 
     //used to delay the executation of code by a specified number of milliseconds
@@ -159,17 +160,21 @@ class mondayClient {
 
     //returns true/false if a graph is successfully saved. Will save new graphs, if a graph already exists then graph will be updated
     async saveGraph(graphName, graphJSON) {
-        const success = await this.monday.storage.instance.getItem("all_graphs").then(res => {
+        const response = await this.monday.storage.instance.getItem("all_graphs").then(res => {
             const data = res["data"];
             var graphList = data["value"];
             if (graphName.includes(",")) {
-                console.log("Invalid graph name, name must not contain any commmas");
-                return false;
+                return { 
+                   message: "Invalid graph name, name must not contain any commas.",
+                   success: false
+                };
             }
             if (data["value"] == null || data["value"].toString().localeCompare("null") === 0) {
                 this.monday.storage.instance.setItem("all_graphs", graphName);
-                console.log("Adding ", graphName, " as first graph of graph list");
-                return true;
+                return { 
+                    message: "Adding " + graphName + " as first graph of graph list.",
+                    success: true
+                 }; 
             } else {
                 if (graphList.split(",").includes(graphName)) {
                     console.log("Updating graph " + graphName);
@@ -181,10 +186,14 @@ class mondayClient {
                 const graphJSONString = JSON.stringify(graphJSON);
                 this.monday.storage.instance.setItem(graphName, graphJSONString);
                 this.notifyServer("save", { "graphName": graphName });
-                return true;            
+                return { 
+                    message: "Graph saved.",
+                    success: true
+                 }; 
             }
         });
-        return success;
+        
+        return response;
     }
 
     //returns JSON data of graph

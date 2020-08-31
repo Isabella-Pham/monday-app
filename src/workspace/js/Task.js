@@ -111,23 +111,9 @@ class Task extends React.Component {
           <div className='add-people'>
             <Autocomplete
               multiple={true}
-              options={[
-                {
-                  name: 'Goodfellas',
-                  email: 'robert.deniro@gmail.com',
-                  user_id: 'deezNuts'
-                }, 
-                {
-                  name: 'Good Will Hunting',
-                  email: 'matt.damon@gmail.com',
-                  user_id: 'deezBalls'
-                },
-                {
-                  name: 'The Godfather',
-                  email: 'matt.damon@gmail.com',
-                  user_id: 'f'
-                }
-              ]}
+              options={this.props.teammates.filter((value) => { 
+                return !this.props.people.map(item => item.id).includes(value.id);
+              })}
               getOptionSelected={(option, value) => option.name === value.name}
               getOptionLabel={(option) => option.name}
               freeSolo={false}
@@ -163,7 +149,7 @@ class Task extends React.Component {
           <div className="task-people">
             {this.props.people.map((item, i) => {
               return (
-                <div className="task-person" key={item.user_id} data-index={i}>
+                <div className="task-person" key={item.id} data-index={i}>
                   <span className="person-name">
                     {item.name}
                   </span>

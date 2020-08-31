@@ -53,7 +53,8 @@ class WorkplaceTools extends React.Component {
         <button className="grid-button save">
           <FontAwesomeIcon
             icon={faSave}
-            size="lg" />
+            size="lg" 
+            onClick={this.props.save}/>
         </button>
         <button className="grid-button folder" onClick={this.toggleFileSystem}>
           <FontAwesomeIcon

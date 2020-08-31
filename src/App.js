@@ -33,22 +33,17 @@ class App extends React.Component {
     };
 
     this._workspace = React.createRef();
-    this.socket = getSocketClient(3000);
     this.showTransitionNode = this.showTransitionNode.bind(this);
     this.hideTransitionNode = this.hideTransitionNode.bind(this);
     this.updateTransitionNode = this.updateTransitionNode.bind(this);
   }
 
   componentDidMount() {
-    this.socket.on('connect', function() {
-      this.socket.send(JSON.stringify({
-        notification: 'lets goooo',
-        params: {
-
-        },
-      }))
-    }.bind(this));
-
+    Constants.setSocket(getSocketClient(3000));
+    Constants.SOCKET.send(JSON.stringify({
+      notification: "hello",
+      params: {}
+    }));
     Constants.setMondayClient(new mondayClient());
   }
   

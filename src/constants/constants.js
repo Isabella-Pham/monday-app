@@ -1,5 +1,3 @@
-import { mondayClient } from "../mondayClient";
-
 const CURSOR_CENTERED = true;
 const ROUND_DECIMALS = 4;
 const MIN_MULTIPLIER = 0.25;
@@ -113,8 +111,17 @@ class WorkspaceSettings {
 class Constants {
   static WORKSPACE_SETTINGS = new WorkspaceSettings();
   static MONDAY_CLIENT = null;
+  static SOCKET = null;
 
-  static get mondayClient() {
+  static get SOCKET() {
+    return Constants.SOCKET;
+  }
+
+  static setSocket(socket) {
+    Constants.SOCKET = socket;
+  }
+
+  static get MONDAY_CLIENT() {
     return Constants.MONDAY_CLIENT;
   }
 
