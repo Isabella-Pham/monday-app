@@ -14,7 +14,6 @@ class mondayClient {
         // this.setAllGraphs();
         this.sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
         this.BASE_URL = window.location.protocol + '//' + window.location.host + '/api/';
-        console.log(this.BASE_URL);
 
         this.team = "MondayWrkFlwApp";
     }
@@ -54,14 +53,13 @@ class mondayClient {
         const teammates = await this.monday.api("{users{name,id,email,photo_original}}").then(res => {
             return res;
         });
-        return teammates["data"]["users"];
+        return teammates ? teammates["data"]["users"] : [];
     }
 
     //takes in the name of a user or their userID and returns all info about them. 
     //Be wary of trying to get info using someone's name if two people have the same exact name.
     async getUserInfo(name) {
         const teammates = await this.getTeammates().then(res => {
-            console.log(res);
             for (var i = 0; i < res.length; i++) {
                 var teammate = res[i];
                 if (teammate["name"].localeCompare(name) == 0) {
@@ -77,9 +75,9 @@ class mondayClient {
 
     async getAllTasks() {
         const tasks = await this.monday.api("{items {name, id, updated_at, subscribers {name, id}}}").then(res => {
-            return res["data"]["items"];
+            return res;
         });
-        return tasks;
+        return tasks ? tasks["data"]["items"] : [];
     }
 
     async createTask(taskName, listOfUsers) {

@@ -31,7 +31,8 @@ class Task extends React.Component {
     super(props);
 
     this.state = {
-      selectedPeople: []
+      selectedPeople: [],
+      currentTitle: this.props.title
     }
 
     this.updateTitle = this.updateTitle.bind(this);
@@ -41,8 +42,18 @@ class Task extends React.Component {
     this.removePerson = this.removePerson.bind(this);
   }
 
-  updateTitle(e) {
-    this.props.editTask(this.props.index, { title: e.target.value });
+  updateTitle(e, value) {
+    e.stopPropagation();
+    
+    if (!value) {
+      value = {
+        name: ''
+      }
+    }
+
+    let title = value.name ? value.name : value 
+    this.props.editTask(this.props.index, { title: title });
+    this.setState({ currentTitle: title });
   }
 
   updateIsCompleted(e) {
@@ -95,16 +106,27 @@ class Task extends React.Component {
               onFocus={(event) => event.stopPropagation()}    
             />
           </div>
-          <TextField 
-            fullWidth={true} 
-            variant="outlined"
-            label="Task Description"
-            multiline={false} 
+          <Autocomplete
+            multiple={false}
+            freeSolo={true}
+            options={this.props.tasks}
+            getOptionSelected={(option, value) => option.name === value.name || (option.name === value)}
+            getOptionLabel={(option) => option.name}
+            fullWidth={true}
             onChange={this.updateTitle}
-            onClick={(event) => event.stopPropagation()} 
-            onFocus={(event) => event.stopPropagation()}
-            value={this.props.title}
-          />
+            value={{
+              name: this.state.currentTitle
+            }}
+            renderInput={(params) => <TextField {...params}
+              label="Task Description"
+              variant="outlined"
+              onClick={(event) => event.stopPropagation()} 
+              onFocus={(event) => event.stopPropagation()}  
+              InputProps={{
+                ...params.InputProps,
+              }}
+              />}
+            />
         </AccordionSummary>
         <AccordionDetails>
         <div className='task-details'>
