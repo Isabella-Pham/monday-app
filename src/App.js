@@ -33,7 +33,7 @@ class App extends React.Component {
     };
 
     this._workspace = React.createRef();
-    this.socket = getSocketClient(3001);
+    this.socket = getSocketClient(3000);
     this.showTransitionNode = this.showTransitionNode.bind(this);
     this.hideTransitionNode = this.hideTransitionNode.bind(this);
     this.updateTransitionNode = this.updateTransitionNode.bind(this);

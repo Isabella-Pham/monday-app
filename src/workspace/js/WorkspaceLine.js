@@ -39,25 +39,18 @@ class WorkspaceLine extends React.Component {
       }
     }
 
-    let bindFunctions = [
-      this.handleClick,
-      this.moveNode,
-      this.placeNode,
-      this.deleteSelf,
-      this.duplicateSelf,
-      this.getRealDimensions,
-      this.dummyMethod,
-      this.copyNode,
-      this.cutNode,
-      this.moveToBack,
-      this.moveToFront,
-      this.colorChange,
-      this.flipLine
-    ];
-
-    for (let func of bindFunctions) {
-      this[func.name] = this[func.name].bind(this);
-    }
+    this.handleClick = this.handleClick.bind(this);
+    this.moveNode = this.moveNode.bind(this);
+    this.placeNode = this.placeNode.bind(this);
+    this.deleteSelf = this.deleteSelf.bind(this);
+    this.duplicateSelf = this.duplicateSelf.bind(this);
+    this.getRealDimensions = this.getRealDimensions.bind(this);
+    this.copyNode = this.copyNode.bind(this);
+    this.cutNode = this.cutNode.bind(this);
+    this.moveToBack = this.moveToBack.bind(this);
+    this.moveToFront = this.moveToFront.bind(this);
+    this.colorChange = this.colorChange.bind(this);
+    this.flipLine = this.flipLine.bind(this);    
   }
 
   static getDefault(x, y, type) {
@@ -288,10 +281,6 @@ class WorkspaceLine extends React.Component {
   cutNode() {
     this.props.copySelf(this.props.index);
     this.props.onDelete(this.props.index);
-  }
-
-  dummyMethod() {
-    console.log("Dummy method");
   }
 
   colorChange() {

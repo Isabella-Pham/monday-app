@@ -17,16 +17,10 @@ class TaskPopup extends React.Component {
       show: false,
     }
 
-    let bindFunctions = [
-      this.displaySelf,
-      this.createTask,
-      this.editTask,
-      this.deleteTask
-    ];
-
-    for (let func of bindFunctions) {
-      this[func.name] = this[func.name].bind(this);
-    }
+    this.displaySelf = this.displaySelf.bind(this);
+    this.createTask = this.createTask.bind(this);
+    this.editTask = this.editTask.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
   }
 
   displaySelf() {

@@ -1,5 +1,5 @@
-const PORT = process.env.SOCK_PORT || 3001;
-var wsServer = require('socket.io')();
+const PORT = process.env.SOCK_PORT || 3000;
+const socketIO = require('socket.io');
 var graphViewers = {};
 var clients = [];
 
@@ -15,7 +15,9 @@ function originIsAllowed(origin) {
   return true;
 }
 
-wsServer.on('connection', function (ws) {
+module.exports = function(server) {
+  var wsServer = socketIO(server);
+  wsServer.on('connection', function (ws) {
     id = Math.random();
     console.log("connection is established: " + id);
     clients[id] = ws;
@@ -51,4 +53,5 @@ wsServer.on('connection', function (ws) {
     ws.on('close', function (reasonCode, description) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
-});
+  });
+}

@@ -55,34 +55,28 @@ class Workspace extends React.Component {
       newImageUrl: ''
     };
 
-    let bindFunctions = [
-      this.addNode,
-      this.drawWorkspace,
-      this.deleteNode,
-      this.duplicateNode,
-      this.shiftNode,
-      this.updateNode,
-      this.incZoom,
-      this.decZoom,
-      this.removeGrid,
-      this.toggleGrid,
-      this.storeCopiedNode,
-      this.contextChange,
-      this.changeColor,
-      this.changeText,
-      this.dummyMethod,
-      this.pasteNode,
-      this.handleTextChange,
-      this.handleGridChange,
-      this.changeGrid,
-      this.handleImageChange,
-      this.changeImage
-    ];
-
-    for (let func of bindFunctions) {
-      this[func.name] = this[func.name].bind(this);
-    }
-
+    this.addNode = this.addNode.bind(this);
+    this.drawWorkspace = this.drawWorkspace.bind(this);
+    this.deleteNode = this.deleteNode.bind(this);
+    this.duplicateNode = this.duplicateNode.bind(this);
+    this.shiftNode = this.shiftNode.bind(this);
+    this.updateNode = this.updateNode.bind(this);
+    this.incZoom = this.incZoom.bind(this);
+    this.decZoom = this.decZoom.bind(this);
+    this.removeGrid = this.removeGrid.bind(this);
+    this.toggleGrid = this.toggleGrid.bind(this);
+    this.storeCopiedNode = this.storeCopiedNode.bind(this);
+    this.contextChange = this.contextChange.bind(this);
+    this.changeColor = this.changeColor.bind(this);
+    this.changeText = this.changeText.bind(this);
+    this.dummyMethod = this.dummyMethod.bind(this);
+    this.pasteNode = this.pasteNode.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
+    this.handleGridChange = this.handleGridChange.bind(this);
+    this.changeGrid = this.changeGrid.bind(this);
+    this.handleImageChange = this.handleImageChange.bind(this);
+    this.changeImage = this.changeImage.bind(this);
+    
     this.widthInput = React.createRef();
     this.heightInput = React.createRef();
 

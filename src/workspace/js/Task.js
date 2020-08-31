@@ -34,17 +34,11 @@ class Task extends React.Component {
       selectedPeople: []
     }
 
-    let bindFunctions = [
-      this.updateTitle,
-      this.updateIsCompleted,
-      this.deleteSelf,
-      this.addPeople,
-      this.removePerson
-    ];
-
-    for (let func of bindFunctions) {
-      this[func.name] = this[func.name].bind(this);
-    }
+    this.updateTitle = this.updateTitle.bind(this);
+    this.updateIsCompleted = this.updateIsCompleted.bind(this);
+    this.deleteSelf = this.deleteSelf.bind(this);
+    this.addPeople = this.addPeople.bind(this);
+    this.removePerson = this.removePerson.bind(this);
   }
 
   updateTitle(e) {
