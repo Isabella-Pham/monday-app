@@ -11,7 +11,6 @@ import axios from 'axios';
 class mondayClient {
     constructor() {
         this.monday = mondaySdk();
-        // this.setAllGraphs();
         this.sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
         this.BASE_URL = window.location.protocol + '//' + window.location.host + '/api/';
 
@@ -30,23 +29,11 @@ class mondayClient {
         };
 
         return await axios(options).then((res) => {
-            console.log("Axios response: ", res);
             return res.data;
         }).catch((err) => {
-            console.log("Axios error: ", err.response);
             return err.response.data;
         });
     }
-
-    notifyServer(notification, params){
-        Constants.SOCKET.send({ "notification": notification, "params": params });
-    }
-
-    //used to delay the executation of code by a specified number of milliseconds
-    /*sleep(milliseconds) {
-        //change to settimeout
-        setTimeout
-    }*/
 
     //returns JSON array containing each user on the team and their name, email, and url to their photo
     async getTeammates() {
@@ -56,7 +43,7 @@ class mondayClient {
         return teammates ? teammates["data"]["users"] : [];
     }
 
-    //takes in the name of a user or their userID and returns all info about them. 
+    //Takes in the name of a user or their userID and returns all info about them. 
     //Be wary of trying to get info using someone's name if two people have the same exact name.
     async getUserInfo(name) {
         const teammates = await this.getTeammates().then(res => {
@@ -84,6 +71,9 @@ class mondayClient {
         const boardID = await this.monday.api("{boards{id}}").then(res => {
             return res["data"]["boards"][0]["id"];
         });
+
+        console.log("Board ID", boardID);
+
         const taskID = await this.monday.api(`
             mutation{
                 create_item(
@@ -96,6 +86,9 @@ class mondayClient {
         `).then(res => {
             return res["data"]["create_item"]["id"];
         });
+
+        console.log("Task ID", taskID);
+
         for (var i = 0; i < listOfUsers.length; i++) {
             var user_id = listOfUsers[i];
             const notif = await this.monday.api(`
@@ -111,6 +104,7 @@ class mondayClient {
                 }
               }
             `)
+            console.log("Notification created.")
         }
     }
 
@@ -123,14 +117,6 @@ class mondayClient {
             return [];
         }
     }
-
-    //deletes all graphs saved
-    // async deleteAllGraphs() {
-    //     const success = await this.monday.storage.instance.setItem("all_graphs", "null").then(res => {
-    //         return res["data"]["success"];
-    //     });
-    //     return success;
-    // }
 
     //delete the graph by the name graphName
     async deleteGraph(graphId) {
@@ -151,86 +137,6 @@ class mondayClient {
         }
 
         return await this.sendServerRequest('edit', request);
-    }
-
-    //returns true/false if a graph is successfully saved. Will save new graphs, if a graph already exists then graph will be updated
-    // async saveGraph(graphName, graphJSON) {
-    //     const response = await this.monday.storage.instance.getItem("all_graphs").then(res => {
-    //         const data = res["data"];
-    //         var graphList = data["value"];
-    //         if (graphName.includes(",")) {
-    //             return { 
-    //                message: "Invalid graph name, name must not contain any commas.",
-    //                success: false
-    //             };
-    //         }
-    //         if (data["value"] == null || data["value"].toString().localeCompare("null") === 0) {
-    //             this.monday.storage.instance.setItem("all_graphs", graphName).then((res) => { console.log(res) });
-    //             return { 
-    //                 message: "Adding " + graphName + " as first graph of graph list.",
-    //                 success: true
-    //              }; 
-    //         } else {
-    //             if (graphList.split(",").includes(graphName)) {
-    //                 console.log("Updating graph " + graphName);
-    //             } else {
-    //                 graphList = graphList + "," + graphName;
-    //                 console.log("Adding ", graphName, " to graph list");
-    //                 this.monday.storage.instance.setItem("all_graphs", graphList);
-    //             }
-    //             const graphJSONString = JSON.stringify(graphJSON);
-    //             this.monday.storage.instance.setItem(graphName, graphJSONString).then((res) => { console.log(res) });
-    //             this.notifyServer("save", { "graphName": graphName });
-    //             return { 
-    //                 message: "Graph saved.",
-    //                 success: true
-    //              }; 
-    //         }
-    //     });
-        
-    //     return response;
-    // }
-
-    //returns JSON data of graph
-    async getGraph(graphName) {
-        const graphJSON = await this.monday.storage.instance.getItem(graphName).then(res => {
-            const graph = (res["data"]["value"]);
-            return graph;
-        });
-        this.notifyServer("load", { "graphName": graphName });
-        return JSON.parse(graphJSON);
-    }
-
-    async renameGraph(oldName, newName){
-        const graphJSON = this.getGraph(oldName);
-        this.saveGraph(newName, graphJSON);
-        await this.sleep(10000);
-        this.deleteGraph(oldName);
-        this.notifyServer("rename", { "oldName": oldName, "newName": newName });
-    }
-
-    //checks if there is a graph by the name of graphName
-    async containsGraph(graphName) {
-        const contains = await this.monday.storage.instance.getItem(graphName).then(res => {
-            if (res["data"] == null || !res["data"]["success"]){
-                return false;
-            } else {
-                return true;
-            }
-        });
-        return contains;
-    }
-
-    async setAllGraphs() {
-        const success = await this.containsGraph("all_graphs").then(res => {
-            if (res === false) {
-                this.monday.storage.instance.setItem("all_graphs", "null");
-                return true;
-            } else {
-                return true;
-            }
-        });
-        return success;
     }
 }
 

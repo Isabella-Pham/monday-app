@@ -43,8 +43,11 @@ class Task extends React.Component {
   }
 
   updateTitle(e, value) {
-    e.stopPropagation();
-    
+    if (e) {
+      console.log("E exists")
+      e.stopPropagation();
+    }
+
     if (!value) {
       value = {
         name: ''
@@ -110,10 +113,12 @@ class Task extends React.Component {
             multiple={false}
             freeSolo={true}
             options={this.props.tasks}
+            onChange={this.updateTitle}
+            onInputChange={this.updateTitle}
+            
             getOptionSelected={(option, value) => option.name === value.name || (option.name === value)}
             getOptionLabel={(option) => option.name}
             fullWidth={true}
-            onChange={this.updateTitle}
             value={{
               name: this.state.currentTitle
             }}

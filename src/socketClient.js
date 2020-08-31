@@ -5,8 +5,6 @@ export default function setSocketClient(workspaceRef) {
   if (Constants.SOCKET) {
       return;
   }
-  
-  console.log("SETTING SOCKET CLIENT");
 
   let address = window.location.protocol + '//' + window.location.host;
   let client = io(address);

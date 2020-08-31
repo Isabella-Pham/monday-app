@@ -19,6 +19,8 @@ import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
 import SketchPicker from 'react-color';
 import '../styles/material-ui.css';
 
@@ -54,6 +56,10 @@ class Workspace extends React.Component {
       imageButtonDisabled: true,
       newImageUrl: '',
 
+      showAlert: false,
+      alertMessage: '',
+      alertSeverity: '',
+
       storedGraphId: null
     };
 
@@ -71,7 +77,6 @@ class Workspace extends React.Component {
     this.contextChange = this.contextChange.bind(this);
     this.changeColor = this.changeColor.bind(this);
     this.changeText = this.changeText.bind(this);
-    this.dummyMethod = this.dummyMethod.bind(this);
     this.pasteNode = this.pasteNode.bind(this);
     this.handleTextChange = this.handleTextChange.bind(this);
     this.handleGridChange = this.handleGridChange.bind(this);
@@ -85,6 +90,8 @@ class Workspace extends React.Component {
     this.resetGraph = this.resetGraph.bind(this);
     this.updateCurrentGraph = this.updateCurrentGraph.bind(this);
     this.updateAfterDeletion = this.updateAfterDeletion.bind(this);
+    this.showAlert = this.showAlert.bind(this);
+    this.handleAlertClose = this.handleAlertClose.bind(this);
     
     this.widthInput = React.createRef();
     this.heightInput = React.createRef();
@@ -302,7 +309,7 @@ class Workspace extends React.Component {
 
     this.loadGraph(graph);
 
-    alert('The graph you are editing has been updated by another user.');
+    this.showAlert('The graph you are editing has been updated by another user.', 'info');
 
     return true;
   }
@@ -314,36 +321,52 @@ class Workspace extends React.Component {
 
     this.resetGraph();
 
-    alert('The graph you are editing on has been deleted by another user.');
+    this.showAlert('The graph you are editing on has been deleted by another user.', 'info');
 
     return true;
+  }
+
+  notifyPeople(nodes) {
+    for (let node of nodes) {
+      for (let task of node.tasks) {
+        let userIds = task.people.filter((item) => !item.hasBeenNotified ).map((item) => item.id);
+        Constants.MONDAY_CLIENT.createTask(task.title, userIds).then(() => {
+          console.log("Sent notifications");
+        });
+      }
+    }
   }
 
   saveGraph() {
     let graph = this.getGraphJson();
 
+    console.log(graph.nodes);
+
     if (graph.name === '') {
-      alert('Graph name must be non-empty.');
+      this.showAlert('Graph name must be non-empty.', 'warning');
       return;
     }
+
     if (this.state.storedGraphId === null) {
       Constants.MONDAY_CLIENT.createGraph(graph.name, graph.nodes, graph.width, graph.width).then((res) => {
         if (!res.error) {
+          this.notifyPeople(graph.nodes);
           window.graphs = res.graphs;
-          this.setState({ storedGraphId: res.graph.id });
-          alert('Graph saved.')
+          this.setState({ storedGraphId: res.graph.id, nodes: res.graph.nodes });
+          this.showAlert('Graph saved.', 'success');
         } else {
-          alert(res.message);
+          this.showAlert(res.message, 'warning');
         }
       })
     } else {
       Constants.MONDAY_CLIENT.editGraph(this.state.storedGraphId, graph.name, graph.nodes, graph.width, graph.height).then((res) => {
         if (!res.error) {
+          this.notifyPeople(graph.nodes);
           window.graphs = res.graphs;
-          this.forceUpdate();
-          alert('Graph saved.');
+          this.setState({ nodes: res.graph.nodes });
+          this.showAlert('Graph saved.', 'success');
         } else {
-          alert(res.message);
+          this.showAlert(res.message, 'warning');
         }
       });
     }
@@ -354,6 +377,8 @@ class Workspace extends React.Component {
     Constants.WORKSPACE_SETTINGS.setVerticalBoxes(graph.height);
     document.getElementById('graph-name').value = graph.name;
     this.setState({ nodes: graph.nodes, storedGraphId: graph.id });
+
+    this.showAlert('Loaded successfully.', 'success');
   }
 
   resetGraph() {
@@ -371,7 +396,7 @@ class Workspace extends React.Component {
         }
         window.graphs = res.graphs;
         this.forceUpdate();
-        alert('Deleted graph successfully.')
+        this.showAlert('Deleted graph successfully.', 'success')
       }
     }.bind(this));
   }
@@ -381,11 +406,19 @@ class Workspace extends React.Component {
       if (!res.error) {
         window.graphs = res.graphs;
         this.loadGraph(res.graph);
-        alert('New graph created.')
+        this.showAlert('New graph created.', 'success')
       } else {
-        alert(res.message);
+        this.showAlert(res.message, 'warning');
       }
     });
+  }
+
+  showAlert(message, severity) {
+    this.setState({ showAlert: true, alertMessage: message, alertSeverity: severity });
+  }
+
+  handleAlertClose() {
+    this.setState({ showAlert: false });
   }
 
   toggleGrid() {
@@ -402,10 +435,6 @@ class Workspace extends React.Component {
     this.setState({
       copiedNode: Object.assign({}, this.state.nodes[index])
     });
-  }
-
-  dummyMethod() {
-    console.log('Dummy method');
   }
 
   pasteNode(e) {
@@ -657,7 +686,7 @@ class Workspace extends React.Component {
           let defaultDimensions = WorkspaceImage.getDefaultDimensions(w, h);
           if (defaultDimensions.width > Constants.WORKSPACE_SETTINGS.getHorizontalBoxes() || 
             defaultDimensions.height > Constants.WORKSPACE_SETTINGS.getVerticalBoxes()) {
-            alert(`Image is too big for grid. Please expand grid to at least ${defaultDimensions.width} x ${defaultDimensions.height}`);
+            this.showAlert(`Image is too big for grid. Please expand grid to at least ${defaultDimensions.width} x ${defaultDimensions.height}`, 'warning');
           }
           else {
             let adjustedCord = Constants.getAdjustedCoord(
@@ -678,7 +707,7 @@ class Workspace extends React.Component {
         });
       }
       else {
-        alert('Could not load image!');
+        this.showAlert('Could not load image!', 'warning');
       }
     });
   }
@@ -868,6 +897,11 @@ class Workspace extends React.Component {
             return <WorkspaceNode {...componentProps} />
           }
         })}
+        <Snackbar open={this.state.showAlert} autoHideDuration={3000} onClose={this.handleAlertClose}>
+          <Alert onClose={this.handleAlertClose} severity={this.state.alertSeverity}>
+            {this.state.alertMessage}
+          </Alert>
+        </Snackbar>
       </div>
     );
   }

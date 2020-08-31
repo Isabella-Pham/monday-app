@@ -14,7 +14,7 @@ module.exports.attachSocketServer = function(server) {
   var wsServer = socketIO(server);
   wsServer.on('connect', function (ws) {
     const id = Math.random();
-    console.log("connection is established: " + id);
+    console.log("Connection is established: " + id);
     clients.push({
       socket: ws,
       id: id

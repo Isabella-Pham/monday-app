@@ -25,7 +25,11 @@ class TaskPopup extends React.Component {
     this.teammates = [];
 
     Constants.MONDAY_CLIENT.getTeammates().then(function(res) {
-      this.teammates = res;
+      this.teammates = res.map((item) => {
+        item.hasBeenNotified = false;
+        
+        return item;
+      });
     }.bind(this));
 
     this.tasks = [];

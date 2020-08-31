@@ -64,10 +64,20 @@ function createNewGraph(req, res, next) {
             team
               .save()
               .then(function(result) {
+                let graph = result.graphs[0];
+
+                for (let i = 0; i < graph.nodes.length; i++) {
+                  for (let j = 0; j < graph.nodes[i].tasks.length; j++) {
+                    for (let k = 0; k < graph.nodes[i].tasks[j].people.length; k++) {
+                      graph.nodes[i].tasks[j].people[k].hasBeenNotified = true;
+                    }
+                  }
+                }
+
                 res.status(200).json({
                   error: false,
                   message: "Added graph successfully",
-                  graph: result.graphs[0],
+                  graph: graph,
                   graphs: result.graphs
                 })
               })
@@ -79,10 +89,20 @@ function createNewGraph(req, res, next) {
               })
           }
           else {
+            let graph = team.graphs[team.graphs.length - 1];
+
+            for (let i = 0; i < graph.nodes.length; i++) {
+              for (let j = 0; j < graph.nodes[i].tasks.length; j++) {
+                for (let k = 0; k < graph.nodes[i].tasks[j].people.length; k++) {
+                  graph.nodes[i].tasks[j].people[k].hasBeenNotified = true;
+                }
+              }
+            }
+
             res.status(200).json({
               error: false,
               message: 'Added graph successfully',
-              graph: team.graphs[team.graphs.length - 1],
+              graph: graph,
               graphs: team.graphs
             });
 
@@ -171,8 +191,6 @@ function editGraph(req, res, next) {
       });
   }
 
-  console.log(graphId, teamName, graphName, nodes, width, height);
-
   let setOps = {
     "$set": {
       "graphs.$.name": graphName,
@@ -192,16 +210,27 @@ function editGraph(req, res, next) {
             })
           }
           else {
+            let graph = team.graphs.find((graph) => graph.id === graphId);
+
+            for (let i = 0; i < graph.nodes.length; i++) {
+              for (let j = 0; j < graph.nodes[i].tasks.length; j++) {
+                for (let k = 0; k < graph.nodes[i].tasks[j].people.length; k++) {
+                  graph.nodes[i].tasks[j].people[k].hasBeenNotified = true;
+                }
+              }
+            }
+            
             res.status(200).json({
               error: false,
               message: 'Updated graph successfully',
-              graphs: team.graphs
+              graphs: team.graphs,
+              graph: graph
             });
 
             sendMessageToClients(JSON.stringify({
               message: 'update',
               graphs: team.graphs,
-              graph: team.graphs.find((graph) => graph.id === graphId)
+              graph: graph
             }), clientId);
           }
       })

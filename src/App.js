@@ -104,9 +104,6 @@ class App extends React.Component {
           }
           this._workspace.current.addNode(nodeAttrs);
         }
-        else {
-          console.log('Out of grid');
-        }
       });
     }
   }
