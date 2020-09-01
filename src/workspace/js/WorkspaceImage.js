@@ -60,6 +60,9 @@ class WorkspaceImage extends React.Component {
 
     if (this.props.attributes.isOriginal) {
       this.imageChange();
+      this.props.updateSelf(this.props.index, {
+        isOriginal: false
+      })
     }
   }
 
