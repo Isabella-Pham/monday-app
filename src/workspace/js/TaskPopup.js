@@ -31,12 +31,6 @@ class TaskPopup extends React.Component {
         return item;
       });
     }.bind(this));
-
-    this.tasks = [];
-
-    Constants.MONDAY_CLIENT.getAllTasks().then(function(res) {
-      this.tasks = res;
-    }.bind(this));
   }
 
   displaySelf() {
@@ -105,7 +99,6 @@ class TaskPopup extends React.Component {
                              teammates={this.teammates}
                              editTask={this.editTask}
                              deleteTask={this.deleteTask}
-                             tasks={this.tasks}
                         />
               })}
             </div>

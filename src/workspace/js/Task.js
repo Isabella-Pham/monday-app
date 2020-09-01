@@ -32,7 +32,6 @@ class Task extends React.Component {
 
     this.state = {
       selectedPeople: [],
-      currentTitle: this.props.title
     }
 
     this.updateTitle = this.updateTitle.bind(this);
@@ -42,21 +41,8 @@ class Task extends React.Component {
     this.removePerson = this.removePerson.bind(this);
   }
 
-  updateTitle(e, value) {
-    if (e) {
-      console.log("E exists")
-      e.stopPropagation();
-    }
-
-    if (!value) {
-      value = {
-        name: ''
-      }
-    }
-
-    let title = value.name ? value.name : value 
-    this.props.editTask(this.props.index, { title: title });
-    this.setState({ currentTitle: title });
+  updateTitle(e) {
+    this.props.editTask(this.props.index, { title: e.target.value });
   }
 
   updateIsCompleted(e) {
@@ -109,29 +95,16 @@ class Task extends React.Component {
               onFocus={(event) => event.stopPropagation()}    
             />
           </div>
-          <Autocomplete
-            multiple={false}
-            freeSolo={true}
-            options={this.props.tasks}
+          <TextField 
+            fullWidth={true} 
+            variant="outlined"
+            label="Task Description"
+            multiline={false} 
             onChange={this.updateTitle}
-            onInputChange={this.updateTitle}
-            
-            getOptionSelected={(option, value) => option.name === value.name || (option.name === value)}
-            getOptionLabel={(option) => option.name}
-            fullWidth={true}
-            value={{
-              name: this.state.currentTitle
-            }}
-            renderInput={(params) => <TextField {...params}
-              label="Task Description"
-              variant="outlined"
-              onClick={(event) => event.stopPropagation()} 
-              onFocus={(event) => event.stopPropagation()}  
-              InputProps={{
-                ...params.InputProps,
-              }}
-              />}
-            />
+            onClick={(event) => event.stopPropagation()} 
+            onFocus={(event) => event.stopPropagation()}
+            value={this.props.title}
+          />
         </AccordionSummary>
         <AccordionDetails>
         <div className='task-details'>
@@ -141,7 +114,7 @@ class Task extends React.Component {
               options={this.props.teammates.filter((value) => { 
                 return !this.props.people.map(item => item.id).includes(value.id);
               })}
-              getOptionSelected={(option, value) => option.name === value.name}
+              getOptionSelected={(option, value) => option.id === value.id}
               getOptionLabel={(option) => option.name}
               freeSolo={false}
               fullWidth={true}
