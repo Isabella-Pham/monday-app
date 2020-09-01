@@ -68,11 +68,11 @@ class WorkplaceTools extends React.Component {
             icon={faBorderAll}
             size="lg" />
         </button>
-        <button className="grid-button save">
+        <button className="grid-button save" onClick={this.props.save}>
           <FontAwesomeIcon
             icon={faSave}
             size="lg" 
-            onClick={this.props.save}/>
+            />
         </button>
         <button className="grid-button folder" onClick={this.toggleFileSystem}>
           <FontAwesomeIcon
