@@ -67,12 +67,11 @@ function createNewGraph(req, res, next) {
                 let graph = result.graphs[0];
 
                 for (let i = 0; i < graph.nodes.length; i++) {
-                  if (!graph.nodes[i].tasks) {
-                    continue;
-                  }    
-                  for (let j = 0; j < graph.nodes[i].tasks.length; j++) {
-                    for (let k = 0; k < graph.nodes[i].tasks[j].people.length; k++) {
-                      graph.nodes[i].tasks[j].people[k].hasBeenNotified = true;
+                  if (graph.nodes[i].tasks) {
+                    for (let j = 0; j < graph.nodes[i].tasks.length; j++) {
+                      for (let k = 0; k < graph.nodes[i].tasks[j].people.length; k++) {
+                        graph.nodes[i].tasks[j].people[k].hasBeenNotified = true;
+                      }
                     }
                   }
                 }
@@ -95,12 +94,11 @@ function createNewGraph(req, res, next) {
             let graph = team.graphs[team.graphs.length - 1];
 
             for (let i = 0; i < graph.nodes.length; i++) {
-              if (!graph.nodes[i].tasks) {
-                continue;
-              }
-              for (let j = 0; j < graph.nodes[i].tasks.length; j++) {
-                for (let k = 0; k < graph.nodes[i].tasks[j].people.length; k++) {
-                  graph.nodes[i].tasks[j].people[k].hasBeenNotified = true;
+              if (graph.nodes[i].tasks) {
+                for (let j = 0; j < graph.nodes[i].tasks.length; j++) {
+                  for (let k = 0; k < graph.nodes[i].tasks[j].people.length; k++) {
+                    graph.nodes[i].tasks[j].people[k].hasBeenNotified = true;
+                  }
                 }
               }
             }
@@ -219,12 +217,11 @@ function editGraph(req, res, next) {
             let graph = team.graphs.find((graph) => graph.id === graphId);
 
             for (let i = 0; i < graph.nodes.length; i++) {
-              if (!graph.nodes[i].tasks) {
-                continue;
-              }
-              for (let j = 0; j < graph.nodes[i].tasks.length; j++) {
-                for (let k = 0; k < graph.nodes[i].tasks[j].people.length; k++) {
-                  graph.nodes[i].tasks[j].people[k].hasBeenNotified = true;
+              if (graph.nodes[i].tasks) {
+                for (let j = 0; j < graph.nodes[i].tasks.length; j++) {
+                  for (let k = 0; k < graph.nodes[i].tasks[j].people.length; k++) {
+                    graph.nodes[i].tasks[j].people[k].hasBeenNotified = true;
+                  }
                 }
               }
             }

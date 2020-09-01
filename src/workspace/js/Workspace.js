@@ -328,19 +328,17 @@ class Workspace extends React.Component {
 
   notifyPeople(nodes) {
     for (let node of nodes) {
-      for (let task of node.tasks) {
-        let userIds = task.people.filter((item) => !item.hasBeenNotified ).map((item) => item.id);
-        Constants.MONDAY_CLIENT.createTask(task.title, userIds).then(() => {
-          console.log("Sent notifications");
-        });
+      if (node.tasks) {
+        for (let task of node.tasks) {
+          let userIds = task.people.filter((item) => !item.hasBeenNotified ).map((item) => item.id);
+          Constants.MONDAY_CLIENT.createTask(task.title, userIds);
+        }
       }
     }
   }
 
   saveGraph() {
     let graph = this.getGraphJson();
-
-    console.log(graph.nodes);
 
     if (graph.name === '') {
       this.showAlert('Graph name must be non-empty.', 'warning');
