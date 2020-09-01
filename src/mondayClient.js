@@ -141,3 +141,118 @@ class mondayClient {
 }
 
 export { mondayClient };
+
+//the code below features the above functions except with the monday storage API. 
+//As the monday storage API is currently in BETA, we did not use these functions but instead chose to store data in MongoDB.
+//Once the storage API is no longer in BETA, this code can be implemented
+/*
+    //returns an array containing all graphs saved
+    async getAllGraphs() {
+        const allGraphs = await this.monday.storage.instance.getItem("all_graphs").then(res => {
+            var all = res["data"]["value"];
+            if (all != null) {
+                return all.split(",");
+            }
+            return [];
+        });
+        return allGraphs;
+    }
+
+    //deletes all graphs saved
+    async deleteAllGraphs() {
+        const success = await this.monday.storage.instance.setItem("all_graphs", "null").then(res => {
+            return res["data"]["success"];
+        });
+        return success;
+    }
+
+    //delete the graph by the name graphName
+    async deleteGraph(graphName) {
+        const success = await this.monday.storage.instance.getItem("all_graphs").then(res => {
+            console.log("Deleting graph ", graphName);
+            const data = res["data"];
+            var graphList = data["value"].split(",");
+            graphList.splice(graphList.indexOf(graphName), 1);
+            const graphListString = graphList.toString();
+            this.monday.storage.instance.setItem("all_graphs", graphListString);
+            this.monday.storage.instance.setItem(graphName, "null");
+            this.notifyServer("delete", { "graphName": graphName });
+            return true;
+        });
+        return success;
+    }
+
+    //returns true/false if a graph is successfully saved. Will save new graphs, if a graph already exists then graph will be updated
+    async saveGraph(graphName, graphJSON) {
+        const success = await this.monday.storage.instance.getItem("all_graphs").then(res => {
+            const data = res["data"];
+            var graphList = data["value"];
+            if (graphName.includes(",")) {
+                console.log("Invalid graph name, name must not contain any commmas");
+                return false;
+            }
+            if (data["value"] == null || data["value"].toString().localeCompare("null") === 0) {
+                this.monday.storage.instance.setItem("all_graphs", graphName);
+                console.log("Adding ", graphName, " as first graph of graph list");
+                return true;
+            } else {
+                if (graphList.split(",").includes(graphName)) {
+                    console.log("Updating graph " + graphName);
+                } else {
+                    graphList = graphList + "," + graphName;
+                    console.log("Adding ", graphName, " to graph list");
+                    this.monday.storage.instance.setItem("all_graphs", graphList);
+                }
+                const graphJSONString = JSON.stringify(graphJSON);
+                this.monday.storage.instance.setItem(graphName, graphJSONString);
+                this.notifyServer("save", { "graphName": graphName });
+                return true;
+            }
+        });
+        return success;
+    }
+
+    //returns JSON data of graph
+    async getGraph(graphName) {
+        const graphJSON = await this.monday.storage.instance.getItem(graphName).then(res => {
+            const graph = (res["data"]["value"]);
+            return graph;
+        });
+        this.notifyServer("load", { "graphName": graphName });
+        return JSON.parse(graphJSON);
+    }
+
+    async renameGraph(oldName, newName){
+        const graphJSON = this.getGraph(oldName);
+        this.saveGraph(newName, graphJSON);
+        await this.sleep(10000);
+        this.deleteGraph(oldName);
+        this.notifyServer("rename", { "oldName": oldName, "newName": newName });
+    }
+
+    //checks if there is a graph by the name of graphName
+    async containsGraph(graphName) {
+        const contains = await this.monday.storage.instance.getItem(graphName).then(res => {
+            if (res["data"] == null || !res["data"]["success"]){
+                return false;
+            } else {
+                return true;
+            }
+        });
+        return contains;
+    }
+
+    async setAllGraphs() {
+        const success = await this.containsGraph("all_graphs").then(res => {
+            if (res === false) {
+                this.monday.storage.instance.setItem("all_graphs", "null");
+                return true;
+            } else {
+                return true;
+            }
+        });
+        return success;
+    }
+}
+
+*/
